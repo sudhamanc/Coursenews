@@ -26,17 +26,17 @@
     "@astrojs/markdown-remark": "^7.2.1",
     "@astrojs/netlify": "^8.1.2",
     "@netlify/blobs": "^10.7.9",
+    "@netlify/functions": "^5.3.0",
     "astro": "^7.1.3",
     "fast-xml-parser": "^5.10.1",
     "isomorphic-dompurify": "^3.19.0",
     "katex": "^0.18.1",
     "rehype-katex": "^7.0.1",
-    "remark-math": "^6.0.0"
+    "remark-math": "^6.0.0",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@netlify/functions": "^5.3.0",
     "netlify-cli": "^26.2.0",
-    "typescript": "^5.9.3",
     "unpdf": "^1.6.2"
   }
 }
