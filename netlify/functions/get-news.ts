@@ -6,11 +6,13 @@
  * headlines and never touches the Anthropic key.
  */
 import type { Handler } from '@netlify/functions';
+import { connectLambda } from '@netlify/blobs';
 import { readLatest } from '../lib/news';
 import { json, error } from '../lib/http';
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'GET') return error(405, 'Method not allowed.');
+  connectLambda(event as any);
 
   try {
     const feed = await readLatest();

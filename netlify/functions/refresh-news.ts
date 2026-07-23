@@ -12,6 +12,7 @@
  * If NEWS_REFRESH_KEY is not set, the endpoint is disabled (503).
  */
 import type { Handler } from '@netlify/functions';
+import { connectLambda } from '@netlify/blobs';
 import { timingSafeEqual } from 'node:crypto';
 import { buildFeed, writeLatest } from '../lib/news';
 import { json, error } from '../lib/http';
@@ -35,6 +36,7 @@ export const handler: Handler = async (event) => {
   const provided = event.headers['x-refresh-key'] || event.queryStringParameters?.key || undefined;
   if (!keyMatches(provided)) return error(401, 'Unauthorized.');
 
+  connectLambda(event as any);
   try {
     const feed = await buildFeed();
     await writeLatest(feed);

@@ -9,6 +9,7 @@
  * history is simply namespaced per browser.
  */
 import type { Handler } from '@netlify/functions';
+import { connectLambda } from '@netlify/blobs';
 import { getVisitorId } from '../lib/identity';
 import { isValidThreadId } from '../lib/validate';
 import {
@@ -44,6 +45,7 @@ function transcriptToText(t: Thread): string {
 }
 
 export const handler: Handler = async (event) => {
+  connectLambda(event as any);
   const visitorId = getVisitorId(event);
   const id = extractThreadId(event.path, event.queryStringParameters);
 

@@ -6,9 +6,11 @@
  * call per run.
  */
 import { schedule } from '@netlify/functions';
+import { connectLambda } from '@netlify/blobs';
 import { buildFeed, writeLatest } from '../lib/news';
 
-export const handler = schedule('0 13 * * *', async () => {
+export const handler = schedule('0 13 * * *', async (event) => {
+  connectLambda(event as any);
   try {
     const feed = await buildFeed();
     await writeLatest(feed);

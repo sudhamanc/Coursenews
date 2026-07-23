@@ -7,6 +7,7 @@
  * per-browser visitor id. The Anthropic API key never leaves this function.
  */
 import type { Handler } from '@netlify/functions';
+import { connectLambda } from '@netlify/blobs';
 import { getVisitorId, getClientIp } from '../lib/identity';
 import { validateChatBody } from '../lib/validate';
 import { consumeDailyQuota } from '../lib/ratelimit';
@@ -27,6 +28,10 @@ const MAX_STORED_MESSAGES = 40; // keep transcripts bounded
 
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return error(405, 'Method not allowed.');
+
+  // Wire the Netlify Blobs context for this Lambda-compat (v1) function.
+  // Without this, getStore() throws MissingBlobsEnvironmentError and nothing persists.
+  connectLambda(event as any);
 
   const visitorId = getVisitorId(event);
 
@@ -94,16 +99,18 @@ export const handler: Handler = async (event) => {
   }
 
   // Persist transcript + index (best-effort; skipped if storage is unavailable).
+  let saved = false;
   if (store) {
     try {
       await writeThread(store, visitorId, thread);
       const index = upsertIndexEntry(await readIndex(store, visitorId), thread);
       await writeIndex(store, visitorId, index);
+      saved = true;
     } catch (err) {
       console.error('blobs write error', err);
       // The reply still succeeds even if persistence fails.
     }
   }
 
-  return json(200, { threadId: thread.id, title: thread.title, reply, remaining: quota.remaining });
+  return json(200, { threadId: thread.id, title: thread.title, reply, remaining: quota.remaining, saved });
 };
