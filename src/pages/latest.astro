@@ -1,0 +1,182 @@
+---
+import Newspaper from '../layouts/Newspaper.astro';
+---
+
+<Newspaper
+  section="latest"
+  title="Latest in AI — The Course Ledger"
+  description="A daily, ranked digest of AI, data, and engineering stories from arXiv and Hacker News."
+>
+  <section>
+    <span class="flag">The Wire</span>
+    <div class="grid grid--lede">
+      <div>
+        <h2 class="headline headline--xl">Latest in AI</h2>
+        <p class="deck">
+          More AI, data, and engineering news breaks each day than anyone can
+          read. This wire pulls from arXiv and Hacker News, then ranks the field
+          by how interesting and useful each story is.
+        </p>
+      </div>
+      <aside class="col-rule">
+        <p class="u-sans u-muted" style="font-size:.74rem;line-height:1.6">
+          Refreshed automatically every day at <strong>13:00 UTC</strong>.
+          Headlines link to the original source; summaries are AI-generated.
+        </p>
+        <p class="u-sans u-muted" id="news-generated" style="font-size:.7rem;margin-top:.5rem"></p>
+      </aside>
+    </div>
+
+    <hr class="rule rule--heavy" />
+
+    <p id="news-loading" class="u-muted">Loading the latest…</p>
+    <p id="news-empty" class="u-muted" hidden>
+      The wire hasn’t been populated yet. Once the daily refresh runs, ranked
+      stories will appear here.
+    </p>
+
+    <ol class="news" id="news-list"></ol>
+    <div class="u-center u-mt">
+      <button type="button" class="dig-deeper" id="news-more" hidden>Show more stories</button>
+    </div>
+  </section>
+</Newspaper>
+
+<script>
+  interface NewsItem {
+    id: string;
+    title: string;
+    url: string;
+    source: string;
+    published: string;
+    points?: number;
+    authors?: string;
+    category?: string;
+    why?: string;
+  }
+
+  const TOP = 12;
+  const list = document.getElementById('news-list') as HTMLOListElement;
+  const loading = document.getElementById('news-loading')!;
+  const empty = document.getElementById('news-empty')!;
+  const moreBtn = document.getElementById('news-more') as HTMLButtonElement;
+  const generated = document.getElementById('news-generated')!;
+
+  const safeHref = (url: string): string | null => {
+    try {
+      const u = new URL(url);
+      return u.protocol === 'http:' || u.protocol === 'https:' ? u.href : null;
+    } catch {
+      return null;
+    }
+  };
+
+  function renderItem(item: NewsItem, rank: number): HTMLLIElement | null {
+    const href = safeHref(item.url);
+    if (!href) return null;
+
+    const li = document.createElement('li');
+    li.className = 'news__item';
+
+    const rankEl = document.createElement('span');
+    rankEl.className = 'news__rank';
+    rankEl.textContent = String(rank);
+
+    const main = document.createElement('div');
+
+    const meta = document.createElement('div');
+    meta.className = 'news__meta';
+    const badge = document.createElement('span');
+    badge.className = 'news__source';
+    badge.textContent = item.source;
+    meta.appendChild(badge);
+    if (item.category) {
+      const cat = document.createElement('span');
+      cat.className = 'news__cat';
+      cat.textContent = item.category;
+      meta.appendChild(cat);
+    }
+    if (typeof item.points === 'number') {
+      const pts = document.createElement('span');
+      pts.className = 'u-muted';
+      pts.textContent = `${item.points} points`;
+      meta.appendChild(pts);
+    }
+
+    const h = document.createElement('h3');
+    h.className = 'headline headline--sm news__title';
+    const a = document.createElement('a');
+    a.href = href;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = item.title;
+    h.appendChild(a);
+
+    main.appendChild(meta);
+    main.appendChild(h);
+
+    if (item.why) {
+      const why = document.createElement('p');
+      why.className = 'news__why';
+      why.textContent = item.why;
+      main.appendChild(why);
+    }
+
+    const foot = document.createElement('p');
+    foot.className = 'news__foot u-muted';
+    const when = new Date(item.published).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    foot.textContent = item.authors ? `${item.authors} · ${when}` : when;
+    main.appendChild(foot);
+
+    li.appendChild(rankEl);
+    li.appendChild(main);
+    return li;
+  }
+
+  async function load() {
+    try {
+      const res = await fetch('/api/news');
+      if (!res.ok) throw new Error(String(res.status));
+      const feed = await res.json();
+      const items: NewsItem[] = Array.isArray(feed.items) ? feed.items : [];
+      loading.hidden = true;
+
+      if (items.length === 0) {
+        empty.hidden = false;
+        return;
+      }
+
+      if (feed.generatedAt) {
+        generated.textContent = `Last updated ${new Date(feed.generatedAt).toLocaleString()}`;
+      }
+
+      let rank = 0;
+      const nodes = items
+        .map((it) => renderItem(it, ++rank))
+        .filter((n): n is HTMLLIElement => n !== null);
+
+      nodes.forEach((n, i) => {
+        if (i >= TOP) n.classList.add('news__item--hidden');
+        list.appendChild(n);
+      });
+
+      if (nodes.length > TOP) {
+        moreBtn.hidden = false;
+        moreBtn.addEventListener('click', () => {
+          list.querySelectorAll('.news__item--hidden').forEach((n) => n.classList.remove('news__item--hidden'));
+          moreBtn.hidden = true;
+        });
+      }
+    } catch {
+      loading.hidden = true;
+      empty.hidden = false;
+      empty.textContent = 'The wire is unavailable right now. Please try again later.';
+    }
+  }
+
+  load();
+</script>

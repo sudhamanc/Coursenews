@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import Newspaper from '../layouts/Newspaper.astro';
+import { COURSES } from '../lib/courses';
+
+const articles = await getCollection('articles');
+const featuresFor = (slug: string) =>
+  articles
+    .filter((a) => a.data.course === slug)
+    .sort((a, b) => a.data.order - b.data.order);
+const lecturePath = (a: (typeof articles)[number]) =>
+  `/courses/${a.data.course}/${a.id.split('/').pop()}`;
+
+const desks = COURSES.map((c) => {
+  const features = featuresFor(c.slug);
+  return { course: c, count: features.length, preview: features.slice(0, 3) };
+});
+---
+
+<Newspaper section="home">
+  <section>
+    <span class="flag">From the Desk</span>
+    <div class="grid grid--lede">
+      <div>
+        <h2 class="headline headline--xl">
+          Four Courses, One Newsroom: The Concepts Behind Modern AI
+        </h2>
+        <p class="deck">
+          A running broadsheet that turns lecture material into readable,
+          in-depth features — and lets you interrogate any idea in the margin.
+        </p>
+      </div>
+      <aside class="col-rule">
+        <span class="flag">The Masthead</span>
+        <p class="u-sans u-muted" style="font-size:.8rem;line-height:1.6">
+          Every article is written from the lecture material itself, with the key
+          terms pulled into the margin. The <em>Latest in AI</em> wire rounds up
+          fresh work from arXiv and Hacker News each day.
+        </p>
+        <p class="u-sans" style="font-size:.8rem">
+          <a href="/latest">Read today’s wire →</a>
+        </p>
+      </aside>
+    </div>
+
+    <hr class="rule rule--heavy" />
+
+    <span class="flag">The Desks</span>
+    <div class="grid grid--2 desks">
+      {
+        desks.map(({ course, count, preview }) => (
+          <article class="desk">
+            <h3 class="headline headline--md">
+              <a href={`/courses/${course.slug}`}>{course.title}</a>
+            </h3>
+            <p class="card__excerpt">{course.blurb}</p>
+            {preview.length > 0 && (
+              <ul class="desk__list">
+                {preview.map((a) => (
+                  <li>
+                    <a href={lecturePath(a)}>
+                      <span class="desk__lecture u-muted">{a.data.lectureId}</span>
+                      {' '}{a.data.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p>
+              <a class="readmore" href={`/courses/${course.slug}`}>
+                All {count} features →
+              </a>
+            </p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</Newspaper>

@@ -1,0 +1,75 @@
+---
+import '../styles/newspaper.css';
+import 'katex/dist/katex.min.css';
+import { COURSES } from '../lib/courses';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  /** Section flag shown in nav highlight, e.g. a course slug or "latest". */
+  section?: string;
+}
+
+const {
+  title = 'The Course Ledger',
+  description = 'A newspaper of the AI, machine-learning, and data-science concepts from my Drexel coursework — explained in depth.',
+  section,
+} = Astro.props;
+
+const now = new Date();
+const dateLine = now.toLocaleDateString('en-US', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light dark" />
+    <title>{title}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <div class="paper">
+      <header class="masthead">
+        <div class="masthead__kicker">Vol. I · Drexel University · Artificial Intelligence Desk</div>
+        <h1 class="masthead__title"><a href="/" style="color:inherit;border:none;">The Course Ledger</a></h1>
+        <div class="masthead__dateline">
+          <span>{dateLine}</span>
+          <span>Concepts, Explained</span>
+          <span>Price: Your Curiosity</span>
+        </div>
+      </header>
+
+      <nav class="topnav" aria-label="Sections">
+        <a href="/" aria-current={section === 'home' ? 'page' : undefined}>Front Page</a>
+        {
+          COURSES.map((c) => (
+            <a
+              href={`/courses/${c.slug}`}
+              aria-current={section === c.slug ? 'page' : undefined}
+            >
+              {c.shortTitle}
+            </a>
+          ))
+        }
+        <a href="/latest" aria-current={section === 'latest' ? 'page' : undefined}>Latest in AI</a>
+      </nav>
+      <hr class="rule rule--heavy" />
+
+      <main>
+        <slot />
+      </main>
+
+      <footer class="footer">
+        <p>The Course Ledger — compiled from lecture material for study and review.</p>
+      </footer>
+    </div>
+  </body>
+</html>

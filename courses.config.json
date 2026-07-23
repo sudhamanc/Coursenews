@@ -1,0 +1,33 @@
+{
+  "$schema": "./courses.schema.json",
+  "courses": [
+    {
+      "slug": "applications-of-ml",
+      "title": "Applications of Machine Learning",
+      "shortTitle": "Applications of ML",
+      "dir": "ApplicationsofML",
+      "blurb": "Computer vision, natural language, transformers, diffusion, and reinforcement learning — machine learning put to work."
+    },
+    {
+      "slug": "applied-ai",
+      "title": "Applied AI",
+      "shortTitle": "Applied AI",
+      "dir": "AppliedAI",
+      "blurb": "INFO 629/686 — foundations and applied techniques across the modern artificial-intelligence landscape."
+    },
+    {
+      "slug": "applied-ml-data-science",
+      "title": "Applied Machine Learning for Data Science",
+      "shortTitle": "Applied ML for Data Science",
+      "dir": "AppliedMachineLearningforDataScience",
+      "blurb": "Practical, end-to-end machine-learning workflows for the working data scientist."
+    },
+    {
+      "slug": "human-ai",
+      "title": "Human-AI Interaction",
+      "shortTitle": "Human-AI",
+      "dir": "HumanAI",
+      "blurb": "Designing systems where people and artificial intelligence collaborate effectively and responsibly."
+    }
+  ]
+}

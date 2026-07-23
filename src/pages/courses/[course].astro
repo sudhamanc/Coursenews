@@ -1,0 +1,98 @@
+---
+import { getCollection } from 'astro:content';
+import Newspaper from '../../layouts/Newspaper.astro';
+import { COURSES, COURSE_BY_SLUG } from '../../lib/courses';
+
+export async function getStaticPaths() {
+  return COURSES.map((course) => ({
+    params: { course: course.slug },
+    props: { course },
+  }));
+}
+
+const { course } = Astro.props;
+
+const articles = (await getCollection('articles'))
+  .filter((a) => a.data.course === course.slug)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const lecturePath = (a: (typeof articles)[number]) =>
+  `/courses/${course.slug}/${a.id.split('/').pop()}`;
+
+const [lead, ...rest] = articles;
+---
+
+<Newspaper
+  section={course.slug}
+  title={`${course.title} — The Course Ledger`}
+  description={course.blurb}
+>
+  <section>
+    <span class="flag">{course.shortTitle} Desk</span>
+    <h2 class="headline headline--xl">{course.title}</h2>
+    <p class="deck">{course.blurb}</p>
+    <hr class="rule rule--thin" />
+
+    {articles.length === 0 && <p class="u-muted">No features filed on this desk yet.</p>}
+
+    {
+      lead && (
+        <article class="lede-story">
+          <div class="byline">
+            {lead.data.lectureId} · Feature
+            {lead.data.readingTime ? ` · ${lead.data.readingTime} min read` : ''}
+          </div>
+          <h3 class="headline headline--lg">
+            <a href={lecturePath(lead)}>{lead.data.title}</a>
+          </h3>
+          <p class="deck">{lead.data.deck}</p>
+          {lead.data.concepts.length > 0 && (
+            <p class="u-sans u-muted lede-story__concepts">
+              Inside:{' '}
+              {lead.data.concepts.slice(0, 5).map((c, i) => (
+                <>
+                  {i > 0 ? ' · ' : ''}
+                  {c.term}
+                </>
+              ))}
+            </p>
+          )}
+          <p>
+            <a class="readmore" href={lecturePath(lead)}>
+              Read the feature →
+            </a>
+          </p>
+        </article>
+      )
+    }
+
+    {
+      rest.length > 0 && (
+        <>
+          <hr class="rule" />
+          <div class="grid grid--3">
+            {rest.map((a) => (
+              <article class="card">
+                <div class="byline">
+                  {a.data.lectureId}
+                  {a.data.readingTime ? ` · ${a.data.readingTime} min` : ''}
+                </div>
+                <h3 class="headline headline--sm">
+                  <a href={lecturePath(a)}>{a.data.title}</a>
+                </h3>
+                <p class="card__excerpt">{a.data.deck}</p>
+                {a.data.tags.length > 0 && (
+                  <div class="tag-row">
+                    {a.data.tags.slice(0, 3).map((t) => (
+                      <span class="tag">{t}</span>
+                    ))}
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+        </>
+      )
+    }
+  </section>
+</Newspaper>

@@ -1,0 +1,142 @@
+---
+import { getCollection, render } from 'astro:content';
+import Newspaper from '../../../layouts/Newspaper.astro';
+import ConceptChat from '../../../components/ConceptChat.astro';
+import { COURSE_BY_SLUG } from '../../../lib/courses';
+
+export async function getStaticPaths() {
+  const articles = await getCollection('articles');
+  return articles.map((entry) => ({
+    params: { course: entry.data.course, lecture: entry.id.split('/').pop()! },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const course = COURSE_BY_SLUG[entry.data.course];
+const { Content } = await render(entry);
+
+// Sibling lectures for prev/next navigation within the course.
+const siblings = (await getCollection('articles'))
+  .filter((a) => a.data.course === entry.data.course)
+  .sort((a, b) => a.data.order - b.data.order);
+const idx = siblings.findIndex((a) => a.id === entry.id);
+const prev = idx > 0 ? siblings[idx - 1] : null;
+const next = idx < siblings.length - 1 ? siblings[idx + 1] : null;
+const slugOf = (a: (typeof siblings)[number]) => a.id.split('/').pop();
+
+const dateLine = entry.data.date
+  ? entry.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  : null;
+---
+
+<Newspaper
+  section={entry.data.course}
+  title={`${entry.data.title} — The Course Ledger`}
+  description={entry.data.deck}
+>
+  <div class="feature">
+    <nav class="crumbs u-sans">
+      <a href={`/courses/${course.slug}`}>{course.shortTitle} Desk</a>
+      <span aria-hidden="true"> / </span>
+      <span class="u-muted">{entry.data.lectureId}</span>
+    </nav>
+
+    <article class="article">
+      <span class="flag">{course.shortTitle} · Feature</span>
+      <h1 class="headline headline--xl">{entry.data.title}</h1>
+      <p class="deck">{entry.data.deck}</p>
+      <div class="byline article__byline">
+        {entry.data.lectureId}
+        {dateLine ? ` · ${dateLine}` : ''}
+        {entry.data.readingTime ? ` · ${entry.data.readingTime} min read` : ''}
+      </div>
+
+      {
+        entry.data.tags.length > 0 && (
+          <div class="tag-row article__tags">
+            {entry.data.tags.map((t) => (
+              <span class="tag">{t}</span>
+            ))}
+          </div>
+        )
+      }
+
+      <hr class="rule rule--thin" />
+
+      <div class="feature__grid">
+        <div class="article__body">
+          <Content />
+
+          <hr class="rule" />
+          <div class="feature__cta">
+            <button
+              type="button"
+              class="dig-deeper dig-deeper--primary"
+              data-concept-id=""
+              data-concept-term={entry.data.title}
+            >
+              Dig deeper on this feature →
+            </button>
+            <p class="u-muted u-sans" style="font-size:.72rem;margin:.5rem 0 0">
+              Opens an on-call assistant. Sign in to ask questions.
+            </p>
+          </div>
+        </div>
+
+        {
+          entry.data.concepts.length > 0 && (
+            <aside class="keyterms col-rule">
+              <span class="flag">Key Terms</span>
+              <dl class="keyterms__list">
+                {entry.data.concepts.map((c) => (
+                  <div class="keyterms__item" id={`term-${c.id}`}>
+                    <dt class="keyterms__term">{c.term}</dt>
+                    <dd class="keyterms__def">{c.definition}</dd>
+                    <button
+                      type="button"
+                      class="dig-deeper"
+                      data-concept-id={c.id}
+                      data-concept-term={c.term}
+                    >
+                      Dig deeper ↗
+                    </button>
+                  </div>
+                ))}
+              </dl>
+            </aside>
+          )
+        }
+      </div>
+    </article>
+
+    <nav class="feature__nav" aria-label="Adjacent features">
+      {
+        prev ? (
+          <a class="feature__navlink" href={`/courses/${course.slug}/${slugOf(prev)}`}>
+            <span class="u-muted u-sans">← {prev.data.lectureId}</span>
+            <span>{prev.data.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+      {
+        next ? (
+          <a class="feature__navlink feature__navlink--next" href={`/courses/${course.slug}/${slugOf(next)}`}>
+            <span class="u-muted u-sans">{next.data.lectureId} →</span>
+            <span>{next.data.title}</span>
+          </a>
+        ) : (
+          <span />
+        )
+      }
+    </nav>
+  </div>
+
+  <ConceptChat
+    course={entry.data.course}
+    lectureId={entry.data.lectureId}
+    lectureTitle={entry.data.title}
+  />
+</Newspaper>

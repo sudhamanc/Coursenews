@@ -1,0 +1,31 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+.astro/
+
+# netlify
+.netlify/
+
+# local dev server controller (scripts/serve.sh)
+.dev-server.pid
+.dev-server.log
+
+# environment / secrets — NEVER commit real keys
+.env
+.env.*
+!.env.example
+
+# intermediate PDF-extracted text (regenerable via `npm run extract`)
+content/_extracted/
+
+# source lecture PDFs — kept local (copyrighted material); not published.
+# The deployed site renders the authored articles in src/content/articles/ and
+# does not need these. Drop your own PDFs here and run `npm run extract`.
+Documents/
+
+# os / editor
+.DS_Store
+*.log
+npm-debug.log*

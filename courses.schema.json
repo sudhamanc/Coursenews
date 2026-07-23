@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Course Ledger — courses configuration",
+  "description": "Single source of truth for the courses in the site. Add or edit an entry here to add/rename a course; then drop the source PDFs in Documents/<dir>/ and run `npm run extract`.",
+  "type": "object",
+  "required": ["courses"],
+  "properties": {
+    "courses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["slug", "title", "shortTitle", "dir", "blurb"],
+        "additionalProperties": false,
+        "properties": {
+          "slug": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "description": "URL-safe identifier, e.g. `applied-ai`. Used in routes and validated server-side."
+          },
+          "title": { "type": "string", "description": "Full display title." },
+          "shortTitle": { "type": "string", "description": "Compact title for nav and cards." },
+          "dir": {
+            "type": "string",
+            "description": "Source folder name under `Documents/` holding this course's PDFs."
+          },
+          "blurb": { "type": "string", "description": "One-line standfirst shown on the section front." }
+        }
+      }
+    }
+  }
+}

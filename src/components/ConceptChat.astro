@@ -1,0 +1,312 @@
+---
+/**
+ * ConceptChat — the "Dig deeper" chat island.
+ *
+ * Renders a slide-in panel plus a thread-history drawer. It does NOT talk to
+ * Anthropic directly; it POSTs to the Netlify Function proxy at `/api/chat`
+ * (and `/api/threads`), attaching the Netlify Identity JWT. The API key lives
+ * only in the function environment.
+ *
+ * Lecture context is passed via data-* attributes and read by the client script.
+ * "Dig deeper" trigger buttons live in the page and carry `data-concept-*`;
+ * this component listens for clicks on `.dig-deeper`.
+ */
+export interface Props {
+  course: string;
+  lectureId: string;
+  lectureTitle: string;
+}
+const { course, lectureId, lectureTitle } = Astro.props;
+---
+
+<div
+  id="concept-chat"
+  class="chat"
+  data-course={course}
+  data-lecture-id={lectureId}
+  data-lecture-title={lectureTitle}
+  hidden
+>
+  <div class="chat__scrim" data-close></div>
+  <aside class="chat__panel" role="dialog" aria-modal="true" aria-label="Dig deeper chat">
+    <header class="chat__head">
+      <div>
+        <span class="flag" style="margin:0">Dig Deeper</span>
+        <p class="chat__subject" id="chat-subject">Ask about this feature</p>
+      </div>
+      <div class="chat__head-actions">
+        <button type="button" class="chat__btn" data-view="history" title="Past conversations">History</button>
+        <button type="button" class="chat__btn" data-view="new" title="New conversation">New</button>
+        <button type="button" class="chat__btn chat__btn--close" data-close aria-label="Close">✕</button>
+      </div>
+    </header>
+
+    <!-- Conversation view -->
+    <div class="chat__body" data-pane="chat">
+      <ol class="chat__log" id="chat-log" aria-live="polite"></ol>
+      <form class="chat__form" id="chat-form">
+        <label class="u-sans u-muted" for="chat-input" style="font-size:.7rem">Your question</label>
+        <textarea
+          id="chat-input"
+          name="message"
+          rows="3"
+          maxlength="4000"
+          placeholder="e.g. Explain self-attention with a small example…"
+          required></textarea>
+        <div class="chat__form-row">
+          <span class="chat__hint u-muted" id="chat-status"></span>
+          <button type="submit" class="chat__send" id="chat-send">Ask</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- History view -->
+    <div class="chat__body" data-pane="history" hidden>
+      <p class="u-sans u-muted" style="font-size:.72rem;margin-top:0">
+        Your saved conversations, newest first.
+      </p>
+      <ul class="chat__threads" id="chat-threads"></ul>
+      <p class="u-muted" id="chat-threads-empty" hidden>No saved conversations yet.</p>
+    </div>
+  </aside>
+</div>
+
+<script>
+  type ChatMsg = { role: 'user' | 'assistant'; content: string };
+
+  const root = document.getElementById('concept-chat');
+  if (root) {
+    const course = root.dataset.course!;
+    const lectureId = root.dataset.lectureId!;
+    const lectureTitle = root.dataset.lectureTitle!;
+
+    const panelSubject = document.getElementById('chat-subject')!;
+    const log = document.getElementById('chat-log') as HTMLOListElement;
+    const form = document.getElementById('chat-form') as HTMLFormElement;
+    const input = document.getElementById('chat-input') as HTMLTextAreaElement;
+    const sendBtn = document.getElementById('chat-send') as HTMLButtonElement;
+    const statusEl = document.getElementById('chat-status')!;
+    const threadsEl = document.getElementById('chat-threads') as HTMLUListElement;
+    const threadsEmpty = document.getElementById('chat-threads-empty')!;
+
+    let threadId: string | null = null;
+    let concept: { id: string; term: string } | null = null;
+    let busy = false;
+
+    // Anonymous per-browser id so chat history persists without a login.
+    function visitorId(): string {
+      try {
+        let v = localStorage.getItem('cl:visitor');
+        if (!v || !/^[A-Za-z0-9_-]{1,80}$/.test(v)) {
+          v = (crypto.randomUUID?.() ?? `v-${Date.now()}-${Math.random().toString(36).slice(2)}`).slice(0, 80);
+          localStorage.setItem('cl:visitor', v);
+        }
+        return v;
+      } catch {
+        return 'anon';
+      }
+    }
+    const reqHeaders = (extra: Record<string, string> = {}) => ({
+      'X-Visitor-Id': visitorId(),
+      ...extra,
+    });
+
+    function setPane(name: 'chat' | 'history') {
+      root!.querySelectorAll<HTMLElement>('[data-pane]').forEach((el) => {
+        el.hidden = el.dataset.pane !== name;
+      });
+    }
+
+    function escapeHtml(s: string) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function addMessage(m: ChatMsg) {
+      const li = document.createElement('li');
+      li.className = `chat__msg chat__msg--${m.role}`;
+      li.innerHTML = `<span class="chat__role">${m.role === 'user' ? 'You' : 'The Desk'}</span>
+        <div class="chat__bubble">${escapeHtml(m.content)}</div>`;
+      log.appendChild(li);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function openPanel(seed?: { id: string; term: string }) {
+      concept = seed ?? null;
+      panelSubject.textContent = seed ? `On: ${seed.term}` : `On: ${lectureTitle}`;
+      root!.hidden = false;
+      document.body.style.overflow = 'hidden';
+      setPane('chat');
+      input.focus();
+    }
+
+    function closePanel() {
+      root!.hidden = true;
+      document.body.style.overflow = '';
+    }
+
+    function startNew() {
+      threadId = null;
+      log.innerHTML = '';
+      statusEl.textContent = '';
+      setPane('chat');
+      if (concept) {
+        input.value = `Explain "${concept.term}" in more depth.`;
+      }
+      input.focus();
+    }
+
+    // Trigger buttons anywhere in the page.
+    document.querySelectorAll<HTMLElement>('.dig-deeper').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.conceptId || '';
+        const term = btn.dataset.conceptTerm || '';
+        openPanel(id ? { id, term } : undefined);
+        startNew();
+      });
+    });
+
+    root.querySelectorAll('[data-close]').forEach((el) =>
+      el.addEventListener('click', closePanel),
+    );
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !root!.hidden) closePanel();
+    });
+
+    root.querySelector('[data-view="new"]')!.addEventListener('click', startNew);
+    root.querySelector('[data-view="history"]')!.addEventListener('click', loadThreads);
+
+    async function loadThreads() {
+      setPane('history');
+      threadsEl.innerHTML = '';
+      threadsEmpty.hidden = true;
+      try {
+        const res = await fetch('/api/threads', { headers: reqHeaders() });
+        if (!res.ok) throw new Error(String(res.status));
+        const data = await res.json();
+        const items: any[] = data.threads || [];
+        if (items.length === 0) {
+          threadsEmpty.hidden = false;
+          threadsEmpty.textContent = 'No saved conversations yet.';
+          return;
+        }
+        for (const t of items) {
+          const li = document.createElement('li');
+          const when = new Date(t.updatedAt || t.createdAt).toLocaleString();
+          li.className = 'chat__thread-row';
+          li.innerHTML = `<button class="chat__thread" data-open="${escapeHtml(t.id)}">
+            <span class="chat__thread-title">${escapeHtml(t.title || 'Untitled')}</span>
+            <span class="chat__thread-date u-muted">${escapeHtml(when)}</span>
+          </button>
+          <div class="chat__thread-actions">
+            <button class="chat__mini" data-download="${escapeHtml(t.id)}">Download</button>
+            <button class="chat__mini chat__mini--danger" data-delete="${escapeHtml(t.id)}">Delete</button>
+          </div>`;
+          li.querySelector('[data-open]')!.addEventListener('click', () => openThread(t.id));
+          li.querySelector('[data-download]')!.addEventListener('click', () => downloadThread(t.id));
+          li.querySelector('[data-delete]')!.addEventListener('click', () => deleteThread(t.id, li));
+          threadsEl.appendChild(li);
+        }
+      } catch {
+        threadsEmpty.hidden = false;
+        threadsEmpty.textContent = 'Could not load conversations.';
+      }
+    }
+
+    async function downloadThread(id: string) {
+      try {
+        const res = await fetch(`/api/threads/${encodeURIComponent(id)}?format=txt`, { headers: reqHeaders() });
+        if (!res.ok) throw new Error(String(res.status));
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `conversation-${id}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch {
+        statusEl.textContent = 'Could not download that conversation.';
+      }
+    }
+
+    async function deleteThread(id: string, row: HTMLElement) {
+      try {
+        const res = await fetch(`/api/threads/${encodeURIComponent(id)}`, {
+          method: 'DELETE',
+          headers: reqHeaders(),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        row.remove();
+        if (threadId === id) startNew();
+        if (!threadsEl.children.length) {
+          threadsEmpty.hidden = false;
+          threadsEmpty.textContent = 'No saved conversations yet.';
+        }
+      } catch {
+        statusEl.textContent = 'Could not delete that conversation.';
+      }
+    }
+
+    async function openThread(id: string) {
+      try {
+        const res = await fetch(`/api/threads/${encodeURIComponent(id)}`, { headers: reqHeaders() });
+        if (!res.ok) throw new Error(String(res.status));
+        const data = await res.json();
+        threadId = data.id;
+        log.innerHTML = '';
+        (data.messages || []).forEach(addMessage);
+        panelSubject.textContent = data.title ? `Thread: ${data.title}` : panelSubject.textContent;
+        setPane('chat');
+      } catch {
+        statusEl.textContent = 'Could not open that conversation.';
+      }
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (busy) return;
+      const message = input.value.trim();
+      if (!message) return;
+
+      busy = true;
+      sendBtn.disabled = true;
+      statusEl.textContent = 'Thinking…';
+      addMessage({ role: 'user', content: message });
+      input.value = '';
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: reqHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({
+            message,
+            threadId,
+            context: { course, lectureId, lectureTitle, conceptId: concept?.id, conceptTerm: concept?.term },
+          }),
+        });
+
+        if (res.status === 429) {
+          statusEl.textContent = 'Rate limit reached. Please try again later.';
+          return;
+        }
+        if (!res.ok) throw new Error(String(res.status));
+
+        const data = await res.json();
+        threadId = data.threadId || threadId;
+        addMessage({ role: 'assistant', content: data.reply ?? '(no reply)' });
+        statusEl.textContent = '';
+      } catch {
+        statusEl.textContent = 'Something went wrong. Please try again.';
+      } finally {
+        busy = false;
+        sendBtn.disabled = false;
+      }
+    });
+
+    // Expose opener for any external trigger if needed.
+    (window as any).openConceptChat = openPanel;
+  }
+</script>
