@@ -191,6 +191,7 @@ Environment variables (see [`.env.example`](.env.example)):
 | `NEWS_MODEL`           | no       | `claude-haiku-4-5` | News-ranking model id.                     |
 | `CHAT_DAILY_CAP`       | no       | `100`              | Max chat messages per client IP per day.   |
 | `CHAT_MAX_INPUT_CHARS` | no       | `4000`             | Max characters per chat message.           |
+| `NEWS_REFRESH_KEY`     | no       | — (disabled)       | Secret enabling on-demand `GET /api/refresh-news?key=…`. |
 
 Locally these come from `.env`. In production they're set in the Netlify UI.
 
@@ -207,11 +208,12 @@ publish dir, functions dir, redirects, security headers). Deploy either way:
    the defaults.
 3. **Site configuration → Environment variables** → add `ANTHROPIC_API_KEY`
    (scope: **Functions**). Optionally add `CHAT_MODEL`, `NEWS_MODEL`,
-   `CHAT_DAILY_CAP`, `CHAT_MAX_INPUT_CHARS`.
+   `CHAT_DAILY_CAP`, `CHAT_MAX_INPUT_CHARS`, `NEWS_REFRESH_KEY`.
 4. **Blobs** — no setup needed; it's provisioned automatically for the site.
 5. **Scheduled function** — `news-refresh` self-registers to run daily at
-   **13:00 UTC**. After the first deploy, seed the wire once via
-   **Site → Functions → `news-refresh` → Run now** (or wait for the first run).
+   **13:00 UTC**. To populate the wire immediately, set `NEWS_REFRESH_KEY` (a long
+   random string) and call `https://<your-site>/api/refresh-news?key=<secret>`
+   once (or just wait for the first scheduled run).
 6. Deploy. Every push to the production branch redeploys.
 
 ### Option B — CLI

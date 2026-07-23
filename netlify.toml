@@ -29,6 +29,12 @@
   to = "/.netlify/functions/get-news"
   status = 200
 
+# On-demand "Latest in AI" refresh (secret-protected; see refresh-news.ts).
+[[redirects]]
+  from = "/api/refresh-news"
+  to = "/.netlify/functions/refresh-news"
+  status = 200
+
 # Security headers + CSP (Phase 6).
 #
 # Notes:
