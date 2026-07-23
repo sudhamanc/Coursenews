@@ -4,7 +4,9 @@
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "20"
+  # Astro 7 requires Node >= 22.12.0. (If a NODE_VERSION is also set in the
+  # Netlify UI, it overrides this value — keep them in sync.)
+  NODE_VERSION = "22"
 
 # Friendly API paths -> Netlify Functions.
 [[redirects]]
