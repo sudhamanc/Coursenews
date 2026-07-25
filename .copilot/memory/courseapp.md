@@ -19,7 +19,7 @@ NO RAG. Articles authored directly (no build-time API cost).
 - applications-of-ml  -> Documents/ApplicationsofML (10 PDFs: L01-L11, no L04)
 - applied-ai          -> Documents/AppliedAI (9 PDFs: Week 1-9)
 - applied-ml-data-science -> Documents/AppliedMachineLearningforDataScience (10: Lecture_02-10, Week1LectureSlides)
-- human-ai            -> Documents/HumanAI (4 PDFs: week1-4)
+- human-ai            -> Documents/HumanAI (5 PDFs: week1-4 + HumanValuesforAIWeek5Readings)
 
 ## Toolchain gotchas (VERIFIED)
 - npm cache ~/.npm is root-owned in sandbox -> use `export npm_config_cache="$TMPDIR/courseapp-npm-cache"` before npm install
@@ -205,6 +205,23 @@ NO RAG. Articles authored directly (no build-time API cost).
   paper, only shown on hover (:hover set --accent); fine in dark theme. Fix: add `color: var(--ink);`
   to `.chat__thread`. LESSON: always give <button>-based text an explicit themed color; never rely on
   inherited/UA button color, or it breaks when the site theme and OS theme disagree.
+
+## New content: human-ai Week 5 — Information Architecture (this session)
+- User added Documents/HumanAI/HumanValuesforAIWeek5Readings.pdf (160p) + "update the app"; then clarified the
+  Week 5 topic is INFORMATION ARCHITECTURE and to also pull from NN/g's IA study guide
+  (https://www.nngroup.com/articles/ia-study-guide/).
+- MISMATCH: that PDF's 3 papers are about human VALUES/ETHICS for AI, not classic IA: (1) "A Mulching Proposal"
+  (Keyes et al., CHI'19) satire — the FAT checklist can bless a monstrous system; (2) TikTok mini-review —
+  algorithms shaping identity/values (algorithmic literacy, folk theories, identity strainer, algorithmized self);
+  (3) Varanasi & Goyal "It is currently hodgepodge" (CHI'23) — RAI values hard to operationalize, "value levers".
+- RESOLUTION: wrote src/content/articles/human-ai/week5-haii.md as an IA feature grounded in NN/g (IA vs
+  navigation; 4 systems organization/labeling/navigation/search; findability vs discoverability; information
+  scent; flat vs deep + 3-click-rule-false + polyhierarchy; card sorting + tree testing / mental models) that
+  PIVOTS to the readings as the responsible/values lens (taxonomy -> personalized p(item|you) feed; FAT critique;
+  value levers). order:5, lectureId W5, 7 concepts, 3 inline SVG diagrams (markers arw-ia-nav, arw-feed), KaTeX.
+  Build EXIT 0; dist page = 3 figures + katex; human-ai front lists it (now 5 weeks; 34 articles total).
+- Delta pipeline: `npm run extract -- human-ai` (only new PDF -> humanvaluesforaiweek5readings.txt). Article named
+  week5-haii.md for URL consistency (extract .txt slug != article slug is fine; article file path drives the URL).
 
 ## Reusable/shareable refactor (this session)
 - SINGLE SOURCE OF TRUTH: courses.config.json (repo root) + courses.schema.json. Consumed by
