@@ -12,7 +12,7 @@ import { getStore, type Store } from '@netlify/blobs';
 const DAILY_CAP = Number(process.env.CHAT_DAILY_CAP || 100);
 
 function rateStore(): Store {
-  return getStore({ name: 'rate-limits', consistency: 'strong' });
+  return getStore('rate-limits');
 }
 
 function todayKey(identifier: string): string {

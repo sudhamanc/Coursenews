@@ -45,9 +45,9 @@ export interface ThreadIndex {
   threads: IndexEntry[];
 }
 
-/** Strong consistency so a freshly written thread is immediately listable. */
+/** The site-wide store holding chat threads (persists across deploys). */
 export function threadsStore(): Store {
-  return getStore({ name: 'chat-threads', consistency: 'strong' });
+  return getStore('chat-threads');
 }
 
 export const indexKey = (userId: string) => `user/${userId}/index.json`;

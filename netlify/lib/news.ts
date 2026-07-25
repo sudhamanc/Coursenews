@@ -35,7 +35,7 @@ const WINDOW_MS = 48 * 60 * 60 * 1000;
 const RELEVANCE = /\b(ai|artificial intelligence|machine learning|ml|deep learning|neural|llm|language model|transformer|gpt|diffusion|reinforcement|dataset|database|vector|embedding|inference|training|fine-?tun|agent|rag|multimodal|open-?source model)\b/i;
 
 export function newsStore(): Store {
-  return getStore({ name: 'news', consistency: 'strong' });
+  return getStore('news');
 }
 
 export async function readLatest(): Promise<NewsFeed | null> {
