@@ -878,6 +878,7 @@ img {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
+  color: var(--ink);
 }
 .chat__thread:hover .chat__thread-title {
   color: var(--accent);

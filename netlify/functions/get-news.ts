@@ -17,7 +17,7 @@ export const handler: Handler = async (event) => {
   try {
     const feed = await readLatest();
     return json(200, feed ?? { generatedAt: null, items: [] }, {
-      'Cache-Control': 'public, max-age=300, stale-while-revalidate=1800',
+      'Cache-Control': 'public, max-age=120, stale-while-revalidate=600',
     });
   } catch (err) {
     console.error('get-news error', err);
