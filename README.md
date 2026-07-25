@@ -35,11 +35,15 @@ it at your own PDFs, edit one config file, and you have your own edition.
   and themed inline SVG diagrams (light/dark aware).
 - **Newspaper UI** — front page, per-course section fronts, feature pages with a
   Key Terms rail.
+- **Reader themes** — a light default styled after the *Financial Times* (salmon
+  paper, claret flags, Oxford-blue links) with a one-click light/dark toggle,
+  remembered per browser.
 - **"Dig deeper" chat** — a Netlify Function proxies to Claude Haiku; the API key
   never reaches the browser. Conversations are saved and can be reopened,
   downloaded, or deleted.
-- **Latest in AI** — a scheduled function pulls arXiv + Hacker News daily, ranks
-  them with one Haiku call, and caches the feed.
+- **Latest in AI** — a scheduled function pulls fresh work from arXiv (RSS) and
+  Hacker News daily, keeps a balanced mix from each source, ranks them with one
+  Haiku call, and caches the feed.
 - **Incremental content pipeline** — adding lectures or a course is a delta, never
   a full rebuild.
 - **Scripted lifecycle** — setup, start/stop (with port cleanup), build, deploy.
@@ -74,11 +78,11 @@ shared by the site, the extraction script, and the Functions.
 | Storage     | Netlify Blobs                                                     |
 | LLM         | Anthropic Claude Haiku (`@anthropic-ai/sdk`)                      |
 | PDF text    | `unpdf`                                                           |
-| News        | arXiv Atom API + Hacker News (Algolia) via `fast-xml-parser`     |
+| News        | arXiv RSS feed + Hacker News (Algolia) via `fast-xml-parser`     |
 
 ## Prerequisites
 
-- **Node.js ≥ 20** and npm.
+- **Node.js ≥ 22.12** (required by Astro 7) and npm.
 - An **Anthropic API key** (for chat + news ranking) — [console.anthropic.com](https://console.anthropic.com).
 - A **Netlify account** (for deploy). The Netlify CLI is installed as a dev
   dependency, so no global install is needed.
@@ -122,6 +126,7 @@ courses.config.json        # SINGLE SOURCE OF TRUTH for courses (slug, dir, titl
 courses.schema.json        # JSON schema for the above (editor validation)
 netlify.toml               # build, functions dir, redirects, security headers/CSP
 astro.config.mjs           # Astro config (KaTeX pipeline, Netlify adapter)
+.copilot/memory/           # assistant repo memory (version-controlled project notes)
 Documents/<Course>/*.pdf   # source lecture PDFs (input)
 content/_extracted/        # extracted text + manifest.json (gitignored, regenerable)
 scripts/
@@ -136,8 +141,8 @@ src/
   lib/courses.ts           # reads courses.config.json
   styles/newspaper.css
 netlify/
-  functions/  chat.ts · threads.ts · get-news.ts · news-refresh.ts
-  lib/        identity.ts · validate.ts · blobs.ts · anthropic.ts · ratelimit.ts · http.ts
+  functions/  chat.ts · threads.ts · get-news.ts · news-refresh.ts · refresh-news.ts
+  lib/        identity.ts · validate.ts · blobs.ts · anthropic.ts · news.ts · ratelimit.ts · http.ts
 ```
 
 ## Adding content (a delta operation)
@@ -243,7 +248,10 @@ DNS instructions. HTTPS (including the HSTS header in `netlify.toml`) is automat
   the system prompt is written to resist prompt injection.
 - **Output safety** — assistant and news text render via `textContent` (no HTML
   injection); external news links are protocol-validated (`http`/`https` only).
-- **Headers** — CSP and standard security headers are set in `netlify.toml`.
+- **Headers** — a Content Security Policy and standard security headers are set in
+  `netlify.toml`. The CSP allows Astro's own inlined first-party scripts and the
+  inline styles KaTeX/Shiki need, while still blocking external script origins,
+  framing, and objects.
 
 ## Authentication (disabled)
 
@@ -271,9 +279,10 @@ and re-add `identity.netlify.com` to the CSP in `netlify.toml`.
   feed.
 - **Chat returns 502 locally** → `ANTHROPIC_API_KEY` isn't set in `.env` (or is a
   placeholder). Add a real key and restart.
-- **Interactive pages look inert on :8888** → in dev, the production CSP blocks
-  Astro's HMR inline scripts. Use `npm run dev` (:4321) for UI work; production
-  builds ship external scripts and are unaffected.
+- **Interactive pages look inert on :8888** → Netlify Dev applies the production
+  CSP, and Astro's dev HMR uses blob-worker scripts it doesn't allow. Use
+  `npm run dev` (:4321) for UI work. In production the CSP permits Astro's inlined
+  first-party scripts, so `/latest` and the chat panel work normally.
 
 ## Dependency audit note
 
