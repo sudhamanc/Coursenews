@@ -195,6 +195,16 @@ NO RAG. Articles authored directly (no build-time API cost).
   content/_extracted/_AUTHORING_SPEC.md, which is gitignored/not shipped and merely instructs stripping Drexel.)
 - Build EXIT 0 (39 pages + SSR fn). Verified in dist: no drexel, data-theme="light" + theme-toggle in HTML,
   #fff1e5 + [data-theme=dark] in bundled CSS.
+- POST-DEPLOY follow-ups (commit f23c242): (1) "no arXiv after running refresh" was NOT a code bug —
+  live /api/refresh-news then /api/news returned arXiv:18/HN:17 with real titles. Cause = get-news
+  CDN/browser cache (was `max-age=300, stale-while-revalidate=1800` => stale up to ~30min after a
+  manual refresh). Lowered to `max-age=120, stale-while-revalidate=600` so manual refreshes surface
+  within ~2min while normal visitors still get cached responses. (2) Saved-conversation title invisible
+  in FT LIGHT mode: `.chat__thread` is a <button> and `.chat__thread-title` had NO explicit color ->
+  inherited the OS system ButtonText color (LIGHT when the OS is in dark mode) -> invisible on salmon
+  paper, only shown on hover (:hover set --accent); fine in dark theme. Fix: add `color: var(--ink);`
+  to `.chat__thread`. LESSON: always give <button>-based text an explicit themed color; never rely on
+  inherited/UA button color, or it breaks when the site theme and OS theme disagree.
 
 ## Reusable/shareable refactor (this session)
 - SINGLE SOURCE OF TRUTH: courses.config.json (repo root) + courses.schema.json. Consumed by
