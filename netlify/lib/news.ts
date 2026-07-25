@@ -52,35 +52,56 @@ const withTimeout = (ms: number) => {
   return { signal: c.signal, done: () => clearTimeout(t) };
 };
 
-/** Recent AI-related submissions from arXiv. */
+/**
+ * Recent AI-related submissions from arXiv, via the fast pre-generated RSS
+ * feed. The old search API (sortBy=submittedDate over four broad categories)
+ * routinely took ~30s to respond and blew past the fetch timeout, so no arXiv
+ * items ever made it into the feed. The RSS feed returns the latest announced
+ * batch in ~1.5s.
+ */
 export async function fetchArxiv(): Promise<NewsItem[]> {
-  const q =
-    'search_query=' +
-    encodeURIComponent('cat:cs.AI OR cat:cs.LG OR cat:cs.CL OR cat:cs.DB') +
-    '&sortBy=submittedDate&sortOrder=descending&max_results=40';
-  const url = `http://export.arxiv.org/api/query?${q}`;
-  const to = withTimeout(12000);
+  const url = 'https://rss.arxiv.org/rss/cs.AI+cs.LG+cs.CL+cs.DB';
+  const to = withTimeout(15000);
   try {
-    const res = await fetch(url, { signal: to.signal, headers: { 'User-Agent': 'CourseLedger/1.0' } });
+    const res = await fetch(url, {
+      signal: to.signal,
+      headers: { 'User-Agent': 'CourseLedger/1.0 (AI news digest)' },
+    });
     if (!res.ok) return [];
     const xml = await res.text();
     const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@_' });
     const doc = parser.parse(xml);
-    const entries = doc?.feed?.entry ? (Array.isArray(doc.feed.entry) ? doc.feed.entry : [doc.feed.entry]) : [];
-    return entries.map((e: any): NewsItem => {
-      const authors = e.author ? (Array.isArray(e.author) ? e.author : [e.author]) : [];
-      const links = e.link ? (Array.isArray(e.link) ? e.link : [e.link]) : [];
-      const abs = links.find((l: any) => l['@_rel'] === 'alternate')?.['@_href'] || e.id;
-      return {
-        id: `arxiv:${String(e.id).split('/abs/').pop()}`,
-        title: String(e.title || '').replace(/\s+/g, ' ').trim(),
-        url: String(abs),
+    const channel = doc?.rss?.channel;
+    const raw = channel?.item ? (Array.isArray(channel.item) ? channel.item : [channel.item]) : [];
+    const items: NewsItem[] = [];
+    for (const it of raw) {
+      const description = String(it.description ?? '');
+      // Announce types: "new" (fresh submission), "cross" (cross-listed), or
+      // "replace" (a revised version of an existing paper). Skip replacements.
+      const announce = /Announce Type:\s*(\w+)/i.exec(description)?.[1]?.toLowerCase();
+      if (announce === 'replace') continue;
+      const link = String(it.link ?? '').trim();
+      if (!link) continue;
+      const arxivId = /\/abs\/([^/\s?#]+)/.exec(link)?.[1] ?? link;
+      const abstract = /Abstract:\s*([\s\S]+)$/i
+        .exec(description)?.[1]
+        ?.replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 1200);
+      const creators = String(it['dc:creator'] ?? '').replace(/\s+/g, ' ').trim();
+      items.push({
+        id: `arxiv:${arxivId}`,
+        title: String(it.title ?? '').replace(/\s+/g, ' ').trim(),
+        url: link,
         source: 'arXiv',
-        published: new Date(e.published || e.updated || Date.now()).toISOString(),
-        authors: authors.map((a: any) => a.name).filter(Boolean).slice(0, 4).join(', ') || undefined,
-        abstract: String(e.summary || '').replace(/\s+/g, ' ').trim().slice(0, 1200),
-      };
-    });
+        published: it.pubDate ? new Date(it.pubDate).toISOString() : new Date().toISOString(),
+        authors: creators
+          ? creators.split(',').map((s) => s.trim()).filter(Boolean).slice(0, 4).join(', ')
+          : undefined,
+        abstract,
+      });
+    }
+    return items;
   } catch {
     return [];
   } finally {
@@ -121,25 +142,34 @@ export async function fetchHackerNews(): Promise<NewsItem[]> {
   return out;
 }
 
-/** Dedupe by id + url, keep the last 48h, and require topical relevance. */
+/**
+ * Dedupe, filter, and assemble a balanced candidate set. Hacker News items are
+ * held to a 48h window and a topical-relevance check; arXiv items come from the
+ * latest RSS batch and are on-topic by category. Crucially, we keep a per-source
+ * quota so arXiv (which has no "points") is never crowded out by Hacker News
+ * before the ranker sees it.
+ */
 export function prefilter(items: NewsItem[]): NewsItem[] {
   const now = Date.now();
   const seen = new Set<string>();
-  const kept: NewsItem[] = [];
+  const hn: NewsItem[] = [];
+  const arxiv: NewsItem[] = [];
   for (const it of items) {
     if (!it.title || !it.url) continue;
     const key = it.id || it.url;
     if (seen.has(key) || seen.has(it.url)) continue;
-    if (now - new Date(it.published).getTime() > WINDOW_MS) continue;
-    const hay = `${it.title} ${it.abstract ?? ''}`;
-    if (it.source === 'Hacker News' && !RELEVANCE.test(hay)) continue; // arXiv is already on-topic
+    if (it.source === 'Hacker News') {
+      if (now - new Date(it.published).getTime() > WINDOW_MS) continue;
+      if (!RELEVANCE.test(`${it.title} ${it.abstract ?? ''}`)) continue;
+    }
     seen.add(key);
     seen.add(it.url);
-    kept.push(it);
+    (it.source === 'Hacker News' ? hn : arxiv).push(it);
   }
-  // Preliminary sort: HN by points, arXiv by recency; interleave later via ranker.
-  kept.sort((a, b) => (b.points ?? 0) - (a.points ?? 0) || b.published.localeCompare(a.published));
-  return kept.slice(0, 30);
+  hn.sort((a, b) => (b.points ?? 0) - (a.points ?? 0) || b.published.localeCompare(a.published));
+  // Balanced quota per source; the Haiku ranker interleaves them afterward.
+  const PER_SOURCE = 18;
+  return [...hn.slice(0, PER_SOURCE), ...arxiv.slice(0, PER_SOURCE)];
 }
 
 /**
