@@ -483,6 +483,27 @@ img {
   text-transform: uppercase;
   margin-right: 0.45rem;
 }
+
+/* ---- Editor's Picks (home right rail) ------------------------------------ */
+.pick {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--rule);
+}
+.pick:last-child {
+  border-bottom: none;
+}
+.pick__desk {
+  display: block;
+  font-family: var(--sans);
+  font-size: 0.64rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.15rem;
+}
+.pick__title {
+  margin: 0;
+}
 .readmore {
   font-family: var(--sans);
   text-transform: uppercase;

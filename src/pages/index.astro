@@ -4,42 +4,74 @@ import Newspaper from '../layouts/Newspaper.astro';
 import { COURSES } from '../lib/courses';
 
 const articles = await getCollection('articles');
+
+const featurePath = (a: (typeof articles)[number]) =>
+  `/courses/${a.data.course}/${a.id.split('/').pop()}`;
+
 const featuresFor = (slug: string) =>
   articles
     .filter((a) => a.data.course === slug)
     .sort((a, b) => a.data.order - b.data.order);
-const lecturePath = (a: (typeof articles)[number]) =>
-  `/courses/${a.data.course}/${a.id.split('/').pop()}`;
 
+const shortTitleBySlug = Object.fromEntries(COURSES.map((c) => [c.slug, c.shortTitle]));
+
+// The desks — one card per course. Stays generic: new courses appear here
+// automatically as they are added to courses.config.json.
 const desks = COURSES.map((c) => {
   const features = featuresFor(c.slug);
   return { course: c, count: features.length, preview: features.slice(0, 3) };
 });
+
+// Editor's Picks — a hand-curated shortlist spanning the desks. Edit this list to
+// re-curate; ids that don't exist are simply skipped, so it never breaks a build.
+const EDITORS_PICKS = [
+  'applications-of-ml/l08-transformers',
+  'advanced-ai/week1',
+  'human-ai/week5-haii',
+  'advanced-ai/agentic-ai-survey',
+  'applications-of-ml/l10-vt-diffusion-adapters',
+];
+const byId = Object.fromEntries(articles.map((a) => [a.id, a]));
+const editorsPicks = EDITORS_PICKS.map((id) => byId[id]).filter(Boolean);
+
+// Top Stories — the lead feature from every desk. Automatic and generic: it grows
+// with each new course, no curation required.
+const topStories = COURSES.map((c) => featuresFor(c.slug)[0]).filter(Boolean);
+
+const totalFeatures = articles.length;
 ---
 
 <Newspaper section="home">
   <section>
-    <span class="flag">From the Desk</span>
     <div class="grid grid--lede">
       <div>
+        <span class="flag">From the Desk</span>
         <h2 class="headline headline--xl">
-          Four Courses, One Newsroom: The Concepts Behind Modern AI
+          The Concepts Behind Modern AI, Explained in Depth
         </h2>
         <p class="deck">
-          A running broadsheet that turns lecture material into readable,
-          in-depth features — and lets you interrogate any idea in the margin.
+          A running broadsheet on the ideas driving artificial intelligence — each
+          one written up as an in-depth feature you can interrogate in the margin.
+        </p>
+        <p class="u-sans u-muted" style="font-size:.8rem;line-height:1.6">
+          {totalFeatures} features across {desks.length} desks, with the key terms
+          pulled into the margin. The <em>Latest in AI</em> wire rounds up fresh
+          work from arXiv and Hacker News each day —{' '}
+          <a href="/latest">read today’s wire →</a>
         </p>
       </div>
       <aside class="col-rule">
-        <span class="flag">The Masthead</span>
-        <p class="u-sans u-muted" style="font-size:.8rem;line-height:1.6">
-          Every article is written from the lecture material itself, with the key
-          terms pulled into the margin. The <em>Latest in AI</em> wire rounds up
-          fresh work from arXiv and Hacker News each day.
-        </p>
-        <p class="u-sans" style="font-size:.8rem">
-          <a href="/latest">Read today’s wire →</a>
-        </p>
+        <span class="flag">Editor’s Picks</span>
+        {
+          editorsPicks.map((a) => (
+            <div class="pick">
+              <span class="pick__desk">{shortTitleBySlug[a.data.course]}</span>
+              <h3 class="headline headline--sm pick__title">
+                <a href={featurePath(a)}>{a.data.title}</a>
+              </h3>
+            </div>
+          ))
+        }
       </aside>
     </div>
 
@@ -58,10 +90,7 @@ const desks = COURSES.map((c) => {
               <ul class="desk__list">
                 {preview.map((a) => (
                   <li>
-                    <a href={lecturePath(a)}>
-                      <span class="desk__lecture u-muted">{a.data.lectureId}</span>
-                      {' '}{a.data.title}
-                    </a>
+                    <a href={featurePath(a)}>{a.data.title}</a>
                   </li>
                 ))}
               </ul>
@@ -71,6 +100,29 @@ const desks = COURSES.map((c) => {
                 All {count} features →
               </a>
             </p>
+          </article>
+        ))
+      }
+    </div>
+
+    <hr class="rule rule--heavy" />
+
+    <span class="flag">Top Stories</span>
+    <p class="u-sans u-muted" style="font-size:.78rem;margin:-.15rem 0 .6rem">
+      A lead feature from every desk.
+    </p>
+    <div class="grid grid--3">
+      {
+        topStories.map((a) => (
+          <article class="card">
+            <div class="byline">
+              {shortTitleBySlug[a.data.course]}
+              {a.data.readingTime ? ` · ${a.data.readingTime} min` : ''}
+            </div>
+            <h3 class="headline headline--sm">
+              <a href={featurePath(a)}>{a.data.title}</a>
+            </h3>
+            <p class="card__excerpt">{a.data.deck}</p>
           </article>
         ))
       }

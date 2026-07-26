@@ -250,6 +250,20 @@ NO RAG. Articles authored directly (no build-time API cost).
   [], carry forward the previous feed's arXiv items (readLatest() -> filter source==='arXiv') so the wire never
   collapses to HN-only. (get-news cache already lowered to 120/600 earlier.)
 
+## Home redesign + lecture/INFO cleanup (session 2 cont.)
+- src/lib/courses.ts IMPORTS courses.config.json (single source); the site reads COURSES from JSON. STALE-CACHE
+  again this session: read_file served an OLD inline-array courses.ts AND an older index.astro. Got disk truth via
+  terminal `cat`; wrote the new index.astro via create_file->$TMPDIR then `cp` over it (edit tools unsafe on stale buffer).
+- index.astro REDESIGNED: generic headline "The Concepts Behind Modern AI" (NO hardcoded course count),
+  Editor's Picks right rail (curated id list EDITORS_PICKS in index.astro; byId lookup, missing ids skipped),
+  Top Stories at bottom (auto: featuresFor(slug)[0] per course = lead per desk; grows as courses are added),
+  Latest-in-AI teaser, "{totalFeatures} features across {desks.length} desks" line. featurePath (renamed from
+  lecturePath); desks show titles only. New CSS .pick/.pick__desk/.pick__title.
+- Removed user-facing lecture/coursework wording: index.astro copy; Newspaper.astro footer -> "The Course Ledger
+  — the ideas behind modern AI, explained in depth."; dropped "INFO 629/686 — " from applied-ai blurb in courses.config.json.
+- NOT DONE (user said "no, just commit"): applied-ml URL slugs still contain "lecture-0X-1"/"week1lectureslides";
+  the article-page template [lecture].astro still uses element ids/classes lecture-title/lecture-id. Left as-is.
+
 ## Reusable/shareable refactor (this session)
 - SINGLE SOURCE OF TRUTH: courses.config.json (repo root) + courses.schema.json. Consumed by
   src/lib/courses.ts (import JSON), netlify/lib/validate.ts (import JSON -> COURSES map),
