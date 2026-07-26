@@ -28,6 +28,13 @@
       "shortTitle": "Human-AI",
       "dir": "HumanAI",
       "blurb": "Designing systems where people and artificial intelligence collaborate effectively and responsibly."
+    },
+    {
+      "slug": "advanced-ai",
+      "title": "Advanced AI",
+      "shortTitle": "Advanced AI",
+      "dir": "AdvancedAI",
+      "blurb": "Agentic systems, neuro-symbolic reasoning, and the frontier of autonomous, responsible artificial intelligence."
     }
   ]
 }

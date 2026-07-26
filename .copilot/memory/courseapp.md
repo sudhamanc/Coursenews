@@ -19,7 +19,8 @@ NO RAG. Articles authored directly (no build-time API cost).
 - applications-of-ml  -> Documents/ApplicationsofML (10 PDFs: L01-L11, no L04)
 - applied-ai          -> Documents/AppliedAI (9 PDFs: Week 1-9)
 - applied-ml-data-science -> Documents/AppliedMachineLearningforDataScience (10: Lecture_02-10, Week1LectureSlides)
-- human-ai            -> Documents/HumanAI (5 PDFs: week1-4 + HumanValuesforAIWeek5Readings)
+- human-ai            -> Documents/HumanAI (6 PDFs: week1-4 + HumanValuesforAIWeek5Readings + Week5-HAII lecture)
+- advanced-ai         -> Documents/AdvancedAI (5: Week1Slides + agentic survey/enterprise/cybersecurity + NeuroSymbolic)
 
 ## Toolchain gotchas (VERIFIED)
 - npm cache ~/.npm is root-owned in sandbox -> use `export npm_config_cache="$TMPDIR/courseapp-npm-cache"` before npm install
@@ -123,6 +124,14 @@ NO RAG. Articles authored directly (no build-time API cost).
   f6a1716 moved typescript & @netlify/functions to dependencies; 4a36825 set Node 22 (netlify.toml NODE_VERSION=22,
   .nvmrc, engines>=22.12.0) since Astro 7 needs >=22.12.0. No NODE_VERSION UI override exists (netlify.toml governs).
 - git push HANGS when sandboxed (credential helper/keychain blocked) -> push UNSANDBOXED.
+- git push can 403 "Permission to sudhamanc/Coursenews denied to schand201_comcast" when the macOS keychain
+  credential for github.com resolves to the Comcast WORK account instead of sudhamanc (commit author identity
+  sudhamanc/outlook != push auth). Fix: clear cached cred (`printf 'protocol=https\nhost=github.com\n\n' |
+  git credential-osxkeychain erase`) then push + auth as sudhamanc with a PAT, or `gh auth login/switch`.
+- NETLIFY AUTO-PUBLISH IS OFF for this site (VERIFIED this session): pushing to main BUILDS but does NOT
+  auto-go-live — the user must click Publish (or Trigger deploy) in the Netlify Deploys tab. Symptom of the
+  gap: the pushed commit is correct and local build shows the change, but the live site still serves the old
+  content with `Age: 0` + `must-revalidate` (so it is NOT a browser/CDN cache issue) until it is published.
 
 ## Netlify Blobs + v1 functions gotcha (VERIFIED root cause of "history not saving")
 - v1 (Lambda-compat, `export const handler`) functions do NOT get the Blobs context ambiently.
@@ -222,6 +231,24 @@ NO RAG. Articles authored directly (no build-time API cost).
   Build EXIT 0; dist page = 3 figures + katex; human-ai front lists it (now 5 weeks; 34 articles total).
 - Delta pipeline: `npm run extract -- human-ai` (only new PDF -> humanvaluesforaiweek5readings.txt). Article named
   week5-haii.md for URL consistency (extract .txt slug != article slug is fine; article file path drives the URL).
+
+## Session 2 additions (Advanced AI course + Week 5 lecture + news carry-forward)
+- NEW COURSE advanced-ai (Documents/AdvancedAI) added to courses.config.json (5th course). 5 articles authored
+  via 5 PARALLEL SUBAGENTS (all build-verified + grounded in source PDFs, terms confirmed via grep):
+  advanced-ai/week1.md "A Crowd of Minds" (W1: neuron/Hebbian/ensembles/MoE/Switch-Transformer/wisdom-of-crowds/
+  swarm/WoC-Bots — the prof's "alternative to deep learning" thesis), agentic-ai-survey.md (R1),
+  agentic-ai-enterprise.md (R2: watsonx/Citigroup/FinRobot/JADA), agentic-ai-cybersecurity.md (R3: autonomous
+  SOC + post-quantum), neuro-symbolic-ai.md (R4: Kautz taxonomy/AlphaGo/System1-2). Clean URL slugs chosen
+  (NOT the long PDF-derived slugs). Subagents fold the single-line .txt then author per _AUTHORING_SPEC.
+- Week 5 human-ai article EXPANDED with the new Week5-HAII.pdf LECTURE (the actual IA lecture; the earlier
+  version used only the readings PDF + NN/g). Added: wireframes (lo/mid/hi fidelity), CONTEXT ARCHITECTURE
+  (IA applied to an AI's context: prompts/history/system-instructions/guardrails/RAG/tools/memory/state), and
+  the "information environments constructed through language" framing. Now 8 concepts, readingTime 11, 3 diagrams.
+- NEWS FIX (root cause of "arXiv showed one day then gone"): arXiv RSS is EMPTY on non-announcement days
+  (weekends/holidays) — VERIFIED 0 items on a Sunday (HTTP 200, 0 <item>). The daily 13:00 UTC refresh then
+  OVERWROTE the cached feed with Hacker-News-only. FIX in netlify/lib/news.ts buildFeed: if fetchArxiv() returns
+  [], carry forward the previous feed's arXiv items (readLatest() -> filter source==='arXiv') so the wire never
+  collapses to HN-only. (get-news cache already lowered to 120/600 earlier.)
 
 ## Reusable/shareable refactor (this session)
 - SINGLE SOURCE OF TRUTH: courses.config.json (repo root) + courses.schema.json. Consumed by

@@ -4,8 +4,8 @@ lectureId: W5
 title: "Information Architecture When the Architect Is an Algorithm"
 deck: "Structure was once a designer's taxonomy you could inspect; when a recommender curates the feed, the blueprint turns personal and opaque — and findability becomes a question of human values."
 order: 5
-readingTime: 9
-tags: ["information-architecture", "navigation", "findability", "algorithmic-curation", "responsible-ai", "ethics"]
+readingTime: 11
+tags: ["information-architecture", "wireframing", "findability", "context-architecture", "algorithmic-curation", "responsible-ai"]
 concepts:
   - id: information-architecture
     term: Information Architecture (IA)
@@ -19,9 +19,12 @@ concepts:
   - id: information-scent
     term: Information Scent
     definition: "The cues a label or link gives about what lies behind it, letting users 'follow their noses' toward a goal; weak scent is behind most information-architecture failures."
-  - id: ia-research-methods
-    term: Card Sorting and Tree Testing
-    definition: "Card sorting reveals how users naturally group content (their mental model); tree testing checks whether a proposed hierarchy is findable by giving users tasks on a bare, unstyled structure."
+  - id: ia-methods
+    term: Card Sorting, Tree Testing, and Wireframes
+    definition: "Methods that make an invisible structure testable before build: card sorting surfaces users' mental models, tree testing checks whether a bare hierarchy is findable, and wireframes are low-to-high-fidelity blueprints that fix content hierarchy and flow before visual design."
+  - id: context-architecture
+    term: Context Architecture
+    definition: "Applying information-architecture principles to the information environment around an AI system — its prompts, history, system instructions and guardrails, retrieved (RAG) sources, tools, and long-term memory — deciding what the model receives, how it is labeled and prioritized, and what it must never do."
   - id: algorithmic-curation
     term: Algorithmic Curation and the Algorithmized Self
     definition: "When a recommender replaces a shared taxonomy with a personalized, opaque ranking, users know the structure only through perception — and begin to shape their behavior to the feed even as it shapes them."
@@ -98,7 +101,12 @@ content is grouped — the taxonomy, whether by topic, task, or audience.
 **Labeling** chooses the words that name those groups. **Navigation** sets how
 people move between them. **Search** lets people query instead of browse. Good
 architecture makes those four agree with how users already think.
-
+IA is not only a digital concern. A museum groups fossils by era; a supermarket
+gathers like products in one aisle; both are information environments people read
+through language and category. That is the deeper claim of the discipline — we
+experience products and services as *environments constructed out of words and
+groupings* — and when those are structured well, the environment feels predictable
+even when the information behind it is complex.
 ## Scent, and the Shape of a Hierarchy
 
 Two goals sit at the center of IA. **Findability** is whether users can locate
@@ -172,6 +180,32 @@ given a bare, unstyled hierarchy and a set of tasks, and their success reveals
 whether the structure itself is findable, independent of visual polish. The
 throughline is humility: the right architecture matches the user's mental model,
 not the org chart.
+
+Structure also gets drawn before it gets built. A **wireframe** is a low-fidelity
+blueprint — simple boxes and placeholders — that fixes the content hierarchy,
+information architecture, and user flow before any visual design begins, climbing
+from rough low-fidelity sketches through mid-fidelity layouts to high-fidelity
+screens as the idea firms up. Wireframing early tests navigation and task flows,
+aligns a team on functionality, and catches usability problems while they are still
+cheap to fix — the discipline of settling *how the experience works before how it
+looks*.
+
+## Context Architecture: Arranging What the AI Knows
+
+The same discipline now reaches inside the machine. **Context architecture** applies
+information-architecture principles to the information environment surrounding an AI
+system — deciding what the model receives, how it is organized, and how that shapes
+its behavior. The context ecosystem is a structure in its own right: the user's
+prompt and conversation history, the system instructions and guardrails, retrieved
+knowledge and RAG sources, the available tools and APIs, stored preferences and
+long-term memory, and the current system state. Arranging it raises the familiar IA
+questions in new clothing — what belongs in the context at all, how concepts should
+be labeled and categorized, which sources deserve greater authority, what the system
+should remember or forget, and what it must *never* do. And as in classic IA, more
+is not better: irrelevant or poorly structured context adds cost, introduces
+retrieval noise, and produces inconsistent answers. Context *engineering* builds the
+plumbing; context *architecture* gives that information structure, meaning, and
+boundaries.
 
 ## When the Architect Is an Algorithm
 
@@ -268,7 +302,9 @@ Whether the arranger is a designer or a model, information architecture decides 
 people can find, understand, and — increasingly — become. The classic discipline
 still supplies the fundamentals: organize around real mental models, label with
 honest scent, balance breadth against depth, and test the structure rather than
-trusting it. The algorithmic era adds two duties on top. Keep the structure
+trusting it — instincts that now extend inward, to the context we hand an AI: what
+it is given, how it is labeled, and what it is allowed to do. The algorithmic era
+adds two duties on top. Keep the structure
 legible, so people retain some literacy about why they see what they see; and
 interrogate the values the structure encodes, because when the architecture curates
 identity as readily as it curates articles, findability is no longer only a

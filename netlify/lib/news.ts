@@ -233,7 +233,20 @@ export async function rankWithHaiku(candidates: NewsItem[]): Promise<NewsItem[]>
 
 /** Full refresh pipeline. */
 export async function buildFeed(): Promise<NewsFeed> {
-  const [arxiv, hn] = await Promise.all([fetchArxiv(), fetchHackerNews()]);
+  const [freshArxiv, hn] = await Promise.all([fetchArxiv(), fetchHackerNews()]);
+  let arxiv = freshArxiv;
+  // arXiv only announces Sun–Thu, so its RSS feed is EMPTY on weekends/holidays.
+  // Without this guard, a refresh on an empty day overwrites the cached feed with
+  // a Hacker-News-only one (the "arXiv vanished after a day" bug). Carry forward
+  // the most recent arXiv items from the last good feed instead.
+  if (arxiv.length === 0) {
+    try {
+      const prev = await readLatest();
+      arxiv = (prev?.items ?? []).filter((i) => i.source === 'arXiv');
+    } catch {
+      /* no previous feed available — fall back to Hacker News only */
+    }
+  }
   const candidates = prefilter([...arxiv, ...hn]);
   const items = await rankWithHaiku(candidates);
   return { generatedAt: new Date().toISOString(), items };
