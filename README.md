@@ -1,12 +1,12 @@
 # The Course Ledger
 
-A static **newspaper** that turns university lecture PDFs into long-form, in-depth
+A static **newspaper** that turns a folder of source PDFs into long-form, in-depth
 feature articles — concepts explained as sections with KaTeX math and hand-drawn
 SVG diagrams. A **"Dig deeper"** assistant (Claude Haiku, via a serverless proxy)
 lets you interrogate any concept, and a daily **"Latest in AI"** wire ranks fresh
 work from arXiv and Hacker News.
 
-It ships with four AI courses out of the box, but it's built to be reused: point
+It ships with several AI courses out of the box, but it's built to be reused: point
 it at your own PDFs, edit one config file, and you have your own edition.
 
 ---
@@ -31,10 +31,12 @@ it at your own PDFs, edit one config file, and you have your own edition.
 
 ## Features
 
-- **Per-lecture feature articles** authored from the source PDFs, with KaTeX math
+- **In-depth feature articles** authored from the source PDFs, with KaTeX math
   and themed inline SVG diagrams (light/dark aware).
 - **Newspaper UI** — front page, per-course section fronts, feature pages with a
   Key Terms rail.
+- **Curated front page** — a generic home page (no hard-coded course count) with
+  *Editor's Picks* and *Top Stories* that surface standout features from every desk.
 - **Reader themes** — a light default styled after the *Financial Times* (salmon
   paper, claret flags, Oxford-blue links) with a one-click light/dark toggle,
   remembered per browser.
@@ -43,8 +45,9 @@ it at your own PDFs, edit one config file, and you have your own edition.
   downloaded, or deleted.
 - **Latest in AI** — a scheduled function pulls fresh work from arXiv (RSS) and
   Hacker News daily, keeps a balanced mix from each source, ranks them with one
-  Haiku call, and caches the feed.
-- **Incremental content pipeline** — adding lectures or a course is a delta, never
+  Haiku call, and caches the feed. It carries arXiv forward on days that feed is
+  empty (arXiv announces only Sun–Thu), so the wire never collapses to one source.
+- **Incremental content pipeline** — adding a feature or a course is a delta, never
   a full rebuild.
 - **Scripted lifecycle** — setup, start/stop (with port cleanup), build, deploy.
 
@@ -127,7 +130,7 @@ courses.schema.json        # JSON schema for the above (editor validation)
 netlify.toml               # build, functions dir, redirects, security headers/CSP
 astro.config.mjs           # Astro config (KaTeX pipeline, Netlify adapter)
 .copilot/memory/           # assistant repo memory (version-controlled project notes)
-Documents/<Course>/*.pdf   # source lecture PDFs (input)
+Documents/<Course>/*.pdf   # source PDFs (input)
 content/_extracted/        # extracted text + manifest.json (gitignored, regenerable)
 scripts/
   extract-pdfs.mjs         # PDF -> text (incremental)
@@ -149,12 +152,12 @@ netlify/
 
 Everything here is incremental — you never rebuild existing content.
 
-### Add lectures to an existing course
+### Add features to an existing course
 
 1. Drop the new PDF(s) into `Documents/<Course>/`.
 2. `npm run extract` — only the **new** PDFs are processed; cached text is reused,
    and the manifest is merged.
-3. Author the article(s): create `src/content/articles/<slug>/<lecture>.md` with
+3. Author the article(s): create `src/content/articles/<slug>/<feature>.md` with
    frontmatter matching [`src/content.config.ts`](src/content.config.ts) (`course`,
    `lectureId`, `title`, `deck`, `order`, `concepts[]`, …). Astro picks up new
    files automatically — no rebuild of other articles.
