@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Newspaper from '../../layouts/Newspaper.astro';
+import CanonMap from '../../components/CanonMap.astro';
 import { COURSES, COURSE_BY_SLUG } from '../../lib/courses';
 
 export async function getStaticPaths() {
@@ -11,6 +12,9 @@ export async function getStaticPaths() {
 }
 
 const { course } = Astro.props;
+
+// The LLM Canon desk opens with a lineage map of all its papers.
+const isCanon = course.slug === 'llm-canon';
 
 const articles = (await getCollection('articles'))
   .filter((a) => a.data.course === course.slug)
@@ -32,6 +36,8 @@ const [lead, ...rest] = articles;
     <h2 class="headline headline--xl">{course.title}</h2>
     <p class="deck">{course.blurb}</p>
     <hr class="rule rule--thin" />
+
+    {isCanon && <CanonMap />}
 
     {articles.length === 0 && <p class="u-muted">No features filed on this desk yet.</p>}
 

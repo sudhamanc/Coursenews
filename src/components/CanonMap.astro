@@ -1,0 +1,299 @@
+---
+/**
+ * CanonMap — the connections graph for "The LLM Canon" desk.
+ *
+ * Seven horizontal track "lanes"; each paper is placed left→right by year and
+ * links to its feature. Edges follow each paper's primary lineage parent; the
+ * GPT scaling spine (Attention → GPT-1 → GPT-2 → Scaling Laws → GPT-3 →
+ * Chinchilla → LLaMA) is accented. Pure inline SVG, so it inherits the paper
+ * theme (light/dark) via `currentColor` and the CSS custom properties.
+ *
+ * The node data below is the single source of truth for the graph; it mirrors
+ * the article slugs under `src/content/articles/llm-canon/`.
+ */
+type Track =
+  | 'architecture'
+  | 'pretraining'
+  | 'scaling'
+  | 'alignment'
+  | 'adaptation'
+  | 'efficiency'
+  | 'inference-compute';
+
+interface Paper {
+  slug: string;
+  label: string;
+  year: number;
+  track: Track;
+  parent?: string;
+}
+
+const LANES: { id: Track; label: string }[] = [
+  { id: 'architecture', label: 'Architecture' },
+  { id: 'pretraining', label: 'Pretraining' },
+  { id: 'scaling', label: 'Scaling' },
+  { id: 'alignment', label: 'Alignment' },
+  { id: 'adaptation', label: 'Adaptation' },
+  { id: 'efficiency', label: 'Efficiency' },
+  { id: 'inference-compute', label: 'Inference' },
+];
+
+// Placed by primary lineage parent; parents are chronologically ≤ their child
+// so every edge reads left→right (or straight down within a year).
+const PAPERS: Paper[] = [
+  { slug: 'attention-is-all-you-need', label: 'Attention', year: 2017, track: 'architecture' },
+  { slug: 'switch-transformer', label: 'Switch / MoE', year: 2021, track: 'architecture', parent: 'attention-is-all-you-need' },
+  { slug: 'deepseek-moe', label: 'DeepSeekMoE', year: 2024, track: 'architecture', parent: 'switch-transformer' },
+  { slug: 'muon', label: 'Muon', year: 2024, track: 'architecture', parent: 'deepseek-moe' },
+
+  { slug: 'gpt-1', label: 'GPT-1', year: 2018, track: 'pretraining', parent: 'attention-is-all-you-need' },
+  { slug: 'bert', label: 'BERT', year: 2018, track: 'pretraining', parent: 'attention-is-all-you-need' },
+  { slug: 'gpt-2', label: 'GPT-2', year: 2019, track: 'pretraining', parent: 'gpt-1' },
+  { slug: 'the-pile', label: 'The Pile', year: 2020, track: 'pretraining', parent: 'gpt-3' },
+  { slug: 'opt', label: 'OPT', year: 2022, track: 'pretraining', parent: 'gpt-3' },
+  { slug: 'bloom', label: 'BLOOM', year: 2022, track: 'pretraining', parent: 'the-pile' },
+  { slug: 'llama', label: 'LLaMA', year: 2023, track: 'pretraining', parent: 'chinchilla' },
+
+  { slug: 'scaling-laws', label: 'Scaling Laws', year: 2020, track: 'scaling', parent: 'gpt-2' },
+  { slug: 'gpt-3', label: 'GPT-3', year: 2020, track: 'scaling', parent: 'scaling-laws' },
+  { slug: 'chinchilla', label: 'Chinchilla', year: 2022, track: 'scaling', parent: 'scaling-laws' },
+  { slug: 'palm', label: 'PaLM', year: 2022, track: 'scaling', parent: 'gpt-3' },
+
+  { slug: 'instructgpt-rlhf', label: 'InstructGPT', year: 2022, track: 'alignment', parent: 'gpt-3' },
+  { slug: 'self-instruct', label: 'Self-Instruct', year: 2022, track: 'alignment', parent: 'instructgpt-rlhf' },
+  { slug: 'constitutional-ai', label: 'Constitutional AI', year: 2022, track: 'alignment', parent: 'instructgpt-rlhf' },
+  { slug: 'dpo', label: 'DPO', year: 2023, track: 'alignment', parent: 'instructgpt-rlhf' },
+  { slug: 'orpo', label: 'ORPO', year: 2024, track: 'alignment', parent: 'dpo' },
+  { slug: 'grpo', label: 'GRPO', year: 2024, track: 'alignment', parent: 'dpo' },
+
+  { slug: 'lora', label: 'LoRA', year: 2021, track: 'adaptation', parent: 'gpt-3' },
+  { slug: 'qlora', label: 'QLoRA', year: 2023, track: 'adaptation', parent: 'lora' },
+
+  { slug: 'multi-query-attention', label: 'MQA', year: 2019, track: 'efficiency', parent: 'attention-is-all-you-need' },
+  { slug: 'rope', label: 'RoPE', year: 2021, track: 'efficiency', parent: 'attention-is-all-you-need' },
+  { slug: 'alibi', label: 'ALiBi', year: 2021, track: 'efficiency', parent: 'attention-is-all-you-need' },
+  { slug: 'flashattention', label: 'FlashAttention', year: 2022, track: 'efficiency', parent: 'attention-is-all-you-need' },
+  { slug: 'speculative-decoding', label: 'Spec. Decoding', year: 2022, track: 'efficiency', parent: 'attention-is-all-you-need' },
+  { slug: 'grouped-query-attention', label: 'GQA', year: 2023, track: 'efficiency', parent: 'multi-query-attention' },
+  { slug: 'flashattention-2', label: 'FlashAttn-2', year: 2023, track: 'efficiency', parent: 'flashattention' },
+  { slug: 'paged-attention-vllm', label: 'PagedAttn / vLLM', year: 2023, track: 'efficiency', parent: 'flashattention-2' },
+  { slug: 'kv-cache-compression', label: 'KV Cache / MLA', year: 2024, track: 'efficiency', parent: 'grouped-query-attention' },
+
+  { slug: 'rag', label: 'RAG', year: 2020, track: 'inference-compute', parent: 'bert' },
+  { slug: 'chain-of-thought', label: 'Chain-of-Thought', year: 2022, track: 'inference-compute', parent: 'gpt-3' },
+  { slug: 'react', label: 'ReAct', year: 2022, track: 'inference-compute', parent: 'chain-of-thought' },
+  { slug: 'tree-of-thoughts', label: 'Tree of Thoughts', year: 2023, track: 'inference-compute', parent: 'chain-of-thought' },
+  { slug: 'test-time-scaling', label: 'Test-Time Scaling', year: 2024, track: 'inference-compute', parent: 'tree-of-thoughts' },
+];
+
+// --- Layout -------------------------------------------------------------
+const YEAR0 = 2017;
+const YEAR1 = 2024;
+const X0 = 214; // x of the first year column
+const COL_W = 138;
+const MARGIN_T = 64;
+const LANE_H = 138;
+const NODE_W = 122;
+const NODE_H = 30;
+const ROW_GAP = 40;
+
+const W = X0 + (YEAR1 - YEAR0) * COL_W + 84;
+const H = MARGIN_T + LANES.length * LANE_H + 34;
+
+const years: number[] = [];
+for (let y = YEAR0; y <= YEAR1; y++) years.push(y);
+
+const cx = (year: number) => X0 + (year - YEAR0) * COL_W;
+const laneIndex: Record<string, number> = Object.fromEntries(LANES.map((l, i) => [l.id, i]));
+const laneCenterY = (track: Track) => MARGIN_T + laneIndex[track] * LANE_H + LANE_H / 2;
+
+// Stack papers that share a (lane, year) cell vertically within the lane.
+const groups = new Map<string, Paper[]>();
+for (const p of PAPERS) {
+  const key = `${p.track}:${p.year}`;
+  (groups.get(key) ?? groups.set(key, []).get(key)!).push(p);
+}
+const pos: Record<string, { x: number; y: number }> = {};
+for (const [key, list] of groups) {
+  const [, yearStr] = key.split(':');
+  const baseY = laneCenterY(list[0].track);
+  const n = list.length;
+  list.forEach((p, i) => {
+    pos[p.slug] = { x: cx(Number(yearStr)), y: baseY + (i - (n - 1) / 2) * ROW_GAP };
+  });
+}
+
+const TRUNK = new Set(['gpt-1', 'gpt-2', 'scaling-laws', 'gpt-3', 'chinchilla', 'llama']);
+
+const edges = PAPERS.filter((p) => p.parent && pos[p.parent]).map((p) => {
+  const a = pos[p.parent!];
+  const b = pos[p.slug];
+  const trunk = TRUNK.has(p.slug);
+  const dx = b.x - a.x;
+  let d: string;
+  if (Math.abs(dx) < NODE_W * 0.5) {
+    // Same column → straight vertical connector between node edges.
+    const ay = b.y >= a.y ? a.y + NODE_H / 2 : a.y - NODE_H / 2;
+    const by = b.y >= a.y ? b.y - NODE_H / 2 : b.y + NODE_H / 2;
+    d = `M ${a.x} ${ay} L ${b.x} ${by}`;
+  } else {
+    const ax = a.x + NODE_W / 2;
+    const bx = b.x - NODE_W / 2;
+    const c = Math.max(34, (bx - ax) * 0.5);
+    d = `M ${ax} ${a.y} C ${ax + c} ${a.y}, ${bx - c} ${b.y}, ${bx} ${b.y}`;
+  }
+  return { d, trunk };
+});
+---
+
+<figure class="canon-map">
+  <svg
+    viewBox={`0 0 ${W} ${H}`}
+    role="img"
+    aria-label="Lineage map of 37 seminal large-language-model papers, arranged in seven research tracks from 2017 to 2024, with edges linking each paper to the work it builds on."
+  >
+    <!-- lane bands + labels -->
+    {
+      LANES.map((lane, i) => (
+        <g>
+          {i % 2 === 1 && (
+            <rect class="canon-map__lane" x="0" y={MARGIN_T + i * LANE_H} width={W} height={LANE_H} />
+          )}
+          <text class="canon-map__lanelabel" x="14" y={laneCenterY(lane.id) + 4} font-size="12">
+            {lane.label}
+          </text>
+        </g>
+      ))
+    }
+
+    <!-- year axis -->
+    {
+      years.map((yr) => (
+        <g>
+          <line class="canon-map__grid" x1={cx(yr)} y1={MARGIN_T - 10} x2={cx(yr)} y2={H - 16} />
+          <text class="canon-map__axis" x={cx(yr)} y={MARGIN_T - 20} text-anchor="middle" font-size="12">
+            {yr}
+          </text>
+        </g>
+      ))
+    }
+
+    <!-- edges (drawn under nodes) -->
+    {edges.map((e) => <path class={`canon-map__edge${e.trunk ? ' canon-map__edge--trunk' : ''}`} d={e.d} />)}
+
+    <!-- nodes -->
+    {
+      PAPERS.map((p) => (
+        <a class="canon-map__node" href={`/courses/llm-canon/${p.slug}`}>
+          <rect
+            x={pos[p.slug].x - NODE_W / 2}
+            y={pos[p.slug].y - NODE_H / 2}
+            width={NODE_W}
+            height={NODE_H}
+            rx="4"
+          />
+          <text x={pos[p.slug].x} y={pos[p.slug].y + 4} text-anchor="middle" font-size="11.5">
+            {p.label}
+          </text>
+        </a>
+      ))
+    }
+  </svg>
+  <figcaption class="canon-map__cap">
+    <b>The lineage.</b> Seven tracks, 2017–2024. Each box is a paper — select one to read the feature.
+    The <span class="canon-map__swatch" /> claret spine is the scaling trunk that runs from
+    <em>Attention</em> to <em>LLaMA</em>; every other line points from a paper to the work it builds on.
+  </figcaption>
+
+  <style>
+    .canon-map {
+      margin: 0 0 1.75rem;
+      padding: 1.3rem 1.3rem 1rem;
+      border: 1px solid var(--rule);
+      background: var(--paper-2);
+    }
+    .canon-map svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      color: var(--ink);
+      overflow: visible;
+    }
+    .canon-map text {
+      fill: currentColor;
+      font-family: var(--sans);
+    }
+    .canon-map__lane {
+      fill: currentColor;
+      opacity: 0.04;
+    }
+    .canon-map__lanelabel {
+      fill: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .canon-map__grid {
+      stroke: var(--rule);
+      stroke-width: 1;
+      opacity: 0.55;
+    }
+    .canon-map__axis {
+      fill: var(--muted);
+      font-weight: 700;
+    }
+    .canon-map__edge {
+      fill: none;
+      stroke: var(--muted);
+      stroke-width: 1.2;
+      opacity: 0.5;
+    }
+    .canon-map__edge--trunk {
+      stroke: var(--accent);
+      stroke-width: 1.9;
+      opacity: 0.9;
+    }
+    .canon-map__node rect {
+      fill: var(--paper-2);
+      stroke: var(--ink);
+      stroke-width: 1.3;
+      transition: fill 120ms ease, stroke 120ms ease;
+    }
+    .canon-map__node text {
+      fill: var(--ink);
+      font-weight: 600;
+    }
+    .canon-map__node:hover rect,
+    .canon-map__node:focus-visible rect {
+      fill: var(--accent);
+      stroke: var(--accent);
+    }
+    .canon-map__node:hover text,
+    .canon-map__node:focus-visible text {
+      fill: var(--paper-2);
+    }
+    .canon-map__cap {
+      margin-top: 0.9rem;
+      padding-top: 0.6rem;
+      border-top: 1px solid var(--rule);
+      font-family: var(--sans);
+      font-size: 0.74rem;
+      line-height: 1.5;
+      color: var(--muted);
+      text-align: center;
+    }
+    .canon-map__cap b {
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.7rem;
+    }
+    .canon-map__swatch {
+      display: inline-block;
+      width: 1.5em;
+      border-top: 2px solid var(--accent);
+      vertical-align: middle;
+      margin: 0 0.15em;
+    }
+  </style>
+</figure>

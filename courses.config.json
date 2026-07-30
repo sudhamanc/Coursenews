@@ -35,6 +35,13 @@
       "shortTitle": "Advanced AI",
       "dir": "AdvancedAI",
       "blurb": "Agentic systems, neuro-symbolic reasoning, and the frontier of autonomous, responsible artificial intelligence."
+    },
+    {
+      "slug": "llm-canon",
+      "title": "The LLM Canon",
+      "shortTitle": "LLM Canon",
+      "dir": "LLMCanon",
+      "blurb": "Thirty-seven seminal papers that built the large language model — from attention to the optimizer frontier — read as one connected lineage."
     }
   ]
 }

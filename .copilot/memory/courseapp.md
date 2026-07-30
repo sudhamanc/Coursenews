@@ -305,3 +305,28 @@ NO RAG. Articles authored directly (no build-time API cost).
 - News: 13:00 UTC daily, rolling 48h + dedupe, headline link + 1-2 sentence AI summary,
   top ~12 shown rest expandable; HN summary from title/meta, arXiv from abstract
 - Chat non-streaming v1; per-user daily message cap -> 429
+
+## Session 3: "The LLM Canon" desk (37 seminal-paper features + connections graph)
+
+- NEW 6th desk `llm-canon` "The LLM Canon" in courses.config.json (dir "LLMCanon" — NO Documents/ PDFs;
+  authored DIRECTLY, extraction never run for it; renders anyway since site reads COURSES from JSON +
+  articles from the content collection). validate.ts auto-allows it (imports courses.config.json).
+- 37 articles src/content/articles/llm-canon/<slug>.md, order 1-37 = LINEAGE order (Attention=1 … Muon=37).
+  lectureId = paper YEAR as quoted string (e.g. "2017"); DATE OMITTED. Each: strong lede, thematic H2/H3,
+  KaTeX where needed, EXACTLY ONE inline SVG diagram (unique marker id arw-<slug>), penultimate
+  "## Why It Matters", final "## Lineage" with Builds-on/Leads-to markdown links to sibling canon pages.
+- Source = user's own paraphrase ~/Downloads/seminal-ai-papers.md (rewritten into house voice; NOT verbatim).
+  Authored via 3 HAND exemplars (attention-is-all-you-need, instructgpt-rlhf, flashattention) + 7 PARALLEL
+  SUBAGENTS (batches A-G) each reading source + _AUTHORING_SPEC.md + the 3 exemplars.
+- CONNECTIONS GRAPH: src/components/CanonMap.astro — 7 track-lanes (architecture/pretraining/scaling/alignment/
+  adaptation/efficiency/inference) x year(2017-2024); 37 clickable SVG nodes (link to each paper); edges follow
+  each paper's primary parent; GPT trunk (attention->gpt-1->gpt-2->scaling-laws->{gpt-3,chinchilla}->llama)
+  accented. Data-driven: PAPERS[] array in the component = graph source of truth. Rendered on desk front via
+  `isCanon` in src/pages/courses/[course].astro (above the lead). Scoped <style> uses theme vars; nodes hover to
+  accent. Home + nav pick up the desk automatically (generic COURSES map).
+- LAYOUT gotcha: strict year->x timeline OVERLAPS in 2022 (11 papers). Fix: nodes sharing a (lane,year) cell
+  stack VERTICALLY within the lane band (ROW_GAP). Graph parents set chronologically <= child so edges read L->R
+  (e.g. lora GRAPH parent = gpt-3 not llama, since LoRA 2021 predates LLaMA 2023 even though MD builds_on=llama).
+- VERIFIED: astro build EXIT 0, 76 pages (was 39). 37 canon pages, exactly 1 <figure> each, 0 broken lineage
+  links, orders 1-37 unique, no source leakage. gpt-2.md "TL;DR" = legit (the paper's summarization prompt cue).
+  MD033 inline-SVG lint warnings = harmless. NOT committed (awaiting user approval).
