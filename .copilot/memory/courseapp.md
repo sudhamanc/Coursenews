@@ -329,4 +329,21 @@ NO RAG. Articles authored directly (no build-time API cost).
   (e.g. lora GRAPH parent = gpt-3 not llama, since LoRA 2021 predates LLaMA 2023 even though MD builds_on=llama).
 - VERIFIED: astro build EXIT 0, 76 pages (was 39). 37 canon pages, exactly 1 <figure> each, 0 broken lineage
   links, orders 1-37 unique, no source leakage. gpt-2.md "TL;DR" = legit (the paper's summarization prompt cue).
-  MD033 inline-SVG lint warnings = harmless. NOT committed (awaiting user approval).
+  MD033 inline-SVG lint warnings = harmless. Committed + pushed (efae368 -> origin/main).
+
+## Session 3b: desk RENAME + Human-AI Week 6 (build-verified)
+
+- RENAMED desk display (user disliked "Canon"): title "The Foundational Papers of Modern AI",
+  shortTitle "Foundational Papers" (courses.config.json). SLUG UNCHANGED = llm-canon, so URLs/paths/
+  CanonMap/article frontmatter all stay stable. No prose ever said "canon" (all 108 hits were slug/URLs);
+  dist grep = 0 "LLM Canon". CanonMap.astro filename kept (internal, not user-visible).
+- HUMAN-AI WEEK 6 = Explainable AI (XAI). User added Documents/HumanAI/Week6-HAII.pdf + "Week 6 - Info 693 -
+  XAI video.pdf". Extracted via `npm run extract -- human-ai` (incremental) -> week6-haii.txt (36p) +
+  week-6-info-693-xai-video.txt (39p). Authored src/content/articles/human-ai/week6-haii.md (order 6,
+  lectureId W6, 3 inline SVG diagrams: transparent-vs-opaque+post-hoc, local/cohort/global, method 2x2
+  scope×timing). Grounded in BOTH sources: black box, transparent/opaque (simulatable/decomposable/algo-
+  transparent), interpretability vs explainability, local/cohort/global, Aristotle four-causes +
+  "explanation is an interaction" (Hoffman), SHAP/LIME/Grad-CAM/counterfactuals/TCAV, model-agnostic vs
+  specific, over-trust/faithfulness, Evaluative AI, ECOA/EU AI Act, State v. Loomis/COMPAS case. Excluded
+  quiz/housekeeping/assignment logistics per spec.
+- Build EXIT 0. human-ai front now 6 weeks (week1-6). Rename + week6 NOT yet committed.

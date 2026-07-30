@@ -38,10 +38,10 @@
     },
     {
       "slug": "llm-canon",
-      "title": "The LLM Canon",
-      "shortTitle": "LLM Canon",
+      "title": "The Foundational Papers of Modern AI",
+      "shortTitle": "Foundational Papers",
       "dir": "LLMCanon",
-      "blurb": "Thirty-seven seminal papers that built the large language model — from attention to the optimizer frontier — read as one connected lineage."
+      "blurb": "Thirty-seven groundbreaking papers that built the large language model — from attention to the optimizer frontier — read as one connected lineage."
     }
   ]
 }
