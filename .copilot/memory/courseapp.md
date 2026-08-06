@@ -347,3 +347,29 @@ NO RAG. Articles authored directly (no build-time API cost).
   specific, over-trust/faithfulness, Evaluative AI, ECOA/EU AI Act, State v. Loomis/COMPAS case. Excluded
   quiz/housekeeping/assignment logistics per spec.
 - Build EXIT 0. human-ai front now 6 weeks (week1-6). Rename + week6 NOT yet committed.
+
+## Session 4: Human-AI Week 7 + 5 reading features (build-verified)
+
+- User added 6 PDFs to Documents/HumanAI: Week7-HAII.pdf plus the Week 7 reading set —
+  "7 - Kore 2022 - Chapter 6.pdf", "7 - Marcus 2019.pdf", Kocielnik-2019.pdf, "Mahmood 2022.pdf",
+  ai_index_report_2026_chapter_3_responsible_ai.pdf. Extracted incrementally via
+  `npm run extract -- human-ai` (6 new .txt; 8 cached). Manifest now 48 lectures / 5 courses.
+- IMPORTANT precedent: readings get their OWN article (like advanced-ai R1-R4), not folded into the
+  week lecture. human-ai now has W1-W7 (orders 1-7) + R1-R5 (orders 8-12).
+  * week7-haii.md      W7  order 7  "The Humble Machine"          3 diagrams (error pipeline, precision/recall
+                                     + recovery cost, recognition-diagnosis-recovery chain)
+  * handling-errors.md R1  order 8  Kore ch.6 "Tolerate the Error, Never the Failure"  2 diagrams
+  * whats-at-stake.md  R2  order 9  Marcus 2019 "It Was Never Going to Be Malice"      1 diagram (bias loop)
+  * imperfect-ai-expectations.md R3 order 10 Kocielnik 2019 "Fifty Percent, Twice"     2 diagrams
+  * owning-mistakes-sincerely.md R4 order 11 Mahmood 2022 "No Apology Beats a Bad One" 2 diagrams
+  * ai-index-responsible-ai.md   R5 order 12 AI Index 2026 ch.3 "The Instruments Are Falling Behind" 2 diagrams
+- Week 7 topic = When Things Go Wrong: error vs bias, error vs failure (stakes), system/user/user-perceived
+  taxonomy, context-window + long-dependency failures, expectation setting (accuracy indicator / example
+  explanation / performance control), precision-recall governed by RECOVERY COST, recognition-diagnosis-
+  recovery, humble machine, apology strategies, bias->discrimination + hidden proxies, FMTI 58->40,
+  adversarial attacks, hallucination + belief collapse, and the "creative failure" material (cookie bot
+  19%->76%, Janelle Shane, Tom White adversarial art, "Skynet" knitting). Quiz/housekeeping/mid-term-survey
+  slides excluded per _AUTHORING_SPEC.
+- Build EXIT 0. Verified in dev browser (:4321): all 12 human-ai entries listed in order on the course front;
+  figures render light+dark, no clipping. figure/marker counts per page: week7=3/3, handling-errors=2/2,
+  whats-at-stake=1/1, imperfect-ai=2/2, owning-mistakes=2/2, ai-index=2/2.
