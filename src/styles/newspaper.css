@@ -1018,3 +1018,54 @@ img {
     gap: 0.6rem;
   }
 }
+
+/* ---- Ecosystem wire (second section on /latest) -------------------------- */
+.eco-group {
+  margin-top: 2rem;
+}
+.eco-group__head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 0.3rem;
+}
+.eco-group__title {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin: 0;
+}
+.eco-group__count {
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  color: var(--faint);
+}
+/* Tighter than the research wire: these are one-line facts, not stories. */
+.eco .news__item {
+  grid-template-columns: 1fr;
+  padding-bottom: 1rem;
+}
+.eco {
+  gap: 1rem;
+}
+/* Lane chip — "tracked" is a watched repo, "new" came from open discovery. */
+.news__lane {
+  border-radius: 999px;
+  padding: 0.05rem 0.5rem;
+  border: 1px solid var(--rule);
+  color: var(--ink-soft);
+}
+.news__lane--discovered {
+  color: var(--paper-2);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.news__version {
+  font-family: var(--mono);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-soft);
+}

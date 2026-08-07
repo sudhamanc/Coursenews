@@ -29,6 +29,11 @@
   to = "/.netlify/functions/get-news"
   status = 200
 
+[[redirects]]
+  from = "/api/ecosystem"
+  to = "/.netlify/functions/get-ecosystem"
+  status = 200
+
 # On-demand "Latest in AI" refresh (secret-protected; see refresh-news.ts).
 [[redirects]]
   from = "/api/refresh-news"

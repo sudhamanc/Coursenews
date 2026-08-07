@@ -373,3 +373,49 @@ NO RAG. Articles authored directly (no build-time API cost).
 - Build EXIT 0. Verified in dev browser (:4321): all 12 human-ai entries listed in order on the course front;
   figures render light+dark, no clipping. figure/marker counts per page: week7=3/3, handling-errors=2/2,
   whats-at-stake=1/1, imperfect-ai=2/2, owning-mistakes=2/2, ai-index=2/2.
+
+## Session 5: "The Ecosystem" — second wire on /latest (build + live-source verified)
+
+- PROBLEM (user): /latest was purely arXiv papers. Root cause: only two sources exist
+  (arXiv RSS + HN) and the ranker prompt prefers "substantive research", so HN (which has
+  no abstract) is always outranked. No prompt tuning fixes it — ecosystem sources weren't
+  in the input set at all.
+- NEW: netlify/lib/ecosystem.ts + functions/get-ecosystem.ts + /api/ecosystem redirect +
+  second section on src/pages/latest.astro ("The Ecosystem / What Shipped"). Buckets:
+  Models | Standards | Libraries | Patterns (fixed enum so the UI can group reliably).
+- TWO LANES (the key design):
+  * tracked    = 17-repo WATCHLIST const via GitHub `releases.atom`. Dated, versioned facts.
+                 Structurally blind to anything not on the list.
+  * discovered = HF trending models, GitHub Trending (HTML scrape), Show HN + front page,
+                 subreddit .rss, commentary RSS. Can surface an unknown project.
+  User's exact complaint (a watchlist would have missed a just-released agent plugin SDK)
+  is what the discovery lane exists for — verified it surfaces obra/superpowers,
+  addyosmani/agent-skills, PrimeIntellect-ai/prime-agent, "Show HN: The Channels SDK".
+- X/TWITTER IS NOT USABLE: api.twitter.com returns 401 unauth, read access is a paid tier.
+  Nitter mirrors dead. Documented in the file header so nobody re-litigates it.
+- USE `releases.atom`, NOT the GitHub REST API: unauth REST is 60 req/hr PER IP and Netlify
+  functions share egress IPs -> a 17-repo watchlist would intermittently 403. Atom has no cap.
+- GOTCHAS FOUND BY LIVE PROBING (all fixed, all verified):
+  * prerelease regex must not require a separator: tags glue the suffix to a digit
+    ("v0.27.0rc1"). Fixed regex + NOT_A_RELEASE guard (pytorch publishes `trunk/<sha>` CI
+    tags through the same feed).
+  * HF trending is full of re-uploads (GGUF/AWQ/Lora/INT8/MLX) of a base model that trends
+    on its own -> HF_DERIVATIVE filter, else the Models bucket is all quant repos.
+  * REDDIT: `.json` API is now blocked (HTML wall); `/.rss` works but ONLY with a
+    Mozilla-prefixed UA, and it 429s on CONCURRENT requests from one IP -> subreddits are
+    fetched IN SERIES (fetchSubreddits), not in the general pool. Still flaky from cloud IPs;
+    treat HN + GitHub Trending + HF as the load-bearing discovery sources.
+  * RANKER: a SINGLE Haiku call over both lanes (43 items) FAILED BADLY — dropped all 26
+    discovery items and its index mapping drifted (ollama's release got crewAI's summary).
+    FIX: rank each lane in its OWN call (rankLane) + an echo check ("t" = first 4 title words
+    copied back; on mismatch keep the item, discard the prose). Result: 33/43 kept, 10 noise
+    dropped, all four buckets populated, captions correct.
+  * UI quota is PER LANE (4+4), not per bucket: ranking puts discovery first, and a flat cap
+    let Show HN fill every Libraries slot and push the real version releases out of view.
+- news-refresh (scheduled) now builds BOTH wires under Promise.allSettled so one failing
+  wire can't blank the other. refresh-news takes ?wire=research|ecosystem|both.
+  Cost: 2 Haiku calls/day instead of 1.
+- Verified: astro build EXIT 0 (get-ecosystem emitted), tsc --noEmit clean, live fetch of all
+  sources ~2s, ranker ~10s, and the rendered DOM checked in dev (4 groups, lane/version chips,
+  computed styles correct in BOTH themes). NOTE: browser screenshots came back blank this
+  session (pane hidden) — verification was DOM + computed-style, not visual.

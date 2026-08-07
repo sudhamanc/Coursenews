@@ -5,7 +5,7 @@ import Newspaper from '../layouts/Newspaper.astro';
 <Newspaper
   section="latest"
   title="Latest in AI — The Course Ledger"
-  description="A daily, ranked digest of AI, data, and engineering stories from arXiv and Hacker News."
+  description="A daily, ranked digest of AI research from arXiv and Hacker News, plus an ecosystem wire tracking model releases, protocol versions, libraries, and architectural patterns."
 >
   <section>
     <span class="flag">The Wire</span>
@@ -39,6 +39,40 @@ import Newspaper from '../layouts/Newspaper.astro';
     <div class="u-center u-mt">
       <button type="button" class="dig-deeper" id="news-more" hidden>Show more stories</button>
     </div>
+  </section>
+
+  <section class="u-mt">
+    <span class="flag">The Ecosystem</span>
+    <div class="grid grid--lede">
+      <div>
+        <h2 class="headline headline--xl">What Shipped</h2>
+        <p class="deck">
+          The wire above tracks what is being <em>discovered</em>. This one tracks
+          what is being <em>used</em> — model releases, protocol versions, library
+          and SDK drops, and the architectural patterns practitioners are arguing
+          about.
+        </p>
+      </div>
+      <aside class="col-rule">
+        <p class="u-sans u-muted" style="font-size:.74rem;line-height:1.6">
+          Two lanes. <strong>Tracked</strong> items come from a fixed watchlist of
+          repositories, so every one is a dated release. <strong>New</strong> items
+          come from open discovery — trending models and repos, launches, and
+          community feeds — so a project nobody has listed can still surface.
+        </p>
+        <p class="u-sans u-muted" id="eco-generated" style="font-size:.7rem;margin-top:.5rem"></p>
+      </aside>
+    </div>
+
+    <hr class="rule rule--heavy" />
+
+    <p id="eco-loading" class="u-muted">Loading the ecosystem…</p>
+    <p id="eco-empty" class="u-muted" hidden>
+      The ecosystem wire hasn’t been populated yet. Once the daily refresh runs,
+      releases and launches will appear here.
+    </p>
+
+    <div id="eco-groups"></div>
   </section>
 </Newspaper>
 
@@ -179,4 +213,164 @@ import Newspaper from '../layouts/Newspaper.astro';
   }
 
   load();
+</script>
+
+<script>
+  interface EcoItem {
+    id: string;
+    title: string;
+    url: string;
+    source: string;
+    lane: 'tracked' | 'discovered';
+    published: string;
+    version?: string;
+    bucket?: string;
+    why?: string;
+    points?: number;
+  }
+
+  // Fixed display order; the ranker is constrained to these four buckets.
+  const BUCKETS: Array<[string, string]> = [
+    ['Models', 'Models & Weights'],
+    ['Standards', 'Standards & Protocols'],
+    ['Libraries', 'Libraries & SDKs'],
+    ['Patterns', 'Patterns & Architecture'],
+  ];
+  // Per LANE, not per bucket. Ranking puts discovery first, so a flat cap let
+  // Show HN fill every Libraries slot and pushed the actual version releases out
+  // of view — the opposite of what this wire is for. Both lanes get a quota.
+  const PER_LANE = 4;
+
+  const groups = document.getElementById('eco-groups')!;
+  const ecoLoading = document.getElementById('eco-loading')!;
+  const ecoEmpty = document.getElementById('eco-empty')!;
+  const ecoGenerated = document.getElementById('eco-generated')!;
+
+  const httpHref = (url: string): string | null => {
+    try {
+      const u = new URL(url);
+      return u.protocol === 'http:' || u.protocol === 'https:' ? u.href : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const chip = (cls: string, text: string): HTMLSpanElement => {
+    const el = document.createElement('span');
+    el.className = cls;
+    el.textContent = text; // textContent throughout — no innerHTML sink
+    return el;
+  };
+
+  function renderEcoItem(item: EcoItem): HTMLLIElement | null {
+    const href = httpHref(item.url);
+    if (!href) return null;
+
+    const li = document.createElement('li');
+    li.className = 'news__item';
+    const main = document.createElement('div');
+
+    const meta = document.createElement('div');
+    meta.className = 'news__meta';
+    meta.appendChild(chip('news__source', item.source));
+    meta.appendChild(
+      chip(
+        `news__lane news__lane--${item.lane}`,
+        item.lane === 'tracked' ? 'Tracked' : 'New',
+      ),
+    );
+    if (item.version) meta.appendChild(chip('news__version', item.version));
+    if (typeof item.points === 'number') meta.appendChild(chip('u-muted', `${item.points} points`));
+
+    const h = document.createElement('h3');
+    h.className = 'headline headline--sm news__title';
+    const a = document.createElement('a');
+    a.href = href;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.textContent = item.title;
+    h.appendChild(a);
+
+    main.appendChild(meta);
+    main.appendChild(h);
+
+    if (item.why) {
+      const why = document.createElement('p');
+      why.className = 'news__why';
+      why.textContent = item.why;
+      main.appendChild(why);
+    }
+
+    const foot = document.createElement('p');
+    foot.className = 'news__foot u-muted';
+    foot.textContent = new Date(item.published).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    main.appendChild(foot);
+
+    li.appendChild(main);
+    return li;
+  }
+
+  async function loadEcosystem() {
+    try {
+      const res = await fetch('/api/ecosystem');
+      if (!res.ok) throw new Error(String(res.status));
+      const feed = await res.json();
+      const items: EcoItem[] = Array.isArray(feed.items) ? feed.items : [];
+      ecoLoading.hidden = true;
+
+      if (items.length === 0) {
+        ecoEmpty.hidden = false;
+        return;
+      }
+      if (feed.generatedAt) {
+        ecoGenerated.textContent = `Last updated ${new Date(feed.generatedAt).toLocaleString()}`;
+      }
+
+      let rendered = 0;
+      for (const [key, label] of BUCKETS) {
+        const ofBucket = items.filter((i) => i.bucket === key);
+        const inBucket = [
+          ...ofBucket.filter((i) => i.lane === 'discovered').slice(0, PER_LANE),
+          ...ofBucket.filter((i) => i.lane === 'tracked').slice(0, PER_LANE),
+        ];
+        if (inBucket.length === 0) continue;
+
+        const section = document.createElement('div');
+        section.className = 'eco-group';
+
+        const head = document.createElement('div');
+        head.className = 'eco-group__head';
+        const title = document.createElement('h3');
+        title.className = 'eco-group__title';
+        title.textContent = label;
+        head.appendChild(title);
+        head.appendChild(chip('eco-group__count', `${inBucket.length}`));
+        section.appendChild(head);
+
+        const ol = document.createElement('ol');
+        ol.className = 'news eco';
+        for (const it of inBucket) {
+          const node = renderEcoItem(it);
+          if (node) {
+            ol.appendChild(node);
+            rendered++;
+          }
+        }
+        section.appendChild(ol);
+        groups.appendChild(section);
+      }
+
+      if (rendered === 0) ecoEmpty.hidden = false;
+    } catch {
+      ecoLoading.hidden = true;
+      ecoEmpty.hidden = false;
+      ecoEmpty.textContent = 'The ecosystem wire is unavailable right now. Please try again later.';
+    }
+  }
+
+  loadEcosystem();
 </script>
