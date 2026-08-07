@@ -3,8 +3,9 @@
 A static **newspaper** that turns a folder of source PDFs into long-form, in-depth
 feature articles — concepts explained as sections with KaTeX math and hand-drawn
 SVG diagrams. A **"Dig deeper"** assistant (Claude Haiku, via a serverless proxy)
-lets you interrogate any concept, and a daily **"Latest in AI"** wire ranks fresh
-work from arXiv and Hacker News.
+lets you interrogate any concept, and a daily **"Latest in AI"** page runs two
+wires: fresh research from arXiv and Hacker News, and an **ecosystem** wire
+tracking model releases, protocol versions, libraries, and design patterns.
 
 It ships with several AI courses out of the box, but it's built to be reused: point
 it at your own PDFs, edit one config file, and you have your own edition.
@@ -15,6 +16,7 @@ it at your own PDFs, edit one config file, and you have your own edition.
 
 - [Features](#features)
 - [How it works](#how-it-works)
+- [The two `/latest` wires](#the-two-latest-wires)
 - [Tech stack](#tech-stack)
 - [Prerequisites](#prerequisites)
 - [Quick start](#quick-start)
@@ -43,10 +45,16 @@ it at your own PDFs, edit one config file, and you have your own edition.
 - **"Dig deeper" chat** — a Netlify Function proxies to Claude Haiku; the API key
   never reaches the browser. Conversations are saved and can be reopened,
   downloaded, or deleted.
-- **Latest in AI** — a scheduled function pulls fresh work from arXiv (RSS) and
-  Hacker News daily, keeps a balanced mix from each source, ranks them with one
-  Haiku call, and caches the feed. It carries arXiv forward on days that feed is
-  empty (arXiv announces only Sun–Thu), so the wire never collapses to one source.
+- **Latest in AI (research wire)** — a scheduled function pulls fresh work from
+  arXiv (RSS) and Hacker News daily, keeps a balanced mix from each source, ranks
+  them with one Haiku call, and caches the feed. It carries arXiv forward on days
+  that feed is empty (arXiv announces only Sun–Thu), so the wire never collapses
+  to one source.
+- **The Ecosystem (releases wire)** — what *shipped*, in four buckets: Models,
+  Standards, Libraries, Patterns. Runs a **tracked** lane (a watchlist of repos
+  read via GitHub release feeds) alongside a **discovered** lane (trending models
+  and repos, launches, community feeds) so brand-new projects can surface too.
+  See [The two `/latest` wires](#the-two-latest-wires).
 - **Incremental content pipeline** — adding a feature or a course is a delta, never
   a full rebuild.
 - **Scripted lifecycle** — setup, start/stop (with port cleanup), build, deploy.
@@ -62,14 +70,77 @@ content/_extracted/<slug>/*.txt  +  manifest.json      (gitignored, regenerable)
         ▼
 src/content/articles/<slug>/*.md   ──►  Astro build  ──►  dist/ (static HTML)
                                                             │
-Browser ──/api/chat──►  netlify/functions/chat.ts  ──►  Claude Haiku
-        ──/api/news──►  netlify/functions/get-news.ts ◄─  news-refresh (daily cron)
-                                   │
-                             Netlify Blobs (transcripts + cached news)
+Browser ──/api/chat──────►  netlify/functions/chat.ts  ──►  Claude Haiku
+        ──/api/news──────►  netlify/functions/get-news.ts      ◄┐
+        ──/api/ecosystem─►  netlify/functions/get-ecosystem.ts ◄┤
+                                   │                            │
+                             Netlify Blobs          news-refresh (daily cron,
+                    (transcripts + both feeds)       builds both wires)
 ```
 
 The single source of truth for courses is [`courses.config.json`](courses.config.json),
 shared by the site, the extraction script, and the Functions.
+
+## The two `/latest` wires
+
+`/latest` carries two independent feeds. Both are rebuilt by the same daily
+scheduled function and cached in Blobs, and each costs one Haiku call per run.
+
+| | **Latest in AI** (research) | **The Ecosystem** (releases) |
+| --- | --- | --- |
+| Question | What is being *discovered*? | What is being *used*? |
+| Sources | arXiv RSS, Hacker News | GitHub release feeds, GitHub Trending, Hugging Face, Show HN, subreddit + commentary RSS |
+| Grouping | Ranked list, free-form category | Four fixed buckets: Models · Standards · Libraries · Patterns |
+| Endpoint | `/api/news` | `/api/ecosystem` |
+| Code | [`netlify/lib/news.ts`](netlify/lib/news.ts) | [`netlify/lib/ecosystem.ts`](netlify/lib/ecosystem.ts) |
+
+### Two lanes, because they fail in opposite ways
+
+- **Tracked** — a fixed watchlist of repositories read via GitHub's
+  `releases.atom`. Every item is a dated, versioned fact. Its blind spot is
+  structural: a project not on the list can never appear.
+- **Discovered** — open-ended sources that rank by trend or votes, so a project
+  nobody has listed can still surface. Its cost is noise, which the ranker filters.
+
+Each lane is ranked in its **own** Haiku call. Ranking both together was tried
+first and failed badly: asked to handle one mixed list, the model dropped every
+discovery item and its index mapping drifted, captioning releases with other
+releases' summaries. Per-lane calls plus a title echo check fixed both.
+
+### Changing what is tracked
+
+Edit the `WATCHLIST` constant in [`netlify/lib/ecosystem.ts`](netlify/lib/ecosystem.ts) —
+it is the single source of truth for that lane:
+
+```ts
+export const WATCHLIST: Array<{ repo: string; hint: EcoBucket }> = [
+  { repo: 'modelcontextprotocol/modelcontextprotocol', hint: 'Standards' },
+  { repo: 'vllm-project/vllm', hint: 'Libraries' },
+  // add: owner/repo — any repo that publishes GitHub Releases
+];
+```
+
+`hint` seeds the bucket; the ranker may override it. Pre-releases (`rc`, `beta`,
+`nightly`, …) and CI tags are filtered out, and each repo contributes at most two
+releases so a chatty monorepo cannot flood the lane.
+
+### Source notes and limitations
+
+- **GitHub Atom feeds, not the REST API.** Unauthenticated REST allows only
+  60 requests/hour *per IP* and Netlify Functions share egress addresses, so a
+  watchlist of this size would intermittently `403`. The Atom feeds have no cap
+  and need no token.
+- **X/Twitter is deliberately absent.** Its API returns `401` unauthenticated and
+  read access starts at a paid tier, so there is no free integration to offer.
+  Show HN, GitHub Trending, and subreddit feeds carry a similar signal.
+- **Reddit is best-effort.** The `.json` API is blocked; the `.rss` feeds work but
+  require a browser-style user agent and rate-limit concurrent requests, so
+  subreddits are fetched in series. Expect it to fail sometimes from cloud IPs —
+  Hacker News, GitHub Trending, and Hugging Face are the dependable sources.
+- **GitHub Trending is scraped.** That page has no API, so the parser is tolerant
+  and returns nothing (rather than erroring) if the markup changes.
+- Every source failure degrades to an empty list, and if *all* sources fail the
+  previous cached feed is kept rather than publishing an empty one.
 
 ## Tech stack
 
@@ -81,7 +152,8 @@ shared by the site, the extraction script, and the Functions.
 | Storage     | Netlify Blobs                                                     |
 | LLM         | Anthropic Claude Haiku (`@anthropic-ai/sdk`)                      |
 | PDF text    | `unpdf`                                                           |
-| News        | arXiv RSS feed + Hacker News (Algolia) via `fast-xml-parser`     |
+| News        | arXiv RSS + Hacker News (Algolia) via `fast-xml-parser`           |
+| Ecosystem   | GitHub `releases.atom` + GitHub Trending + Hugging Face API + RSS |
 
 ## Prerequisites
 
@@ -144,8 +216,10 @@ src/
   lib/courses.ts           # reads courses.config.json
   styles/newspaper.css
 netlify/
-  functions/  chat.ts · threads.ts · get-news.ts · news-refresh.ts · refresh-news.ts
-  lib/        identity.ts · validate.ts · blobs.ts · anthropic.ts · news.ts · ratelimit.ts · http.ts
+  functions/  chat.ts · threads.ts · get-news.ts · get-ecosystem.ts · news-refresh.ts · refresh-news.ts
+  lib/        identity.ts · validate.ts · blobs.ts · anthropic.ts · ratelimit.ts · http.ts
+              news.ts       # research wire (arXiv + Hacker News)
+              ecosystem.ts  # ecosystem wire (WATCHLIST lives here)
 ```
 
 ## Adding content (a delta operation)
@@ -199,7 +273,7 @@ Environment variables (see [`.env.example`](.env.example)):
 | `NEWS_MODEL`           | no       | `claude-haiku-4-5` | News-ranking model id.                     |
 | `CHAT_DAILY_CAP`       | no       | `100`              | Max chat messages per client IP per day.   |
 | `CHAT_MAX_INPUT_CHARS` | no       | `4000`             | Max characters per chat message.           |
-| `NEWS_REFRESH_KEY`     | no       | — (disabled)       | Secret enabling on-demand `GET /api/refresh-news?key=…`. |
+| `NEWS_REFRESH_KEY`     | no       | — (disabled)       | Secret enabling on-demand `GET /api/refresh-news?key=…&wire=research\|ecosystem\|both`. |
 
 Locally these come from `.env`. In production they're set in the Netlify UI.
 
@@ -219,9 +293,12 @@ publish dir, functions dir, redirects, security headers). Deploy either way:
    `CHAT_DAILY_CAP`, `CHAT_MAX_INPUT_CHARS`, `NEWS_REFRESH_KEY`.
 4. **Blobs** — no setup needed; it's provisioned automatically for the site.
 5. **Scheduled function** — `news-refresh` self-registers to run daily at
-   **13:00 UTC**. To populate the wire immediately, set `NEWS_REFRESH_KEY` (a long
-   random string) and call `https://<your-site>/api/refresh-news?key=<secret>`
-   once (or just wait for the first scheduled run).
+   **13:00 UTC** and rebuilds *both* `/latest` wires (one Haiku call each). Until
+   it first runs, `/latest` shows empty states. To populate immediately, set
+   `NEWS_REFRESH_KEY` (a long random string) and call
+   `https://<your-site>/api/refresh-news?key=<secret>` once. Add
+   `&wire=ecosystem` (or `research`) to rebuild just one wire without spending a
+   call on the other.
 6. Deploy. Every push to the production branch redeploys.
 
 ### Option B — CLI
@@ -249,8 +326,10 @@ DNS instructions. HTTPS (including the HSTS header in `netlify.toml`) is automat
   `429`). Also set a **budget/spend limit in the Anthropic console** as a backstop.
 - **Input validation** — message length and course slug are validated server-side;
   the system prompt is written to resist prompt injection.
-- **Output safety** — assistant and news text render via `textContent` (no HTML
-  injection); external news links are protocol-validated (`http`/`https` only).
+- **Output safety** — assistant and wire text render via `textContent` (no HTML
+  injection); every external link on both wires is protocol-validated
+  (`http`/`https` only). Feed content is treated strictly as data — nothing
+  fetched from a third-party source is executed or rendered as markup.
 - **Headers** — a Content Security Policy and standard security headers are set in
   `netlify.toml`. The CSP allows Astro's own inlined first-party scripts and the
   inline styles KaTeX/Shiki need, while still blocking external script origins,
