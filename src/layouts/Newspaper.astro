@@ -107,15 +107,16 @@ const dateLine = now.toLocaleDateString('en-US', {
         </svg>
       </button>
       <header class="masthead">
-        <div class="masthead__kicker">Vol. I · Graduate Studies · Artificial Intelligence Desk</div>
         <h1 class="masthead__title"><a href="/" style="color:inherit;border:none;">The Course Ledger</a></h1>
         <div class="masthead__dateline">
           <span>{dateLine}</span>
-          <span>Concepts, Explained</span>
-          <span>Price: Your Curiosity</span>
         </div>
       </header>
 
+      {/* The wrapper is what carries the scroll-affordance chevrons: it stays put
+          while .topnav scrolls beneath it. data-more-left / data-more-right are
+          set by the script at the bottom of this file. */}
+      <div class="topnav-wrap">
       <nav class="topnav" aria-label="Sections">
         <a href="/" aria-current={section === 'home' ? 'page' : undefined}>Front Page</a>
         {
@@ -130,6 +131,7 @@ const dateLine = now.toLocaleDateString('en-US', {
         }
         <a href="/latest" aria-current={section === 'latest' ? 'page' : undefined}>Latest in AI</a>
       </nav>
+      </div>
       <hr class="rule rule--heavy" />
 
       <main>
@@ -167,16 +169,32 @@ const dateLine = now.toLocaleDateString('en-US', {
         sync();
       })();
 
-      // On narrow screens .topnav is a horizontal scroll strip, so the current
-      // section can start off-screen. Bring it into view without scrolling the
-      // page itself (`block: 'nearest'`).
+      // On narrow screens .topnav is a horizontal scroll strip. Two jobs here:
+      // bring the current section into view, and tell the reader there are more
+      // sections off-screen — a fade alone isn't a strong enough signal, so the
+      // wrapper draws a chevron on whichever side still has content.
       (function () {
-        var current = document.querySelector('.topnav [aria-current="page"]');
-        if (!current) return;
-        var strip = current.parentElement;
-        if (strip.scrollWidth > strip.clientWidth) {
+        var strip = document.querySelector('.topnav');
+        var wrap = document.querySelector('.topnav-wrap');
+        if (!strip || !wrap) return;
+
+        function update() {
+          // 2px of slack absorbs sub-pixel rounding at the extremes.
+          var max = strip.scrollWidth - strip.clientWidth;
+          var scrollable = max > 2;
+          wrap.toggleAttribute('data-more-left', scrollable && strip.scrollLeft > 2);
+          wrap.toggleAttribute('data-more-right', scrollable && strip.scrollLeft < max - 2);
+        }
+
+        strip.addEventListener('scroll', update, { passive: true });
+        window.addEventListener('resize', update);
+        if (window.ResizeObserver) new ResizeObserver(update).observe(strip);
+
+        var current = strip.querySelector('[aria-current="page"]');
+        if (current && strip.scrollWidth > strip.clientWidth) {
           current.scrollIntoView({ inline: 'center', block: 'nearest' });
         }
+        update();
       })();
     </script>
   </body>

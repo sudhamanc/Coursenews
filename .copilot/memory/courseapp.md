@@ -476,3 +476,19 @@ NO RAG. Articles authored directly (no build-time API cost).
   the built output use `python3 -m http.server 4321 --directory dist`.
 - NOT VERIFIABLE LOCALLY: icon at 16px by eye (screenshots blank this session), real iOS
   install, Android maskable crop, netlify.toml headers/CSP (need a deploy preview).
+
+## Session 6b: masthead trim + nav scroll affordance
+- User removed masthead furniture: the "Vol. I · Graduate Studies · Artificial Intelligence Desk"
+  kicker is GONE (markup + .masthead__kicker CSS), and the dateline is now the date ALONE
+  ("Concepts, Explained" / "Price: Your Curiosity" removed).
+- The @media(max-width:480px){.masthead{padding-inline:2.6rem}} rule stays — it originally kept
+  the theme toggle off the kicker; with the kicker gone it now protects the TITLE, which moved up
+  into that space. Verified no toggle/title collision at 375px.
+- NAV SCROLL AFFORDANCE: the edge fade alone was not readable as "there is more" (user report).
+  Added <div class="topnav-wrap"> around <nav class="topnav">; the wrapper does NOT scroll and
+  draws CSS-border chevrons via ::before/::after, toggled by data-more-left / data-more-right
+  attributes set from a scroll+resize+ResizeObserver handler in Newspaper.astro. The mask fade is
+  now also per-side (only the cut-off edge fades) so a chevron never sits over a half-faded word.
+  Chevrons exist only under the 767px media query -> at desktop the pseudo-elements are
+  `content: none`, nav still wraps centred. VERIFIED at 375: right-only at start, both mid-scroll,
+  left-only at end; overflow 0. At 1280: no chevrons, no mask, nav 38px.

@@ -184,13 +184,6 @@ img {
   text-align: center;
   padding: 1.5rem 0 0.75rem;
 }
-.masthead__kicker {
-  font-family: var(--sans);
-  text-transform: uppercase;
-  letter-spacing: 0.28em;
-  font-size: 0.7rem;
-  color: var(--muted);
-}
 .masthead__title {
   font-weight: 800;
   font-size: clamp(2.4rem, 6vw, 4.5rem);
@@ -249,14 +242,10 @@ img {
     overscroll-behavior-x: contain;
     scroll-snap-type: x proximity;
     gap: 1.15rem;
-    /* Let the first/last item clear the edge, and stop scroll-snap from
-       jamming them against it. */
-    padding-inline: 0.15rem;
-    scroll-padding-inline: 0.15rem;
     scrollbar-width: none;
-    /* Fade the right edge so the strip reads as scrollable. */
-    mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+    /* Leave room for the chevrons drawn on .topnav-wrap. */
+    padding-inline: 0.85rem;
+    scroll-padding-inline: 0.85rem;
   }
   .topnav::-webkit-scrollbar {
     display: none;
@@ -265,9 +254,61 @@ img {
     white-space: nowrap;
     scroll-snap-align: start;
   }
+
+  /* Chevrons live on the wrapper, which does NOT scroll, and appear only on the
+     side that still has sections off-screen (attributes set in Newspaper.astro).
+     The edge fade alone proved too subtle to read as "there's more". */
+  .topnav-wrap::before,
+  .topnav-wrap::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 7px;
+    height: 7px;
+    border-style: solid;
+    border-color: var(--accent);
+    border-width: 0;
+    opacity: 0;
+    transition: opacity 140ms ease;
+    pointer-events: none;
+  }
+  .topnav-wrap::before {
+    left: 1px;
+    border-left-width: 1.6px;
+    border-bottom-width: 1.6px;
+    transform: translateY(-50%) rotate(45deg);
+  }
+  .topnav-wrap::after {
+    right: 1px;
+    border-right-width: 1.6px;
+    border-top-width: 1.6px;
+    transform: translateY(-50%) rotate(45deg);
+  }
+  .topnav-wrap[data-more-left]::before,
+  .topnav-wrap[data-more-right]::after {
+    opacity: 1;
+  }
+  /* Only fade the edge that is actually cut off, so the chevron never sits on
+     top of a half-faded word. */
+  .topnav-wrap[data-more-right] .topnav {
+    mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+  }
+  .topnav-wrap[data-more-left] .topnav {
+    mask-image: linear-gradient(to right, transparent, #000 2rem);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 2rem);
+  }
+  .topnav-wrap[data-more-left][data-more-right] .topnav {
+    mask-image: linear-gradient(to right, transparent, #000 2rem, #000 calc(100% - 2rem), transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 2rem, #000 calc(100% - 2rem), transparent);
+  }
 }
 
-/* Reserve the theme toggle's gutter so the masthead kicker wraps beside it
+.topnav-wrap {
+  position: relative;
+}
+
+/* Reserve the theme toggle's gutter so the masthead title wraps beside it
    rather than underneath it. The toggle is translucent with a backdrop blur,
    so an overlap smears the text rather than hiding it. */
 @media (max-width: 480px) {
