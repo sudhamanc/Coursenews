@@ -17,6 +17,8 @@ it at your own PDFs, edit one config file, and you have your own edition.
 - [Features](#features)
 - [How it works](#how-it-works)
 - [The two `/latest` wires](#the-two-latest-wires)
+- [Installable app (PWA) and icons](#installable-app-pwa-and-icons)
+- [Authoring diagrams](#authoring-diagrams)
 - [Tech stack](#tech-stack)
 - [Prerequisites](#prerequisites)
 - [Quick start](#quick-start)
@@ -57,6 +59,11 @@ it at your own PDFs, edit one config file, and you have your own edition.
   See [The two `/latest` wires](#the-two-latest-wires).
 - **Incremental content pipeline** — adding a feature or a course is a delta, never
   a full rebuild.
+- **Installable** — a real PWA: web app manifest, maskable Android icons, an
+  iOS `apple-touch-icon`, and a `theme-color` that follows the light/dark toggle.
+- **Reads on a phone** — wide diagrams scroll at legible size instead of shrinking,
+  the section nav is a one-line scroll strip, and safe-area insets keep content
+  clear of notches and the home indicator in standalone mode.
 - **Scripted lifecycle** — setup, start/stop (with port cleanup), build, deploy.
 
 ## How it works
@@ -142,6 +149,70 @@ releases so a chatty monorepo cannot flood the lane.
 - Every source failure degrades to an empty list, and if *all* sources fail the
   previous cached feed is kept rather than publishing an empty one.
 
+## Installable app (PWA) and icons
+
+The site installs as a standalone app on Android, iOS, and desktop Chrome.
+
+**The mark** is "The Ledger Rule" — a claret serif `L` framed by the paper's
+signature double rule, in the same tokens as the stylesheet (`#fff1e5` paper,
+`#33302e` ink, `#990f3d` claret). It is deliberately three shapes so it still
+reads at 16px in a browser tab.
+
+Sources live in `assets/icons/` and are **not** published; `public/` gets the
+rasterised output, which is committed so a Netlify build never has to run a
+native image binary. Regenerate after editing a source:
+
+```bash
+npm run icons
+```
+
+Two constraints on the rasterisation sources, both enforced by convention:
+literal hex fills only (librsvg ignores `@media`) and the letterform as a
+`<path>`, never `<text>` (librsvg resolves fonts against the host machine).
+
+`mark-maskable.svg` is separate artwork on purpose. Android crops maskable icons
+to a circle of diameter `0.8 x size`, so at 512 every pixel of ink must sit
+inside `[111, 401]` on both axes — the full-bleed mark's serifs and rule ends
+would be sliced. `make-icons.mjs` reads back the rendered pixels and asserts the
+ink bounding box against that window, so the geometry is checked on every run
+rather than eyeballed.
+
+**`theme-color` is driven by JavaScript**, not the `<meta media>` pattern: the
+theme here is `localStorage`-driven rather than `prefers-color-scheme`. It is set
+in two places in `src/layouts/Newspaper.astro` — the pre-paint script and the
+toggle's `sync()` — with the two hex values hardcoded, because the pre-paint
+script runs before the stylesheet is guaranteed to be applied. Keep them in sync
+with `--paper` in `src/styles/newspaper.css`.
+
+`public/favicon.svg` is the one place in the project that follows
+`prefers-color-scheme`: browser chrome tracks the OS, not the site's stored
+preference.
+
+**No service worker**, deliberately. Chrome no longer requires one for
+installability, and it would sit in front of the `/api/*` functions — including a
+metered, rate-limited Anthropic proxy — while adding staleness to a corpus that
+is actively edited.
+
+> After changing the icons, an already-installed app will not repaint. Android
+> may defer the manifest update for days; the reliable check is uninstall and
+> reinstall. On iOS, re-add to the home screen.
+
+## Authoring diagrams
+
+Inline SVG figures are wrapped at build time by `scripts/rehype-figscroll.mjs`
+in a `.figscroll` container, so on a phone they **scroll at readable size**
+rather than scaling down to unreadable. Below 768px the SVG is pinned to a 760px
+floor; an 820-unit `viewBox` then renders at 0.93x, so an 11px label lands at
+about 10px.
+
+**Author new diagrams with `viewBox` width ≤ 640 and `font-size` ≥ 14** and the
+floor never has to bite — the figure fits a phone column without scrolling at
+all.
+
+The plugin wraps `figure > svg` and `table`, skips KaTeX's own inline `<svg>`,
+and is idempotent. `<figcaption>` stays outside the scroller so the caption never
+scrolls away from its figure.
+
 ## Tech stack
 
 | Area        | Choice                                                            |
@@ -154,6 +225,7 @@ releases so a chatty monorepo cannot flood the lane.
 | PDF text    | `unpdf`                                                           |
 | News        | arXiv RSS + Hacker News (Algolia) via `fast-xml-parser`           |
 | Ecosystem   | GitHub `releases.atom` + GitHub Trending + Hugging Face API + RSS |
+| Icons       | Hand-authored SVG rasterised with `sharp` (`npm run icons`)       |
 
 ## Prerequisites
 
@@ -191,6 +263,7 @@ npm start          # full stack (chat + news via Functions/Blobs) -> http://loca
 | `npm run build`        | Production build into `dist/`.                                       |
 | `npm run preview`      | Preview the built site.                                              |
 | `npm run extract`      | Extract PDF text (incremental). See below for per-course usage.      |
+| `npm run icons`        | Regenerate the PWA/favicon PNGs from `assets/icons/*.svg`.            |
 | `npm run deploy`       | Deploy a **draft** preview to Netlify.                               |
 | `npm run deploy:prod`  | Deploy to **production**.                                            |
 
@@ -204,8 +277,15 @@ astro.config.mjs           # Astro config (KaTeX pipeline, Netlify adapter)
 .copilot/memory/           # assistant repo memory (version-controlled project notes)
 Documents/<Course>/*.pdf   # source PDFs (input)
 content/_extracted/        # extracted text + manifest.json (gitignored, regenerable)
+assets/icons/              # hand-authored icon SOURCES (not published)
+  mark.svg · mark-maskable.svg · og.svg
+public/                    # published verbatim; icon PNGs here are generated
+  favicon.svg · favicon-32.png · apple-touch-icon.png · og.png
+  manifest.webmanifest · icons/icon-{192,512}.png · icons/icon-maskable-{192,512}.png
 scripts/
   extract-pdfs.mjs         # PDF -> text (incremental)
+  make-icons.mjs           # SVG -> the PNG icon set (run on demand, outputs committed)
+  rehype-figscroll.mjs     # wraps wide figures/tables in a scroll container at build time
   setup.sh · serve.sh · deploy.sh
 src/
   content.config.ts        # `articles` collection schema (zod)

@@ -1,0 +1,44 @@
+<!--
+  The Course Ledger — primary mark ("The Ledger Rule").
+
+  A claret serif L framed by the paper's signature double rule. Three visual
+  masses only (rule / letter / rule) so it still reads at 16px.
+
+  RASTERISATION SOURCE — two rules apply and must not be broken:
+    1. Literal hex fills only. librsvg (sharp's SVG backend) does not evaluate
+       @media, so prefers-color-scheme here would silently do nothing.
+    2. The L is a <path>, never <text>. librsvg resolves fonts against the host
+       machine, so a <text> element would rasterise differently per machine.
+
+  Palette is copied from src/styles/newspaper.css :root —
+    #fff1e5 (paper)   #33302e (ink)   #990f3d (accent, claret)
+
+  Full-bleed and square on purpose: every consumer (iOS, Android "any",
+  browsers) applies its own rounding. See mark-maskable.svg for the padded
+  variant Android's circle crop requires.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="The Course Ledger">
+  <rect width="512" height="512" fill="#fff1e5"/>
+
+  <!-- Masthead double rule: heavy over light, the heavy-rule / desk motif. -->
+  <rect x="64" y="106" width="384" height="16" fill="#33302e"/>
+  <rect x="64" y="136" width="384" height="7" fill="#33302e"/>
+
+  <!--
+    Serif capital L. Cap height 232 (y 196 -> 428), stem 74 wide, foot arm 108.
+    Bracketed serifs: a top-stem serif spanning the stem, and a foot terminal
+    that steps up at the arm's end. Optically centred at x=256 (the arm makes
+    the glyph right-heavy, so the stem sits left of centre).
+  -->
+  <path fill="#990f3d" d="
+    M 150 196
+    h 110 v 26 h -18
+    v 160 h 108 v -18 h 26 v 64
+    H 150 v -26 h 18
+    V 222 h -18
+    Z
+  "/>
+
+  <!-- Closing rule — the footer double, lighter so it recedes at small sizes. -->
+  <rect x="150" y="452" width="212" height="6" fill="#33302e" opacity="0.38"/>
+</svg>

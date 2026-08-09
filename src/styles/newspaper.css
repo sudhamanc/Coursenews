@@ -66,6 +66,16 @@ body {
   line-height: 1.6;
 }
 
+/* Containment guard. Deliberately `clip`, NOT `hidden`: overflow-x: hidden
+   forces the other axis to `auto`, creating a scroll container that silently
+   breaks `position: sticky` on .keyterms. `clip` creates no scroll container,
+   so sticky survives. Wide content gets its own .figscroll scroller instead of
+   being allowed to push the page sideways. */
+html,
+body {
+  overflow-x: clip;
+}
+
 a {
   color: var(--link);
   text-decoration: none;
@@ -86,14 +96,21 @@ img {
   position: relative;
   max-width: var(--maxw);
   margin: 0 auto;
-  padding: 0 1.25rem 4rem;
+  /* Safe-area insets pair with viewport-fit=cover in Newspaper.astro. On a
+     device without a notch every env() resolves to 0, so max()/calc() keep the
+     original 1.25rem / 4rem padding; in PWA standalone on a notched phone the
+     landscape cutout and the home indicator get real clearance. */
+  padding-top: 0;
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
+  padding-bottom: calc(4rem + env(safe-area-inset-bottom));
 }
 
 /* ---- Theme toggle -------------------------------------------------------- */
 .theme-toggle {
   position: absolute;
-  top: 1rem;
-  right: 1.15rem;
+  top: calc(1rem + env(safe-area-inset-top));
+  right: calc(1.15rem + env(safe-area-inset-right));
   z-index: 5;
   display: inline-flex;
   align-items: center;
@@ -135,10 +152,18 @@ img {
 :root[data-theme="dark"] .theme-toggle__moon {
   display: none;
 }
+/* The visible circle is 2.1rem (~34px), below the 44px minimum touch target
+   (WCAG 2.5.8). Expand the hit area without changing the visual size. */
+.theme-toggle::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+
 @media (max-width: 640px) {
   .theme-toggle {
-    top: 0.6rem;
-    right: 0.6rem;
+    top: calc(0.6rem + env(safe-area-inset-top));
+    right: calc(0.6rem + env(safe-area-inset-right));
   }
 }
 
@@ -208,6 +233,47 @@ img {
 .topnav a:hover,
 .topnav a[aria-current="page"] {
   color: var(--accent);
+}
+
+/* Below the tablet breakpoint the eight section links wrap to five or six
+   centred rows — 130-160px of chrome above the fold on a phone, and it grows
+   with every new desk. Turn it into a horizontal scroll strip instead: one row,
+   ~28px, every section still one tap away. A scrolling section rail is what a
+   newspaper nav is anyway. CSS-only; the layout script centres the current
+   item on load. */
+@media (max-width: 767px) {
+  .topnav {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    gap: 1.15rem;
+    /* Let the first/last item clear the edge, and stop scroll-snap from
+       jamming them against it. */
+    padding-inline: 0.15rem;
+    scroll-padding-inline: 0.15rem;
+    scrollbar-width: none;
+    /* Fade the right edge so the strip reads as scrollable. */
+    mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
+  }
+  .topnav::-webkit-scrollbar {
+    display: none;
+  }
+  .topnav a {
+    white-space: nowrap;
+    scroll-snap-align: start;
+  }
+}
+
+/* Reserve the theme toggle's gutter so the masthead kicker wraps beside it
+   rather than underneath it. The toggle is translucent with a backdrop blur,
+   so an overlap smears the text rather than hiding it. */
+@media (max-width: 480px) {
+  .masthead {
+    padding-inline: 2.6rem;
+  }
 }
 
 /* ---- Section flag -------------------------------------------------------- */
@@ -549,6 +615,15 @@ img {
   gap: 2.75rem;
   align-items: start;
 }
+/* Grid items default to min-width: auto, so a track refuses to shrink below its
+   content's min-content size. The .figscroll floor (760px) would therefore blow
+   the track out to 760px and the scroller would be clipped by the body guard
+   instead of scrolling. minmax(0, 1fr) covers the two-column case above 920px,
+   but the collapsed single-column rule reintroduces the auto minimum — so pin
+   it on the items themselves, at every width. */
+.feature__grid > * {
+  min-width: 0;
+}
 .feature__grid .article__body {
   max-width: 80ch;
 }
@@ -573,6 +648,16 @@ img {
 @media (max-width: 920px) {
   .keyterms {
     position: static;
+  }
+  /* The .col-rule neutralisation lives at 620px, but .feature__grid doesn't
+     collapse until 920 — leaving a 300px window where the now-full-width rail
+     kept a left border and an indent with nothing beside it. Scope the fix to
+     the grid's own breakpoint. */
+  .keyterms.col-rule {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--rule);
+    padding-top: var(--gap);
   }
 }
 .keyterms__list {
@@ -632,6 +717,16 @@ img {
   padding-top: 1.25rem;
   border-top: 1px solid var(--rule);
 }
+/* Two prev/next columns leave ~158px each on a phone — 4-6 wrapped lines per
+   side for a full article title. Stack them. */
+@media (max-width: 640px) {
+  .feature__nav {
+    grid-template-columns: 1fr;
+  }
+  .feature__navlink--next {
+    text-align: left;
+  }
+}
 .feature__navlink {
   display: flex;
   flex-direction: column;
@@ -649,6 +744,22 @@ img {
 }
 
 /* ---- KaTeX display sizing ------------------------------------------------ */
+/* Inline math. `overflow-x: auto` alone is a no-op on an inline box, so the
+   display change is load-bearing, and vertical-align compensates for the
+   baseline shift an overflowing inline-block introduces. Without this a long
+   expression inside a paragraph pushes the whole page sideways. */
+.article__body .katex {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  vertical-align: middle;
+}
+/* Don't regress display math, which has its own scroller below. */
+.article__body .katex-display > .katex {
+  display: block;
+}
+
 .article__body .katex-display {
   overflow-x: auto;
   overflow-y: hidden;
@@ -663,6 +774,78 @@ img {
   margin: 2rem 0;
   padding: 1.4rem 1.4rem 1rem;
   border: 1px solid var(--rule);
+  background: var(--paper-2);
+}
+
+/* ---- Wide content scrollers ---------------------------------------------
+   Diagrams are authored at 560-900 viewBox units. With `width: 100%` they
+   SCALE DOWN on a phone: an 820-unit figure in ~290px of content renders its
+   11px labels at ~3.5px. Unreadable, and scaling gives no way to recover.
+
+   So: don't scale, scroll. Below the tablet breakpoint the SVG is pinned to a
+   760px floor and the wrapper scrolls. At 760 an 820-unit figure renders at
+   0.93x, so an 11px label lands at ~10px — readable with one swipe. A lower
+   floor loses legibility; a higher one makes the common case a two-screen
+   swipe.
+
+   The wrapper is injected at build time by scripts/rehype-figscroll.mjs, which
+   deliberately wraps only the <svg>, leaving <figcaption> outside so the
+   caption never scrolls away from the figure it describes.
+
+   AUTHORING RULE for new diagrams: viewBox width <= 640 and font-size >= 14,
+   and the floor never has to bite. */
+.figscroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+/* Scrollable regions must be keyboard-reachable; the plugin adds tabindex="0",
+   this makes the focus visible. */
+.figscroll:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  /* Give the scroller more of the column back. */
+  .article__body figure {
+    padding-inline: 0.9rem;
+  }
+  .figscroll > svg {
+    width: 760px;
+    min-width: 760px;
+  }
+  /* Fade the right edge so the swipe affordance is visible. */
+  .figscroll {
+    mask-image: linear-gradient(to right, #000 calc(100% - 1.75rem), transparent);
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 1.75rem), transparent);
+  }
+}
+
+/* ---- Tables --------------------------------------------------------------
+   None existed before, so the first authored markdown table would have
+   rendered unstyled and pushed the page sideways. The rehype plugin wraps
+   these in .figscroll too. */
+.article__body table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.article__body thead th {
+  text-align: left;
+  font-weight: 700;
+  border-bottom: 2px solid var(--rule-strong);
+  padding: 0.5rem 0.7rem;
+  white-space: nowrap;
+}
+.article__body tbody td {
+  border-bottom: 1px solid var(--rule);
+  padding: 0.5rem 0.7rem;
+  vertical-align: top;
+}
+.article__body tbody tr:nth-child(even) {
   background: var(--paper-2);
 }
 .article__body figure svg {
@@ -719,6 +902,15 @@ img {
   position: fixed;
   inset: 0;
   z-index: 50;
+  /* dvh, not 100%/vh: `inset: 0` on a fixed element resolves against the LARGE
+     viewport on mobile Safari, so with the URL bar expanded the bottom of the
+     panel — where the composer and Ask button live — sits under browser chrome. */
+  height: 100dvh;
+}
+@supports not (height: 100dvh) {
+  .chat {
+    height: 100%;
+  }
 }
 .chat__scrim {
   position: absolute;
@@ -731,8 +923,9 @@ img {
   position: absolute;
   top: 0;
   right: 0;
-  height: 100%;
+  height: 100dvh;
   width: min(480px, 100%);
+  padding-top: env(safe-area-inset-top);
   background: var(--paper-2);
   border-left: 3px double var(--rule-strong);
   display: flex;
@@ -794,7 +987,9 @@ img {
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  padding: 0.75rem 1.1rem 1.1rem;
+  /* 1.1rem (~18px) is less than the 34px iOS home-indicator inset, which would
+     put the composer under it in standalone mode. */
+  padding: 0.75rem 1.1rem calc(1.1rem + env(safe-area-inset-bottom));
 }
 .chat__log {
   list-style: none;
@@ -854,6 +1049,15 @@ img {
   border: 1px solid var(--rule);
   border-radius: 6px;
   padding: 0.55rem 0.65rem;
+}
+
+/* On a phone the drawer is a fixed height, so dragging the resize handle is a
+   way to push the send button out of the panel entirely. */
+@media (max-width: 767px) {
+  .chat__form textarea {
+    resize: none;
+    max-height: 30dvh;
+  }
 }
 .chat__form-row {
   display: flex;

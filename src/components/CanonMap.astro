@@ -199,6 +199,45 @@ const edges = PAPERS.filter((p) => p.parent && pos[p.parent]).map((p) => {
       ))
     }
   </svg>
+
+  {/*
+    Phone fallback. The graph is 1264 units wide; squeezed into ~294px of phone
+    content its 11.5px labels render at ~2.7px — illegible, and a horizontal
+    scroller would make it a 3+ screen swipe that destroys the overview the map
+    exists to give. A 7-lane x 8-year node graph is not a mobile artifact.
+
+    So below 768px we swap in the same data as a grouped index: every paper,
+    still one tap from its feature, ordered the way the lanes are. No new data —
+    this reads the PAPERS and LANES arrays above.
+
+    Exactly one of the two is live at any width: they swap via `display: none`,
+    which also removes the hidden one from the accessibility tree, so a screen
+    reader never encounters the lineage twice.
+  */}
+  <nav class="canon-index" aria-label="The Foundational Papers, by track">
+    {
+      LANES.map((lane) => (
+        <div class="canon-index__lane">
+          <h3 class="canon-index__lanename">{lane.label}</h3>
+          <ul class="canon-index__list">
+            {
+              PAPERS.filter((p) => p.track === lane.id)
+                .sort((a, b) => a.year - b.year || a.label.localeCompare(b.label))
+                .map((p) => (
+                  <li>
+                    <a href={`/courses/llm-canon/${p.slug}`}>
+                      <span class="canon-index__label">{p.label}</span>
+                      <span class="canon-index__year">{p.year}</span>
+                    </a>
+                  </li>
+                ))
+            }
+          </ul>
+        </div>
+      ))
+    }
+  </nav>
+
   <figcaption class="canon-map__cap">
     <b>The lineage.</b> Seven tracks, 2017–2024. Each box is a paper — select one to read the feature.
     The <span class="canon-map__swatch" /> claret spine is the scaling trunk that runs from
@@ -218,6 +257,61 @@ const edges = PAPERS.filter((p) => p.parent && pos[p.parent]).map((p) => {
       height: auto;
       color: var(--ink);
       overflow: visible;
+    }
+
+    /* ---- Graph vs. index: exactly one is live at any width ---------------- */
+    .canon-index {
+      display: none;
+    }
+    @media (max-width: 767px) {
+      .canon-map svg {
+        display: none;
+      }
+      .canon-index {
+        display: block;
+      }
+    }
+
+    .canon-index__lane + .canon-index__lane {
+      margin-top: 1.4rem;
+    }
+    .canon-index__lanename {
+      font-family: var(--sans);
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      margin: 0 0 0.4rem;
+      padding-bottom: 0.25rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .canon-index__list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .canon-index__list a {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      /* >=44px tall for a comfortable touch target. */
+      padding: 0.62rem 0;
+      border-bottom: none;
+      color: var(--ink);
+    }
+    .canon-index__list li + li a {
+      border-top: 1px solid var(--rule);
+    }
+    .canon-index__label {
+      font-weight: 600;
+    }
+    .canon-index__year {
+      font-family: var(--sans);
+      font-size: 0.7rem;
+      color: var(--faint);
+      flex: none;
     }
     .canon-map text {
       fill: currentColor;

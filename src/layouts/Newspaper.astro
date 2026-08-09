@@ -16,6 +16,11 @@ const {
   section,
 } = Astro.props;
 
+/** Absolute URL for this page — canonical + Open Graph. `Astro.site` comes from
+ *  astro.config.mjs, which reads Netlify's build-time URL env var. */
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL('/og.png', Astro.site);
+
 const now = new Date();
 const dateLine = now.toLocaleDateString('en-US', {
   weekday: 'long',
@@ -29,23 +34,60 @@ const dateLine = now.toLocaleDateString('en-US', {
 <html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- viewport-fit=cover pairs with the env(safe-area-inset-*) padding in
+         newspaper.css; neither is useful alone. interactive-widget lets the
+         Chromium virtual keyboard resize the layout instead of covering it. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+    />
     <meta name="description" content={description} />
     <meta name="color-scheme" content="light dark" />
+
+    <!-- Must precede the pre-paint script below, which rewrites its content. -->
+    <meta id="theme-color-meta" name="theme-color" content="#fff1e5" />
+
     <script is:inline>
       // Set the theme before first paint to avoid a flash of the wrong colors.
       // Defaults to the FT-style light theme unless the visitor chose dark.
       (function () {
+        var theme = 'light';
         try {
-          var stored = localStorage.getItem('theme');
-          document.documentElement.setAttribute('data-theme', stored === 'dark' ? 'dark' : 'light');
+          theme = localStorage.getItem('theme') === 'dark' ? 'dark' : 'light';
         } catch (e) {
-          document.documentElement.setAttribute('data-theme', 'light');
+          /* storage blocked — keep the default */
         }
+        document.documentElement.setAttribute('data-theme', theme);
+        // Colour the browser/PWA chrome to match. The values are hardcoded on
+        // purpose: this runs in <head>, where the stylesheet may not have been
+        // applied yet, so reading --paper via getComputedStyle can come back
+        // empty. Keep them in sync with --paper in src/styles/newspaper.css.
+        var m = document.getElementById('theme-color-meta');
+        if (m) m.setAttribute('content', theme === 'dark' ? '#16150f' : '#fff1e5');
       })();
     </script>
+
     <title>{title}</title>
+    <link rel="canonical" href={canonical} />
+
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- iOS reads these rather than the manifest for home-screen installs. -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Ledger" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="The Course Ledger" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
     <div class="paper">
@@ -105,8 +147,14 @@ const dateLine = now.toLocaleDateString('en-US', {
         var root = document.documentElement;
         var btn = document.getElementById('theme-toggle');
         if (!btn) return;
+        var meta = document.getElementById('theme-color-meta');
         function sync() {
-          btn.setAttribute('aria-pressed', String(root.getAttribute('data-theme') === 'dark'));
+          var dark = root.getAttribute('data-theme') === 'dark';
+          btn.setAttribute('aria-pressed', String(dark));
+          // Keep the browser/PWA chrome colour with the theme. The <meta media>
+          // pattern can't be used here: the theme is localStorage-driven, not
+          // prefers-color-scheme. Values mirror --paper in newspaper.css.
+          if (meta) meta.setAttribute('content', dark ? '#16150f' : '#fff1e5');
         }
         btn.addEventListener('click', function () {
           var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -117,6 +165,18 @@ const dateLine = now.toLocaleDateString('en-US', {
           sync();
         });
         sync();
+      })();
+
+      // On narrow screens .topnav is a horizontal scroll strip, so the current
+      // section can start off-screen. Bring it into view without scrolling the
+      // page itself (`block: 'nearest'`).
+      (function () {
+        var current = document.querySelector('.topnav [aria-current="page"]');
+        if (!current) return;
+        var strip = current.parentElement;
+        if (strip.scrollWidth > strip.clientWidth) {
+          current.scrollIntoView({ inline: 'center', block: 'nearest' });
+        }
       })();
     </script>
   </body>

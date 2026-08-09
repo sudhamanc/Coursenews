@@ -1,10 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="8" fill="#f7f4ec" />
-  <rect x="8" y="10" width="48" height="44" rx="2" fill="#fffdf8" stroke="#1a1a1a" stroke-width="2" />
-  <line x1="14" y1="20" x2="50" y2="20" stroke="#7a1f1f" stroke-width="3" />
-  <line x1="14" y1="28" x2="50" y2="28" stroke="#1a1a1a" stroke-width="2" />
-  <line x1="14" y1="34" x2="50" y2="34" stroke="#1a1a1a" stroke-width="2" />
-  <line x1="14" y1="40" x2="38" y2="40" stroke="#1a1a1a" stroke-width="2" />
-  <line x1="14" y1="46" x2="38" y2="46" stroke="#1a1a1a" stroke-width="2" />
-  <rect x="40" y="38" width="10" height="10" fill="#14213d" />
+<!--
+  The Course Ledger — browser favicon.
+
+  Same mark as assets/icons/mark.svg, with two deliberate differences:
+
+  1. Rounded corners. Browsers render the favicon un-masked in a tab strip, so
+     the rounding is ours to apply (the PNG icons stay square because iOS and
+     Android apply their own).
+
+  2. It follows prefers-color-scheme — the ONE place in this project that does.
+     Everywhere else the theme is driven manually by data-theme + localStorage
+     (see src/layouts/Newspaper.astro), but browser chrome follows the OS, not
+     the site's stored preference, so a tab icon must match the OS instead.
+     Dark values are the :root[data-theme="dark"] tokens from newspaper.css.
+
+  This file is served verbatim from public/ and is NOT a rasterisation source —
+  sharp's SVG backend ignores @media, so mark.svg exists separately for that.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="The Course Ledger">
+  <style>
+    .paper { fill: #fff1e5 }
+    .ink   { fill: #33302e }
+    .mark  { fill: #990f3d }
+    @media (prefers-color-scheme: dark) {
+      .paper { fill: #16150f }
+      .ink   { fill: #ece7db }
+      .mark  { fill: #e6a5a5 }
+    }
+  </style>
+
+  <rect class="paper" width="512" height="512" rx="72"/>
+  <rect class="ink" x="64" y="106" width="384" height="16"/>
+  <rect class="ink" x="64" y="136" width="384" height="7"/>
+  <path class="mark" d="
+    M 150 196
+    h 110 v 26 h -18
+    v 160 h 108 v -18 h 26 v 64
+    H 150 v -26 h 18
+    V 222 h -18
+    Z
+  "/>
+  <rect class="ink" x="150" y="452" width="212" height="6" opacity="0.38"/>
 </svg>

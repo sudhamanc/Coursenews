@@ -1,0 +1,47 @@
+<!--
+  The Course Ledger — social card (1200x630).
+
+  This is where the richer "Rule & Node" idea lives: the LLM Canon lineage
+  abstracted onto a column rule. It has sub-pixel elements at 16px so it can't
+  be the app icon, but at 1200x630 it's unconstrained — giving the site a
+  two-mark system (compact icon mark + editorial mark) the way mastheads do.
+
+  Rasterisation source: literal hex only, all lettering as paths is NOT required
+  here because the wordmark is drawn as rects/paths, not <text>. Do not add
+  <text> — librsvg would resolve fonts against the host machine.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="The Course Ledger">
+  <rect width="1200" height="630" fill="#fff1e5"/>
+
+  <!-- Masthead double rule across the top third. -->
+  <rect x="90" y="150" width="1020" height="14" fill="#33302e"/>
+  <rect x="90" y="180" width="1020" height="6" fill="#33302e"/>
+
+  <!-- The mark, at icon proportions, anchored left. -->
+  <g transform="translate(90, 250) scale(0.60)">
+    <path fill="#990f3d" d="
+      M 150 196
+      h 110 v 26 h -18
+      v 160 h 108 v -18 h 26 v 64
+      H 150 v -26 h 18
+      V 222 h -18
+      Z
+    " transform="translate(-150, -196)"/>
+  </g>
+
+  <!--
+    Rule & Node: a stepping claret lineage crossing the field, ink nodes on the
+    steps, the terminal node in Oxford blue (the "current" paper).
+  -->
+  <g transform="translate(470, 250)">
+    <path d="M 40 250 L 40 170 L 200 170 L 200 90 L 360 90 L 360 20 L 520 20"
+          fill="none" stroke="#990f3d" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="40"  cy="250" r="16" fill="#33302e"/>
+    <circle cx="200" cy="170" r="16" fill="#33302e"/>
+    <circle cx="360" cy="90"  r="16" fill="#33302e"/>
+    <circle cx="520" cy="20"  r="18" fill="#0f5499"/>
+  </g>
+
+  <!-- Footer rule, mirroring the masthead. -->
+  <rect x="90" y="512" width="1020" height="6" fill="#33302e" opacity="0.4"/>
+</svg>

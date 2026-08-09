@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "The Course Ledger",
+  "short_name": "Ledger",
+  "description": "A newspaper of the AI, machine-learning, and data-science concepts from my graduate coursework — explained in depth.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fff1e5",
+  "theme_color": "#fff1e5",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "news"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Latest in AI", "short_name": "Wire", "url": "/latest" },
+    { "name": "Foundational Papers", "short_name": "Canon", "url": "/courses/llm-canon" },
+    { "name": "Applications of ML", "short_name": "App ML", "url": "/courses/applications-of-ml" }
+  ]
+}

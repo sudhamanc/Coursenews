@@ -419,3 +419,60 @@ NO RAG. Articles authored directly (no build-time API cost).
   sources ~2s, ranker ~10s, and the rendered DOM checked in dev (4 groups, lane/version chips,
   computed styles correct in BOTH themes). NOTE: browser screenshots came back blank this
   session (pane hidden) — verification was DOM + computed-style, not visual.
+
+## Session 6: PWA icon + mobile design (build + browser verified)
+
+- PROBLEM (user): installed PWA icon was a generic "C". Root cause: ZERO PWA infra —
+  public/ had only favicon.svg (and its palette was from a SUPERSEDED design), no manifest,
+  no apple-touch-icon, no theme-color. Chrome synthesises a letter avatar from the origin
+  (coursenews.netlify.app -> "C"). PLATFORM SPLIT: iOS ignores manifest icons and needs
+  apple-touch-icon.png; Android needs the manifest. Both required.
+- MARK = "The Ledger Rule": claret serif L between the signature double rule, on salmon.
+  Three shapes so it survives 16px. Sources in assets/icons/ (mark, mark-maskable, og),
+  rasterised by scripts/make-icons.mjs, OUTPUTS COMMITTED to public/ so Netlify never runs
+  a native binary. sharp was ALREADY resolved as an optionalDependency of astro (verified);
+  added explicitly to devDependencies so `--omit=optional` can't drop it.
+- RASTERISATION RULES (librsvg): literal hex only (@media is ignored), letterform as <path>
+  never <text> (fonts resolve against the host machine). XML gotcha: SVG COMMENTS CANNOT
+  CONTAIN "--" — writing "--paper" in a comment broke the parse.
+- MASKABLE: separate padded artwork. Android guarantees only a centred circle of 0.8*size,
+  so at 512 all ink must be in [111,401]. make-icons.mjs reads back pixels and ASSERTS the
+  ink bbox (got [111,134]-[400,377]) — substitutes for the Android check we can't run.
+- theme-color CANNOT use <meta media> here (theme is localStorage-driven, not
+  prefers-color-scheme). Set in TWO places in Newspaper.astro: the pre-paint script and the
+  toggle's sync(). Hex HARDCODED — the pre-paint script runs before the stylesheet is
+  guaranteed applied, so getComputedStyle('--paper') can be empty. public/favicon.svg is the
+  ONE exception that does use prefers-color-scheme (browser chrome follows the OS).
+- NO SERVICE WORKER (deliberate): not needed for installability; would sit in front of the
+  metered/rate-limited /api/chat proxy; adds staleness to an actively edited corpus.
+- FIGSCROLL (biggest win): diagrams were SCALING DOWN — an 820-unit viewBox in ~290px made
+  11px labels render at ~3.5px. Fix = scripts/rehype-figscroll.mjs wraps figure>svg and
+  table in .figscroll + a 760px min-width floor below 768px. Zero content files touched.
+  * ORDERING GOTCHA: inline SVG in markdown arrives as `raw` hast nodes. rehypeRaw MUST run
+    before figscroll: [rehypeKatex, rehypeRaw, rehypeFigscroll]. rehype-raw moved to
+    `dependencies` (astro.config imports it at build time; Netlify prod omits devDeps).
+  * ASTRO CONTENT CACHE: after changing astro.config plugins, `rm -rf .astro dist` — a stale
+    cache made the wrapper look like it wasn't applying (0 wrapped) when it was.
+  * GRID BLOWOUT (found by browser check, not by reading): .article__body is a grid item with
+    min-width:auto, so the 760px floor blew the track to 790px and body{overflow-x:clip}
+    CLIPPED the scroller instead of letting it scroll. FIX: `.feature__grid > * { min-width: 0 }`.
+    minmax(0,1fr) only covers the 2-col case; the collapsed 1fr reintroduces the auto minimum.
+  * VERIFIED at 375px: scroller clientW 304 / scrollW 760, scrolls:true, glyph heights 11-18px
+    (was ~3.5). At 1280 min-width is 0 so desktop is unchanged.
+- overflow-x: CLIP not hidden on html,body — `hidden` creates a scroll container and BREAKS
+  position:sticky on .keyterms. Verified sticky survives at 1280.
+- CanonMap (1264 viewBox, would be 2.7px labels): SVG hidden below 768px, replaced by
+  .canon-index — 7 lanes / 37 papers off the existing PAPERS+LANES arrays, 46px tap targets.
+  display:none swap also removes the hidden one from the a11y tree (no aria-hidden needed).
+- .topnav -> horizontal scroll strip below 768px: 130-160px of chrome -> 38px VERIFIED.
+- Also fixed: toggle/kicker collision (masthead padding-inline 2.6rem <=480px) + 44px hit
+  target via ::before; .feature__nav stacks <=640; .keyterms.col-rule stray left border in
+  the 621-920 window; inline KaTeX needs display:inline-block AND overflow-x (auto alone is
+  a no-op on an inline box); table CSS added (there was none).
+- astro.config `site` was the 'https://example.netlify.app' PLACEHOLDER -> now
+  `process.env.URL || 'http://localhost:4321'` (Netlify injects URL at build), feeding new
+  canonical + OG/Twitter tags. NOTE: real deployed domain still unknown to the repo.
+- `astro preview` DOES NOT WORK (the netlify adapter rejects it). For local verification of
+  the built output use `python3 -m http.server 4321 --directory dist`.
+- NOT VERIFIABLE LOCALLY: icon at 16px by eye (screenshots blank this session), real iOS
+  install, Android maskable crop, netlify.toml headers/CSP (need a deploy preview).
