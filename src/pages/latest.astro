@@ -9,23 +9,12 @@ import Newspaper from '../layouts/Newspaper.astro';
 >
   <section>
     <span class="flag">The Wire</span>
-    <div class="grid grid--lede">
-      <div>
-        <h2 class="headline headline--xl">Latest in AI</h2>
-        <p class="deck">
-          More AI, data, and engineering news breaks each day than anyone can
-          read. This wire pulls from arXiv and Hacker News, then ranks the field
-          by how interesting and useful each story is.
-        </p>
-      </div>
-      <aside class="col-rule">
-        <p class="u-sans u-muted" style="font-size:.74rem;line-height:1.6">
-          Refreshed automatically every day at <strong>13:00 UTC</strong>.
-          Headlines link to the original source; summaries are AI-generated.
-        </p>
-        <p class="u-sans u-muted" id="news-generated" style="font-size:.7rem;margin-top:.5rem"></p>
-      </aside>
-    </div>
+    <h2 class="headline headline--xl">Latest in AI</h2>
+    <p class="deck" style="max-width:60ch">
+      More AI, data, and engineering news breaks each day than anyone can read.
+      This wire pulls from arXiv and Hacker News, then ranks the field by how
+      interesting and useful each story is.
+    </p>
 
     <hr class="rule rule--heavy" />
 
@@ -43,26 +32,7 @@ import Newspaper from '../layouts/Newspaper.astro';
 
   <section class="u-mt">
     <span class="flag">The Ecosystem</span>
-    <div class="grid grid--lede">
-      <div>
-        <h2 class="headline headline--xl">What Shipped</h2>
-        <p class="deck">
-          The wire above tracks what is being <em>discovered</em>. This one tracks
-          what is being <em>used</em> — model releases, protocol versions, library
-          and SDK drops, and the architectural patterns practitioners are arguing
-          about.
-        </p>
-      </div>
-      <aside class="col-rule">
-        <p class="u-sans u-muted" style="font-size:.74rem;line-height:1.6">
-          Two lanes. <strong>Tracked</strong> items come from a fixed watchlist of
-          repositories, so every one is a dated release. <strong>New</strong> items
-          come from open discovery — trending models and repos, launches, and
-          community feeds — so a project nobody has listed can still surface.
-        </p>
-        <p class="u-sans u-muted" id="eco-generated" style="font-size:.7rem;margin-top:.5rem"></p>
-      </aside>
-    </div>
+    <h2 class="headline headline--xl">What Shipped</h2>
 
     <hr class="rule rule--heavy" />
 
@@ -94,7 +64,6 @@ import Newspaper from '../layouts/Newspaper.astro';
   const loading = document.getElementById('news-loading')!;
   const empty = document.getElementById('news-empty')!;
   const moreBtn = document.getElementById('news-more') as HTMLButtonElement;
-  const generated = document.getElementById('news-generated')!;
 
   const safeHref = (url: string): string | null => {
     try {
@@ -184,10 +153,6 @@ import Newspaper from '../layouts/Newspaper.astro';
         return;
       }
 
-      if (feed.generatedAt) {
-        generated.textContent = `Last updated ${new Date(feed.generatedAt).toLocaleString()}`;
-      }
-
       let rank = 0;
       const nodes = items
         .map((it) => renderItem(it, ++rank))
@@ -244,7 +209,6 @@ import Newspaper from '../layouts/Newspaper.astro';
   const groups = document.getElementById('eco-groups')!;
   const ecoLoading = document.getElementById('eco-loading')!;
   const ecoEmpty = document.getElementById('eco-empty')!;
-  const ecoGenerated = document.getElementById('eco-generated')!;
 
   const httpHref = (url: string): string | null => {
     try {
@@ -326,10 +290,6 @@ import Newspaper from '../layouts/Newspaper.astro';
         ecoEmpty.hidden = false;
         return;
       }
-      if (feed.generatedAt) {
-        ecoGenerated.textContent = `Last updated ${new Date(feed.generatedAt).toLocaleString()}`;
-      }
-
       let rendered = 0;
       for (const [key, label] of BUCKETS) {
         const ofBucket = items.filter((i) => i.bucket === key);

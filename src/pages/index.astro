@@ -38,7 +38,6 @@ const editorsPicks = EDITORS_PICKS.map((id) => byId[id]).filter(Boolean);
 // with each new course, no curation required.
 const topStories = COURSES.map((c) => featuresFor(c.slug)[0]).filter(Boolean);
 
-const totalFeatures = articles.length;
 ---
 
 <Newspaper section="home">
@@ -52,12 +51,6 @@ const totalFeatures = articles.length;
         <p class="deck">
           A running broadsheet on the ideas driving artificial intelligence — each
           one written up as an in-depth feature you can interrogate in the margin.
-        </p>
-        <p class="u-sans u-muted" style="font-size:.8rem;line-height:1.6">
-          {totalFeatures} features across {desks.length} desks, with the key terms
-          pulled into the margin. The <em>Latest in AI</em> wire rounds up fresh
-          work from arXiv and Hacker News each day —{' '}
-          <a href="/latest">read today’s wire →</a>
         </p>
       </div>
       <aside class="col-rule">
