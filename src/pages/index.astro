@@ -24,12 +24,12 @@ const desks = COURSES.map((c) => {
 
 // Editor's Picks — a hand-curated shortlist spanning the desks. Edit this list to
 // re-curate; ids that don't exist are simply skipped, so it never breaks a build.
+// Three, not more: the picks sit opposite a short lede, and a longer list just
+// leaves dead space in the left column.
 const EDITORS_PICKS = [
   'applications-of-ml/l08-transformers',
   'advanced-ai/week1',
   'human-ai/week5-haii',
-  'advanced-ai/agentic-ai-survey',
-  'applications-of-ml/l10-vt-diffusion-adapters',
 ];
 const byId = Object.fromEntries(articles.map((a) => [a.id, a]));
 const editorsPicks = EDITORS_PICKS.map((id) => byId[id]).filter(Boolean);

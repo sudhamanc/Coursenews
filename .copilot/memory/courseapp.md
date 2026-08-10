@@ -492,3 +492,25 @@ NO RAG. Articles authored directly (no build-time API cost).
   Chevrons exist only under the 767px media query -> at desktop the pseudo-elements are
   `content: none`, nav still wraps centred. VERIFIED at 375: right-only at start, both mid-scroll,
   left-only at end; overflow 0. At 1280: no chevrons, no mask, nav 38px.
+
+## Session 6c: reclaim vertical space + cap the wire lists
+- HOME LEDE DEAD SPACE (user screenshot): .grid--lede is 2fr/1fr and the aside (5 Editor's Picks)
+  was ~170px taller than the headline+deck column, so the left column reserved the aside's height.
+  FIX: EDITORS_PICKS 5 -> 3 (index.astro) + `.grid--lede { align-items: start }`. Verified 1280px:
+  left 272 / right 264 (was a ~170px gap).
+- /latest: removed the "More AI, data, and engineering news breaks each day..." deck. Both sections
+  are now flag + headline + rule only.
+- LIST CAPS (user asked "keep to 5, ranked by LLM"):
+  * news TOP 12 -> 5. "Show more stories" KEPT, so the other ~22 ranked items stay reachable.
+  * ecosystem PER_LANE=4 (=up to 8/bucket) -> PER_BUCKET=5 via a new interleave(tracked, discovered, n)
+    that ALTERNATES the two lanes' ranked orders instead of concatenating them. Concatenating put all
+    discovered first, which buried the ranking; a flat cap (the original bug) let Show HN evict every
+    tracked release. Alternating preserves each lane's LLM rank AND guarantees both lanes appear,
+    with dated releases leading. VERIFIED against the live feed: Models 2 (dd), Standards 4 (tttt),
+    Libraries 17->5 (tdtdt), Patterns 6->5 (tdtdt); 16 shown vs up to 32 before.
+- GLOBAL VERTICAL RHYTHM (repeats on every page, so small cuts compound):
+  .paper padding-bottom 4rem->2.5rem, .rule margin 1.25rem->0.9rem, .masthead padding 1.5/0.75->0.9/0.5.
+- VERIFY TRICK worth reusing: the /api/* endpoints 404 on a plain static server, so
+  `mkdir dist/api && curl <live>/api/news -o dist/api/news` makes python -m http.server serve the real
+  feed as a static file. fetch().json() ignores the wrong content-type, so the page renders live data
+  and the caps can be asserted end-to-end. Delete dist/api afterwards.

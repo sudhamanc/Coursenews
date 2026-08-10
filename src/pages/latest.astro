@@ -10,11 +10,6 @@ import Newspaper from '../layouts/Newspaper.astro';
   <section>
     <span class="flag">The Wire</span>
     <h2 class="headline headline--xl">Latest in AI</h2>
-    <p class="deck" style="max-width:60ch">
-      More AI, data, and engineering news breaks each day than anyone can read.
-      This wire pulls from arXiv and Hacker News, then ranks the field by how
-      interesting and useful each story is.
-    </p>
 
     <hr class="rule rule--heavy" />
 
@@ -59,7 +54,8 @@ import Newspaper from '../layouts/Newspaper.astro';
     why?: string;
   }
 
-  const TOP = 12;
+  // Default view is the ranker's top 5; the rest stay behind the toggle.
+  const TOP = 5;
   const list = document.getElementById('news-list') as HTMLOListElement;
   const loading = document.getElementById('news-loading')!;
   const empty = document.getElementById('news-empty')!;
@@ -201,10 +197,21 @@ import Newspaper from '../layouts/Newspaper.astro';
     ['Libraries', 'Libraries & SDKs'],
     ['Patterns', 'Patterns & Architecture'],
   ];
-  // Per LANE, not per bucket. Ranking puts discovery first, so a flat cap let
-  // Show HN fill every Libraries slot and pushed the actual version releases out
-  // of view — the opposite of what this wire is for. Both lanes get a quota.
-  const PER_LANE = 4;
+  // Five per bucket, filled by alternating the two lanes' ranked orders rather
+  // than concatenating them. A flat cap let Show HN fill every Libraries slot and
+  // pushed the actual version releases out of view; concatenating fixed that but
+  // buried the ranking. Alternating keeps each lane in LLM-ranked order AND
+  // guarantees both are represented, with the dated releases leading.
+  const PER_BUCKET = 5;
+
+  function interleave(tracked: EcoItem[], discovered: EcoItem[], n: number): EcoItem[] {
+    const out: EcoItem[] = [];
+    for (let i = 0; out.length < n && (i < tracked.length || i < discovered.length); i++) {
+      if (i < tracked.length && out.length < n) out.push(tracked[i]);
+      if (i < discovered.length && out.length < n) out.push(discovered[i]);
+    }
+    return out;
+  }
 
   const groups = document.getElementById('eco-groups')!;
   const ecoLoading = document.getElementById('eco-loading')!;
@@ -293,10 +300,11 @@ import Newspaper from '../layouts/Newspaper.astro';
       let rendered = 0;
       for (const [key, label] of BUCKETS) {
         const ofBucket = items.filter((i) => i.bucket === key);
-        const inBucket = [
-          ...ofBucket.filter((i) => i.lane === 'discovered').slice(0, PER_LANE),
-          ...ofBucket.filter((i) => i.lane === 'tracked').slice(0, PER_LANE),
-        ];
+        const inBucket = interleave(
+          ofBucket.filter((i) => i.lane === 'tracked'),
+          ofBucket.filter((i) => i.lane === 'discovered'),
+          PER_BUCKET,
+        );
         if (inBucket.length === 0) continue;
 
         const section = document.createElement('div');
