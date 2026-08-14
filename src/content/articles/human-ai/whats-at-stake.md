@@ -3,7 +3,7 @@ course: human-ai
 lectureId: R2
 title: "It Was Never Going to Be Malice"
 deck: "The machines will not rise against us — they have no wants at all. What should worry us, this reading argues, is far more mundane and far more likely: brittle systems, borrowed prejudice, and goals we specified badly."
-order: 9
+order: 10
 readingTime: 12
 tags: ["ai-risk", "robustness", "bias", "goal-misspecification", "trust"]
 concepts:

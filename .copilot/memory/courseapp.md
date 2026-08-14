@@ -514,3 +514,32 @@ NO RAG. Articles authored directly (no build-time API cost).
   `mkdir dist/api && curl <live>/api/news -o dist/api/news` makes python -m http.server serve the real
   feed as a static file. fetch().json() ignores the wrong content-type, so the page renders live data
   and the caps can be asserted end-to-end. Delete dist/api afterwards.
+
+## Session 7: Human-AI Week 8 (Data Ownership & Privacy) + OpenAI Privacy Filter
+- Source PDFs arrived OUTSIDE the repo (user's Google Drive .../Summer2026/HumanAIInteraction/Week8/).
+  Workflow: cp into Documents/HumanAI/ then `npm run extract -- human-ai`. Week8-HAII.pdf is 79MB /
+  42p -> too big for the Read tool; the extractor handled it fine (43,245 chars). ALWAYS route large
+  PDFs through the extractor rather than Read.
+- ORDERING SCHEME NOW EXPLICIT: lectures own 1..N, readings follow. Week 8 took order 8, so R1-R5 were
+  bumped 8-12 -> 9-13 and the new reading is R6 order 14. Desk front verified W1-W8 then R1-R6.
+  Any future week N takes order N and pushes every reading down by one.
+- week8-haii.md (W8, order 8, ~1710 words, 2 diagrams): lede is the camouflaged-tank story AND the
+  fact that it may be apocryphal (gwern.net/tank) — the lecture's own point that we repeat it because
+  it flatters the lesson we wanted. Covers: 321-incident study (92.8% created/intensified a privacy
+  risk), generative distortion (TecoGAN unblurring, QTCinderella deepfake, Bourdain voice), algorithmic
+  physiognomy (DeepScore, classroom emotion detection), predictive aggregation (Argentine pregnancy
+  model, UK NDAS), Wachter's right to reasonable inferences + "right to be seen well", scraping loop
+  (LAION-5B medical imagery, Clearview, PIPA/Diversity in Faces), ubiquitous surveillance (Gaggle,
+  Ring, Halo), pipeline leakage (Lee Luda, Roomba annotators), why DP/federated learning are
+  insufficient, notice-and-consent failure, three accountability pillars, Amazon recruiting case,
+  industrial data asymmetry + "third way", and the copyright split (US/EU human-authorship vs
+  UK/India/Ireland/NZ computer-generated-works statutes). Diagrams: analog-vs-algorithmic inference,
+  accountability loop (upfront vs post-deployment).
+- openai-privacy-filter.md (R6, order 14, ~1160 words, 1 diagram): the Apr 22 2026 open-weight PII
+  redactor. Bidirectional token classifier + BIOES constrained-Viterbi span decoding, 1.5B total /
+  50M active, 128k context, 8 labels, Apache 2.0, runs locally. F1 96% on PII-Masking-300k / 97.43%
+  on OpenAI's own corrected version (article flags the self-grading caveat); fine-tune moves a new
+  domain 54% -> 96%. Framed deliberately as a Layer-2 control per the W8 argument: a good instance of
+  a category that still cannot ask whether the pipeline should exist.
+- The figscroll rehype plugin picked up all 3 new diagrams automatically — no per-article work.
+  VERIFIED 375px: both W8 figures 760/304 swipeable, svg text 11px, page overflow 0.

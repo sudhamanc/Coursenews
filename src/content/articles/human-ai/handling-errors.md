@@ -3,7 +3,7 @@ course: human-ai
 lectureId: R1
 title: "Tolerate the Error, Never the Failure"
 deck: "A designer's field guide to AI mistakes argues that the error message is not the afterthought at the edge of the product — it is where trust is either rebuilt or permanently spent."
-order: 8
+order: 9
 readingTime: 11
 tags: ["error-handling", "ux-design", "trust", "feedback", "graceful-degradation"]
 concepts:

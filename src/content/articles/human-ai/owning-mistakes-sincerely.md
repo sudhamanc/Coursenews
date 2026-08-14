@@ -3,7 +3,7 @@ course: human-ai
 lectureId: R4
 title: "No Apology Beats a Bad One"
 deck: "When a voice assistant gets it wrong, the words it chooses next decide whether you use it again — and a CHI study finds that blaming the engineering team is worse for the product than saying nothing at all."
-order: 11
+order: 12
 readingTime: 11
 tags: ["apology", "voice-assistants", "trust-repair", "blame", "error-mitigation"]
 concepts:
