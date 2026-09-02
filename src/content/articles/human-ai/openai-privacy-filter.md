@@ -3,7 +3,7 @@ course: human-ai
 lectureId: R6
 title: "A Small Model That Knows What to Forget"
 deck: "OpenAI's Privacy Filter is a 1.5-billion-parameter redactor that reads a document once, decides which spans are personal, and runs on your own machine — a precise answer to a narrow question, released the same year the field concluded that narrow answers are not enough."
-order: 14
+order: 16
 readingTime: 10
 tags: ["privacy", "pii", "redaction", "open-weights", "privacy-by-design"]
 concepts:

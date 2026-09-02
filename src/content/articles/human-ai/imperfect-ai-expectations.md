@@ -3,7 +3,7 @@ course: human-ai
 lectureId: R3
 title: "Fifty Percent, Twice"
 deck: "Two versions of the same assistant made exactly as many mistakes — and users rated one dramatically more accurate than the other. A CHI study on shaping expectations finds that what people judge is not accuracy but the cost of cleaning up after it."
-order: 11
+order: 13
 readingTime: 12
 tags: ["expectations", "precision-recall", "onboarding", "acceptance", "recovery-cost"]
 concepts:
