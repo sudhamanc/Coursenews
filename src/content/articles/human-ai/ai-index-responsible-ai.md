@@ -3,7 +3,7 @@ course: human-ai
 lectureId: R5
 title: "The Instruments Are Falling Behind"
 deck: "Incidents are climbing, transparency scores have collapsed, and models still cannot tell a fact from something a user merely believes — the 2026 AI Index chapter on responsible AI is, above all, a report about what we have stopped being able to measure."
-order: 13
+order: 15
 readingTime: 13
 tags: ["responsible-ai", "transparency", "hallucination", "governance", "safety"]
 concepts:
