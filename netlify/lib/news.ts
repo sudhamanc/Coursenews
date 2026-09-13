@@ -32,7 +32,27 @@ export interface NewsFeed {
 }
 
 const WINDOW_MS = 48 * 60 * 60 * 1000;
-const RELEVANCE = /\b(ai|artificial intelligence|machine learning|ml|deep learning|neural|llm|language model|transformer|gpt|diffusion|reinforcement|dataset|database|vector|embedding|inference|training|fine-?tun|agent|rag|multimodal|open-?source model)\b/i;
+/**
+ * Topical gate for Hacker News titles, which carry no abstract. Every term must
+ * match as a whole word, so plurals and stems are spelled out: a bare `agent`
+ * rejected "OpenAI Agents API", and `fine-?tun` never matched "fine-tuning".
+ */
+const RELEVANCE =
+  /\b(ai|genai|artificial intelligence|machine learning|ml|deep learning|neural|llms?|language models?|transformers?|gpt|diffusion|reinforcement|datasets?|databases?|vectors?|embeddings?|inference|training|fine-?tun\w*|agents?|agentic|rag|multimodal|open-?source models?|chatgpt|claude|gemini|gemma|copilot|codex)\b/i;
+
+/**
+ * Company names admit a story only alongside a shipping word (`ai` cannot match
+ * inside "OpenAI", so launches need this path). Alone, a name admits whatever
+ * the company is in the news for: replaying the 11 Sep refresh, "Rust is tier-1
+ * language at Microsoft" and a Google power deal outscored AI stories on points
+ * and pushed them out of the Hacker News quota.
+ */
+const COMPANY = /\b(openai|anthropic|deepmind|mistral|google|microsoft|amazon|aws)\b/i;
+const SHIPPING =
+  /\b(models?|apis?|sdks?|launch\w*|releas\w*|announc\w*|introduc\w*|unveil\w*|open-?weights?|open-?sourc\w*)\b/i;
+
+const isRelevant = (text: string): boolean =>
+  RELEVANCE.test(text) || (COMPANY.test(text) && SHIPPING.test(text));
 
 export function newsStore(): Store {
   return getStore('news');
@@ -160,7 +180,7 @@ export function prefilter(items: NewsItem[]): NewsItem[] {
     if (seen.has(key) || seen.has(it.url)) continue;
     if (it.source === 'Hacker News') {
       if (now - new Date(it.published).getTime() > WINDOW_MS) continue;
-      if (!RELEVANCE.test(`${it.title} ${it.abstract ?? ''}`)) continue;
+      if (!isRelevant(`${it.title} ${it.abstract ?? ''}`)) continue;
     }
     seen.add(key);
     seen.add(it.url);

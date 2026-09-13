@@ -97,6 +97,34 @@ const COMMENTARY: Array<{ url: string; source: string }> = [
 ];
 
 /**
+ * Discovery: first-party announcement feeds from the major AI labs and
+ * platforms. A launch like OpenAI's Agents API ships as a blog post — not a
+ * GitHub release, and not guaranteed to be on Hacker News's front page at the
+ * hour the wire refreshes — so these are the only sources certain to carry it.
+ * Anthropic and Meta publish no feed; they surface through Hacker News.
+ */
+const VENDORS: Array<{ url: string; source: string }> = [
+  { url: 'https://openai.com/news/rss.xml', source: 'OpenAI' },
+  { url: 'https://deepmind.google/blog/rss.xml', source: 'Google DeepMind' },
+  { url: 'https://blog.google/technology/ai/rss/', source: 'Google AI' },
+  { url: 'https://azure.microsoft.com/en-us/blog/feed/', source: 'Microsoft Azure' },
+  { url: 'https://mistral.ai/rss.xml', source: 'Mistral' },
+  { url: 'https://aws.amazon.com/blogs/machine-learning/feed/', source: 'AWS' },
+];
+const VENDOR_SOURCES = new Set(VENDORS.map((v) => v.source));
+
+/**
+ * Vendor feeds are voluminous and mostly not launches — AWS posts several
+ * tutorials a day, and most of OpenAI's posts are customer stories. Only
+ * announcement-style titles are taken, newest first, capped per vendor and in
+ * total; slots vendors leave unused go back to the open discovery sources.
+ */
+const VENDOR_SLOTS = 8;
+const VENDOR_PER_SOURCE = 4;
+const LAUNCH_TITLE =
+  /\b(introduc\w*|announc\w*|launch\w*|releas\w*|unveil\w*|now available|generally available|apis?|sdks?)\b/i;
+
+/**
  * Reddit rejects unfamiliar user agents on its feed endpoints, so identify the
  * client honestly but with the conventional Mozilla-compatible prefix.
  */
@@ -123,11 +151,21 @@ const NOT_A_RELEASE = /\/|^[0-9a-f]{7,40}$/i;
  * conversions of a base model that trends on its own. Drop the derivatives so
  * the Models bucket shows original releases.
  */
-const HF_DERIVATIVE = /\b(gguf|awq|gptq|exl2|exl3|mlx|int4|int8|fp8|bnb|lora|quantiz|-w4a16)\b/i;
+const HF_DERIVATIVE = /\b(gguf|awq|gptq|exl2|exl3|mlx|int4|int8|fp8|bnb|lora|quantiz\w*|-w4a16)\b/i;
 
-/** Topical gate for the open discovery lane. */
+/**
+ * Topical gate for the open discovery lane. Terms match as whole words, so
+ * plurals and stems are spelled out (`agents?`, `quantiz\w*`): the bare forms
+ * rejected "OpenAI Agents API", and "quantization" and "orchestration" never
+ * matched at all.
+ *
+ * Company names are deliberately absent. A launch already carries a word listed
+ * here (model, API, SDK, release), so a bare name would only admit the company's
+ * other news — lawsuits, power deals — into slots Hacker News competes for on
+ * points. Vendor launches arrive through VENDORS instead.
+ */
 const ECO_RELEVANCE =
-  /\b(llm|language model|gpt|claude|gemini|llama|mistral|qwen|deepseek|kimi|model|agent|agentic|mcp|model context protocol|plugin|sdk|toolkit|framework|library|release|launch|open-?weights?|fine-?tun|inference|serving|quantiz|embedding|vector|rag|knowledge graph|context window|orchestrat|protocol|spec)\b/i;
+  /\b(llms?|language models?|gpt|chatgpt|claude|gemini|gemma|copilot|codex|llama|mistral|qwen|deepseek|kimi|models?|agents?|agentic|mcp|model context protocol|plugins?|sdks?|apis?|toolkits?|frameworks?|library|libraries|releas\w*|launch\w*|open-?weights?|fine-?tun\w*|inference|serving|quantiz\w*|embeddings?|vectors?|rag|knowledge graphs?|context windows?|orchestrat\w*|protocols?|specs?)\b/i;
 
 export function ecoStore(): Store {
   return getStore('news');
@@ -349,7 +387,11 @@ export async function fetchFeed(url: string, source: string): Promise<EcoItem[]>
   // Atom (<feed><entry>) and RSS (<rss><channel><item>) both appear here.
   const entries = asArray(doc?.feed?.entry);
   const items = asArray(doc?.rss?.channel?.item);
-  const rows = entries.length ? entries : items;
+  // Newest first before truncating: document order is not always recency
+  // (OpenAI's feed lists 1,000+ posts, slightly out of order).
+  const stamp = (e: any): number =>
+    new Date(String(e?.updated ?? e?.published ?? e?.pubDate ?? '')).getTime() || 0;
+  const rows = (entries.length ? entries : items).sort((a, b) => stamp(b) - stamp(a));
   const out: EcoItem[] = [];
   for (const e of rows.slice(0, 20)) {
     const title = clean(e?.title, 200);
@@ -389,6 +431,7 @@ export async function fetchDiscovery(): Promise<EcoItem[]> {
     () => fetchLaunches(),
     () => fetchSubreddits(),
     ...COMMENTARY.map((c) => () => fetchFeed(c.url, c.source)),
+    ...VENDORS.map((v) => () => fetchFeed(v.url, v.source)),
   ];
   return (await pool(jobs, 5)).flat();
 }
@@ -426,11 +469,24 @@ export function prefilterEco(items: EcoItem[]): EcoItem[] {
   }
 
   tracked.sort((a, b) => b.published.localeCompare(a.published));
-  discovered.sort(
-    (a, b) => (b.points ?? 0) - (a.points ?? 0) || b.published.localeCompare(a.published),
-  );
 
-  return [...tracked.slice(0, 20), ...discovered.slice(0, 26)];
+  const open = discovered.filter((it) => !VENDOR_SOURCES.has(it.source));
+  open.sort((a, b) => (b.points ?? 0) - (a.points ?? 0) || b.published.localeCompare(a.published));
+
+  // Vendor posts carry no points, so sorted in with the rest they would sink
+  // below GitHub Trending (always stamped "now") or flood the lane.
+  const perVendor = new Map<string, number>();
+  const vendor = discovered
+    .filter((it) => VENDOR_SOURCES.has(it.source) && LAUNCH_TITLE.test(it.title))
+    .sort((a, b) => b.published.localeCompare(a.published))
+    .filter((it) => {
+      const n = (perVendor.get(it.source) ?? 0) + 1;
+      perVendor.set(it.source, n);
+      return n <= VENDOR_PER_SOURCE;
+    })
+    .slice(0, VENDOR_SLOTS);
+
+  return [...tracked.slice(0, 20), ...vendor, ...open.slice(0, 26 - vendor.length)];
 }
 
 /** First few words of a title, lowercased — used to verify index alignment. */
@@ -481,7 +537,9 @@ async function rankLane(candidates: EcoItem[], lane: EcoLane): Promise<EcoItem[]
           'especially a project you have not seen before, since surfacing genuinely new work is',
           'the point of this lane. DROP only clear noise: unrelated software, job and funding',
           'posts, hardware business news, and pure marketing. Prefer first releases of novel',
-          'tools over incremental updates. Aim to keep at least half the entries.',
+          'tools over incremental updates. An official launch from a major lab or platform',
+          '(a new model, API, SDK, or agent product) always belongs; its customer stories,',
+          'tutorials, and event recaps do not. Aim to keep at least half the entries.',
         ].join(' ');
 
   const system = [

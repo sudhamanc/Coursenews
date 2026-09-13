@@ -566,3 +566,23 @@ NO RAG. Articles authored directly (no build-time API cost).
 - LOCAL TOOLING: host is Node v26 / npm 11, and `npm ci` rejects the lock ("Missing @emnapi/runtime").
   Used `npm install` then `git checkout -- package-lock.json` to keep lock churn out of commits. Netlify
   (Node 22) is unaffected. macOS has no `timeout` binary.
+
+## Session 9: /latest missed OpenAI's Agents API launch
+- MISS (launched 10 Sep 2026; HN "OpenAI Agents API" 345 pts). ROOT CAUSE: both keyword gates match
+  WHOLE WORDS, so `agent` never matched "Agents", `ai` never matches inside "OpenAI", and `fine-?tun`,
+  `quantiz`, `orchestrat` had NEVER matched anything. The story was dropped before the ranker in both
+  wires. Also no source read OpenAI directly (it is a blog post, not a GitHub release).
+- FIX news.ts: plurals/stems spelled out; product names (chatgpt, claude, gemini, gemma, copilot, codex)
+  admit alone; COMPANY names (openai, anthropic, deepmind, mistral, google, microsoft, amazon, aws) admit
+  ONLY with a SHIPPING word (model/api/sdk/launch/release/...). Bare company names were tried first and
+  REJECTED: replaying 11 Sep, "Rust is tier-1 at Microsoft", a Google power deal, and an Amazon labor
+  story took HN quota slots on points and pushed out real AI stories.
+- FIX ecosystem.ts: same plural fixes (no company names — launches already carry model/api/sdk words);
+  new VENDORS lane (OpenAI news RSS, Google DeepMind, Google AI blog, Microsoft Azure blog, Mistral, AWS
+  ML blog). Anthropic + Meta have NO feed (404). Vendor posts: only LAUNCH_TITLE matches, newest first,
+  <=4 per vendor, <=8 total, unused slots return to open sources. fetchFeed now sorts rows by date before
+  slice(0,20) (OpenAI's feed is 1,192 items, not strictly ordered). Ranker prompt told to keep official
+  launches and drop vendor customer stories/tutorials.
+- VERIFIED by replaying the 11 Sep 13:00Z refresh through old vs new prefilters (esbuild bundle, mocked
+  Date.now): old = Agents API absent from both wires; new = present via HN in research, via HN + OpenAI
+  RSS in ecosystem. Live fetch of all sources 2.3s. Ranker (Haiku) not exercised locally.

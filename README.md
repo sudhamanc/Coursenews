@@ -96,7 +96,7 @@ scheduled function and cached in Blobs, and each costs one Haiku call per run.
 | | **Latest in AI** (research) | **The Ecosystem** (releases) |
 | --- | --- | --- |
 | Question | What is being *discovered*? | What is being *used*? |
-| Sources | arXiv RSS, Hacker News | GitHub release feeds, GitHub Trending, Hugging Face, Show HN, subreddit + commentary RSS |
+| Sources | arXiv RSS, Hacker News | GitHub release feeds, GitHub Trending, Hugging Face, Show HN, subreddit + commentary RSS, AI vendor announcement RSS |
 | Grouping | Ranked list, free-form category | Four fixed buckets: Models · Standards · Libraries · Patterns |
 | Endpoint | `/api/news` | `/api/ecosystem` |
 | Code | [`netlify/lib/news.ts`](netlify/lib/news.ts) | [`netlify/lib/ecosystem.ts`](netlify/lib/ecosystem.ts) |
@@ -144,6 +144,20 @@ releases so a chatty monorepo cannot flood the lane.
   require a browser-style user agent and rate-limit concurrent requests, so
   subreddits are fetched in series. Expect it to fail sometimes from cloud IPs —
   Hacker News, GitHub Trending, and Hugging Face are the dependable sources.
+- **Vendor announcement feeds.** A launch like OpenAI's Agents API ships as a blog
+  post, not a GitHub release, so the discovery lane reads first-party RSS from
+  OpenAI, Google (AI blog and DeepMind), Microsoft Azure, Mistral, and AWS. Those
+  feeds are mostly customer stories and tutorials, so only announcement-style
+  titles are taken — at most 4 per vendor and 8 in all, with unused slots going
+  back to the other discovery sources. Anthropic and Meta publish no feed and
+  surface through Hacker News.
+- **Keyword gates match whole words.** Both wires drop Hacker News stories whose
+  title misses a topical term list, so plurals and stems must be spelled out
+  (`agents?`, `quantiz\w*`) — a bare `agent` is why the Agents API launch never
+  reached the ranker. Company names (OpenAI, Anthropic, Google, Microsoft,
+  Mistral, Amazon/AWS) count in the research wire only alongside a shipping word
+  such as *model*, *API*, or *release*: on their own they admitted the companies'
+  non-AI news, which outscored real AI stories on points.
 - **GitHub Trending is scraped.** That page has no API, so the parser is tolerant
   and returns nothing (rather than erroring) if the markup changes.
 - Every source failure degrades to an empty list, and if *all* sources fail the
