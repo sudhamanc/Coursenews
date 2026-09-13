@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# One-command onboarding for The Course Ledger.
+# One-command onboarding for Latent Inference.
 #   - installs dependencies
 #   - creates .env from the template (if missing)
 #   - extracts PDF text (incremental)

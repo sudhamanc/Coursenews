@@ -1,5 +1,5 @@
 <!--
-  The Course Ledger — MASKABLE variant.
+  Latent Inference — MASKABLE variant.
 
   Android crops maskable icons to a circle/squircle and guarantees only a
   centred circle of diameter 0.8 x size. At 512 that circle has r=204.8, so the
@@ -16,7 +16,7 @@
 
   Same rasterisation rules as mark.svg: literal hex, paths not text.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="The Course Ledger">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Latent Inference">
   <rect width="512" height="512" fill="#fff1e5"/>
 
   <g transform="translate(62.7, 54.5) scale(0.755)">

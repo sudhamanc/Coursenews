@@ -1,5 +1,5 @@
 <!--
-  The Course Ledger — primary mark ("The Ledger Rule").
+  Latent Inference — primary mark ("The Ledger Rule").
 
   A claret serif L framed by the paper's signature double rule. Three visual
   masses only (rule / letter / rule) so it still reads at 16px.
@@ -17,7 +17,7 @@
   browsers) applies its own rounding. See mark-maskable.svg for the padded
   variant Android's circle crop requires.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="The Course Ledger">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Latent Inference">
   <rect width="512" height="512" fill="#fff1e5"/>
 
   <!-- Masthead double rule: heavy over light, the heavy-rule / desk motif. -->

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Full-stack local dev controller for The Course Ledger.
+# Full-stack local dev controller for Latent Inference.
 #
 # Runs Netlify Dev (Astro pages + Netlify Functions + Blobs + redirects) as a
 # background process and manages its lifecycle. Start/stop clear stale ports so

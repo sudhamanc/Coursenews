@@ -1,5 +1,5 @@
 <!--
-  The Course Ledger — social card (1200x630).
+  Latent Inference — social card (1200x630).
 
   This is where the richer "Rule & Node" idea lives: the LLM Canon lineage
   abstracted onto a column rule. It has sub-pixel elements at 16px so it can't
@@ -10,7 +10,7 @@
   here because the wordmark is drawn as rects/paths, not <text>. Do not add
   <text> — librsvg would resolve fonts against the host machine.
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="The Course Ledger">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Latent Inference">
   <rect width="1200" height="630" fill="#fff1e5"/>
 
   <!-- Masthead double rule across the top third. -->

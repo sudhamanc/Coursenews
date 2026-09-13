@@ -1,4 +1,4 @@
-# The Course Ledger
+# Latent Inference
 
 A static **newspaper** that turns a folder of source PDFs into long-form, in-depth
 feature articles — concepts explained as sections with KaTeX math and hand-drawn
@@ -7,8 +7,8 @@ lets you interrogate any concept, and a daily **"Latest in AI"** page runs two
 wires: fresh research from arXiv and Hacker News, and an **ecosystem** wire
 tracking model releases, protocol versions, libraries, and design patterns.
 
-It ships with several AI courses out of the box, but it's built to be reused: point
-it at your own PDFs, edit one config file, and you have your own edition.
+It ships with seven sections of AI and machine-learning explainers, but it's built to
+be reused: point it at your own PDFs, edit one config file, and you have your own edition.
 
 ---
 
@@ -37,9 +37,9 @@ it at your own PDFs, edit one config file, and you have your own edition.
 
 - **In-depth feature articles** authored from the source PDFs, with KaTeX math
   and themed inline SVG diagrams (light/dark aware).
-- **Newspaper UI** — front page, per-course section fronts, feature pages with a
-  Key Terms rail.
-- **Curated front page** — a generic home page (no hard-coded course count) with
+- **Newspaper UI** — front page, section fronts, feature pages with a Key Terms
+  rail, and a one-line nav that groups sections into pull-down menus.
+- **Curated front page** — a generic home page (no hard-coded section count) with
   *Editor's Picks* and *Top Stories* that surface standout features from every desk.
 - **Reader themes** — a light default styled after the *Financial Times* (salmon
   paper, claret flags, Oxford-blue links) with a one-click light/dark toggle,
@@ -57,19 +57,19 @@ it at your own PDFs, edit one config file, and you have your own edition.
   read via GitHub release feeds) alongside a **discovered** lane (trending models
   and repos, launches, community feeds) so brand-new projects can surface too.
   See [The two `/latest` wires](#the-two-latest-wires).
-- **Incremental content pipeline** — adding a feature or a course is a delta, never
+- **Incremental content pipeline** — adding a feature or a section is a delta, never
   a full rebuild.
 - **Installable** — a real PWA: web app manifest, maskable Android icons, an
   iOS `apple-touch-icon`, and a `theme-color` that follows the light/dark toggle.
 - **Reads on a phone** — wide diagrams scroll at legible size instead of shrinking,
-  the section nav is a one-line scroll strip, and safe-area insets keep content
+  the nav shortens its labels to stay on one line, and safe-area insets keep content
   clear of notches and the home indicator in standalone mode.
 - **Scripted lifecycle** — setup, start/stop (with port cleanup), build, deploy.
 
 ## How it works
 
 ```text
-Documents/<Course>/*.pdf
+Documents/<Section>/*.pdf
         │  npm run extract  (incremental)
         ▼
 content/_extracted/<slug>/*.txt  +  manifest.json      (gitignored, regenerable)
@@ -85,8 +85,10 @@ Browser ──/api/chat──────►  netlify/functions/chat.ts  ──�
                     (transcripts + both feeds)       builds both wires)
 ```
 
-The single source of truth for courses is [`courses.config.json`](courses.config.json),
-shared by the site, the extraction script, and the Functions.
+The single source of truth for sections is [`courses.config.json`](courses.config.json)
+(the file keeps its original name), shared by the site, the extraction script, and the
+Functions. Pages live at `/sections/<slug>/<article>`; old `/courses/...` URLs redirect
+permanently via [`public/_redirects`](public/_redirects).
 
 ## The two `/latest` wires
 
@@ -276,7 +278,7 @@ npm start          # full stack (chat + news via Functions/Blobs) -> http://loca
 | `npm run status`       | Report whether the server is running and which ports are busy.       |
 | `npm run build`        | Production build into `dist/`.                                       |
 | `npm run preview`      | Preview the built site.                                              |
-| `npm run extract`      | Extract PDF text (incremental). See below for per-course usage.      |
+| `npm run extract`      | Extract PDF text (incremental). See below for per-section usage.     |
 | `npm run icons`        | Regenerate the PWA/favicon PNGs from `assets/icons/*.svg`.            |
 | `npm run deploy`       | Deploy a **draft** preview to Netlify.                               |
 | `npm run deploy:prod`  | Deploy to **production**.                                            |
@@ -284,18 +286,19 @@ npm start          # full stack (chat + news via Functions/Blobs) -> http://loca
 ## Project structure
 
 ```text
-courses.config.json        # SINGLE SOURCE OF TRUTH for courses (slug, dir, titles)
+courses.config.json        # SINGLE SOURCE OF TRUTH for sections and nav groups
 courses.schema.json        # JSON schema for the above (editor validation)
 netlify.toml               # build, functions dir, redirects, security headers/CSP
 astro.config.mjs           # Astro config (KaTeX pipeline, Netlify adapter)
 .copilot/memory/           # assistant repo memory (version-controlled project notes)
-Documents/<Course>/*.pdf   # source PDFs (input)
+Documents/<Section>/*.pdf   # source PDFs (input)
 content/_extracted/        # extracted text + manifest.json (gitignored, regenerable)
 assets/icons/              # hand-authored icon SOURCES (not published)
   mark.svg · mark-maskable.svg · og.svg
 public/                    # published verbatim; icon PNGs here are generated
   favicon.svg · favicon-32.png · apple-touch-icon.png · og.png
   manifest.webmanifest · icons/icon-{192,512}.png · icons/icon-maskable-{192,512}.png
+  _redirects               # 301s from the old /courses/ URLs
 scripts/
   extract-pdfs.mjs         # PDF -> text (incremental)
   make-icons.mjs           # SVG -> the PNG icon set (run on demand, outputs committed)
@@ -306,7 +309,7 @@ src/
   content/articles/<slug>/*.md   # the authored feature articles
   layouts/Newspaper.astro
   components/ConceptChat.astro    # the "Dig deeper" chat island
-  pages/  index.astro · latest.astro · courses/[course].astro · courses/[course]/[lecture].astro
+  pages/  index.astro · latest.astro · sections/[section].astro · sections/[section]/[article].astro
   lib/courses.ts           # reads courses.config.json
   styles/newspaper.css
 netlify/
@@ -320,9 +323,9 @@ netlify/
 
 Everything here is incremental — you never rebuild existing content.
 
-### Add features to an existing course
+### Add features to an existing section
 
-1. Drop the new PDF(s) into `Documents/<Course>/`.
+1. Drop the new PDF(s) into `Documents/<Section>/`.
 2. `npm run extract` — only the **new** PDFs are processed; cached text is reused,
    and the manifest is merged.
 3. Author the article(s): create `src/content/articles/<slug>/<feature>.md` with
@@ -330,14 +333,16 @@ Everything here is incremental — you never rebuild existing content.
    `lectureId`, `title`, `deck`, `order`, `concepts[]`, …). Astro picks up new
    files automatically — no rebuild of other articles.
 
-To re-extract just one course: `npm run extract -- <slug>` (add `--force` to
+To re-extract just one section: `npm run extract -- <slug>` (add `--force` to
 overwrite existing text).
 
-### Add a whole new course
+### Add a whole new section
 
 1. Add an entry to [`courses.config.json`](courses.config.json) (`slug`, `title`,
-   `shortTitle`, `dir`, `blurb`). This one file feeds the site nav, the extractor,
-   and server-side validation.
+   `shortTitle`, `dir`, `tagline`, `blurb`, and optionally `group`). This one file
+   feeds the site nav, the extractor, and server-side validation. A `group` (one of
+   the `groups` ids, such as `ai` or `ml`) places the section in that nav pull-down;
+   without one it gets its own top-level nav link.
 2. Create `Documents/<dir>/` and add the PDFs.
 3. `npm run extract -- <slug>`.
 4. Author `src/content/articles/<slug>/*.md`.
@@ -418,7 +423,7 @@ DNS instructions. HTTPS (including the HSTS header in `netlify.toml`) is automat
   build output in `dist/` contains no secret.
 - **Cost guardrail** — chat is rate-limited per client IP (`CHAT_DAILY_CAP`/day →
   `429`). Also set a **budget/spend limit in the Anthropic console** as a backstop.
-- **Input validation** — message length and course slug are validated server-side;
+- **Input validation** — message length and section slug are validated server-side;
   the system prompt is written to resist prompt injection.
 - **Output safety** — assistant and wire text render via `textContent` (no HTML
   injection); every external link on both wires is protocol-validated

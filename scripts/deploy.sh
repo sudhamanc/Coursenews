@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Deploy The Course Ledger to Netlify.
+# Deploy Latent Inference to Netlify.
 #
 #   ./scripts/deploy.sh          deploy a draft preview
 #   ./scripts/deploy.sh --prod   deploy to production
