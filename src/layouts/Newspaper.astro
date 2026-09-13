@@ -109,7 +109,25 @@ const dateLine = now.toLocaleDateString('en-US', {
       <header class="masthead">
         <h1 class="masthead__title"><a href="/" style="color:inherit;border:none;">The Course Ledger</a></h1>
         <div class="masthead__dateline">
-          <span>{dateLine}</span>
+          <time id="dateline" datetime={now.toISOString().slice(0, 10)}>{dateLine}</time>
+          <script is:inline>
+            // The page is static, so the build-time date above freezes at the last
+            // deploy. Rewrite it with the reader's own date before first paint; the
+            // server-rendered value stays as the no-JS fallback.
+            (function () {
+              var el = document.getElementById('dateline');
+              if (!el) return;
+              var d = new Date();
+              el.textContent = d.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              });
+              var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+              el.setAttribute('datetime', d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()));
+            })();
+          </script>
         </div>
       </header>
 
