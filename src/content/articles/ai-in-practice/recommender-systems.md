@@ -32,7 +32,7 @@ concepts:
 
 Every time a streaming service cues up your next film, an online store nudges a
 product into your cart, or a music app assembles a playlist that feels uncannily
-right, a recommender system is at work. The third lecture of Applied AI treats
+right, a recommender system is at work. This feature treats
 these systems not as marketing gimmicks but as one of the most commercially
 important families of AI ever built — and shows that beneath the convenience lies
 a surprisingly deep vein of mathematics, running from reasoning by analogy to the
@@ -48,7 +48,7 @@ things they would never otherwise have found.
 
 ## A Taxonomy of Recommenders
 
-The lecture lays out a whole family of approaches. **Content-based** recommenders
+There is a whole family of approaches. **Content-based** recommenders
 take the features of items a user already likes and seek other items sharing
 those features. **Collaborative filtering** (neighborhood-based) instead exploits
 relationships between users or between items — an item–item scheme predicts your
@@ -75,7 +75,7 @@ precedent.
 
 ## The Wisdom of Similar Users
 
-Collaborative filtering is best seen through the lecture's worked example: a
+Collaborative filtering is best seen through a worked example: a
 table of users against movies, each cell a rating from 1 to 5, with many cells
 left blank. The method recommends items to a user by leaning on the users who
 have rated things similarly. But the table is mostly question marks — most users
@@ -162,7 +162,7 @@ $$
 
 The latent factors might loosely correspond to genre, mood, or era — but the
 model discovers them from the ratings alone, without being told what they mean.
-The compression is dramatic: in the lecture's example, a matrix of roughly
+The compression is dramatic: in a typical example, a matrix of roughly
 2,000,000 entries is represented by two matrices holding about 300,000 between
 them. Factorization thus solves three problems at once — it predicts the missing
 values, it reduces sparsity, and it reduces dimensionality.
@@ -216,7 +216,7 @@ observed ratings, then uses those same factors to fill in the blanks.
 
 ## The Problems That Won't Go Away
 
-The lecture ends with a sober inventory of open challenges: the cold-start
+The field still faces a sober inventory of open challenges: the cold-start
 problem; scalability across huge numbers of users and items; data sparsity;
 diversity, so the system does not merely echo the most popular items;
 personalization to individual history; privacy and security, including the duty
@@ -230,7 +230,7 @@ Recommender systems are where abstract linear algebra meets billion-dollar
 business models. The move from content-based filtering to matrix factorization
 was, in miniature, the same move the whole field made across its three waves:
 from hand-specified features to latent structure learned from data. Yet the
-lecture's closing list of challenges — cold start, sparsity, privacy, and above
+list of open challenges — cold start, sparsity, privacy, and above
 all explainability — is a reminder that the mathematics is the easy part. A
 recommendation that cannot justify itself, or that quietly encodes bias, can
 erode the very trust that makes the system valuable. Factoring a matrix, it

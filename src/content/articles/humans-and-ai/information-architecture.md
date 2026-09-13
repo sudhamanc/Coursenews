@@ -39,7 +39,7 @@ structure that carried you there; when it is badly organized you loop through th
 same three menus and give up. **Information architecture** — IA — is the largely
 invisible discipline of organizing, structuring, and labeling content so people
 can find what they need and understand where they are. For three decades it has
-been a designer's craft, practiced with sitemaps and taxonomies. This week asks
+been a designer's craft, practiced with sitemaps and taxonomies. This feature asks
 what becomes of that craft when the arranging is handed to an algorithm — and why
 that hand-off turns a usability problem into a question of human values.
 
@@ -266,7 +266,7 @@ blueprint is no longer public; it is private, dynamic, and effectively opaque �
 <figcaption><b>From map to stream.</b> A taxonomy is one structure everyone can inspect; a recommender samples a private, per-user ranking, so no two people see the same architecture.</figcaption>
 </figure>
 
-That opacity has consequences the readings document. Because users cannot see the
+That opacity has consequences the research documents. Because users cannot see the
 structure, they build **algorithmic literacy** out of perception and **folk
 theories** — intuitive stories about why the feed shows what it shows. Researchers
 describe an "identity strainer," in which curation quietly suppresses or amplifies
@@ -283,7 +283,7 @@ scale and personalizes it per person, those value choices become both more power
 and harder to see, which is why "human values for AI" belongs in the same
 conversation as sitemaps.
 
-The readings press the point from two directions. Keyes and colleagues'
+Two works press the point from opposite directions. Keyes and colleagues'
 deliberately grotesque satire, *A Mulching Proposal*, runs a monstrous system
 through the **Fairness, Accountability, and Transparency (FAT)** checklist and
 dutifully "improves" its scores — demonstrating that a procedural checklist can

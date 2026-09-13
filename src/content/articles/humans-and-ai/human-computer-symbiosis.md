@@ -2,7 +2,7 @@
 course: humans-and-ai
 lectureId: W9
 title: "The Quarrel at the Root of the Machine"
-deck: "Week 9 goes back seventy years to find that the field's central argument — build a machine that replaces us, or one that thinks alongside us — was framed by three men within a decade of each other, and that the third warned the first two they could not have both intelligence and obedience."
+deck: "Seventy years back, it turns out that the field's central argument — build a machine that replaces us, or one that thinks alongside us — was framed by three men within a decade of each other, and that the third warned the first two they could not have both intelligence and obedience."
 order: 9
 readingTime: 14
 tags: ["history", "symbiosis", "alignment", "darpa", "governance"]
@@ -36,7 +36,7 @@ concepts:
     definition: "Suleyman's argument that as capable models become cheaper, smaller, and locally runnable, dangerous capabilities proliferate faster than institutions can build safeguards — and that treating governance as an arms race makes the outcome worse."
 ---
 
-The pattern in Week 9 is that nearly every argument the field is now having in
+The pattern is that nearly every argument the field is now having in
 public was already on paper by 1960. Alan Turing proposed that machines might
 replicate human intellectual performance outright. J.C.R. Licklider proposed that
 they should instead form a partnership with people, each contributing what it does
@@ -168,7 +168,7 @@ the letter and none to the intent. That is the alignment problem, named in 1960 
 still open: how do you keep an autonomous system's behavior consistent with human
 goals and values that cannot be fully specified in advance?
 
-The synthesis the lecture arrives at is that generative AI is not a resolution but
+The synthesis is that generative AI is not a resolution but
 a hybrid. **Mimicry in training** — models learn statistical patterns from vast
 collections of human output and generate by predicting likely continuations.
 **Symbiosis in use** — they work best when people frame the goal, supply context,
@@ -232,7 +232,7 @@ examples — first-wave reasoning fused with second-wave learning.
 Foundation models are the reason that boundary is blurred. Trained at scale to
 predict patterns such as the next token, they develop representations adaptable to
 many tasks rather than the one they were built for, and as scale increased —
-GPT-2 to GPT-3 being the lecture's example — capabilities appeared that nobody
+GPT-2 to GPT-3 being the clearest example — capabilities appeared that nobody
 explicitly programmed. Natural language became the interface, so directing a
 computer no longer required programming it.
 
@@ -298,7 +298,7 @@ claims to fear. The framing is self-fulfilling.
 
 ## Why It Matters
 
-Week 8 asked what a system infers about you. Week 9 asks who decided the system
+Inferential privacy asks what a system infers about you. History asks who decided the system
 should exist in that form at all, and finds that the decision was made in an
 argument that never concluded. That matters practically, because the choice is
 still live in every product. When you design an AI feature, you are choosing a

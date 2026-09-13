@@ -279,7 +279,7 @@ means less surprise.
 
 ## Why It Matters
 
-This lecture traces the first act of a twenty-four-year drama that runs from 1999's
+This feature traces the first act of a twenty-four-year drama that runs from 1999's
 n-grams to GPT-4. Its throughline is a single migration: from *counting* word
 sequences to *learning* their representations. The distributional hypothesis
 supplied the philosophy, word2vec turned it into geometry, and recurrent networks

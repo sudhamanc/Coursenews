@@ -206,7 +206,7 @@ states plainly, no framework for navigating these tradeoffs.
 
 ## Why It Matters
 
-Read alongside the week's design material, this chapter supplies the scale. Every
+Read alongside the design features in this section, this chapter supplies the scale. Every
 error the interaction literature teaches you to handle — the confident falsehood, the
 inherited bias, the failure under adversarial pressure — is happening across
 hundreds of documented incidents a year, inside organizations whose own confidence

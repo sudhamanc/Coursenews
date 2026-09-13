@@ -121,7 +121,7 @@ below.
 
 **Type 3 — Neuro | Symbolic** is a pipeline: a neural front end perceives raw data
 and emits clean symbols — `Object: RedCube`, `Location: Table` — which a symbolic
-engine then reasons over. (The lecture situates its own "WoC-Bots" project roughly
+engine then reasons over. (The "WoC-Bots" research project sits roughly
 here.)
 
 **Types 4, 5, and 6** push the symbolic knowledge progressively *inside* the

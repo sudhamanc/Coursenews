@@ -45,7 +45,7 @@ Not all cuts are alike. **Semantic segmentation** assigns every pixel a class la
 — *road*, *sky*, *tumor* — yet is blind to identity: two pedestrians who overlap
 dissolve into a single undifferentiated *person* blob. **Instance segmentation**
 goes further, giving each individual object its own mask so that two cars, or two
-cells, remain countably distinct. The lecture builds from classical region-finding,
+cells, remain countably distinct. The story builds from classical region-finding,
 which knows nothing of class labels at all, toward the encoder–decoder networks
 that make dense, per-pixel prediction practical.
 
@@ -116,7 +116,7 @@ variation *within* them.
 splitting: it recursively merges the two most similar regions until a single region
 remains, emitting every intermediate grouping along the way. The result is a
 *hierarchy* of candidate regions at many scales — the very supply of object
-proposals that region-based detectors will consume in the next lecture.
+proposals that region-based object detectors consume.
 
 ## The U-Turn Network
 

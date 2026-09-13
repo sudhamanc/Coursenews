@@ -38,10 +38,10 @@ reshaping how AI enters the worlds of science and industry.
 
 ## What We Talk About When We Talk About AI
 
-Before charting the waves, the lecture pauses on a deceptively hard question:
+Before charting the waves, it is worth pausing on a deceptively hard question:
 what is AI at all? Russell and Norvig, in their canonical textbook, famously
 offer not one definition but several, each stressing a different facet —
-thinking versus acting, human-like versus rational. The course adopts a working
+thinking versus acting, human-like versus rational. A useful working
 synthesis: **AI is the field dedicated to advancing algorithms that can perceive,
 reason, act, and react by executing complex tasks.** The phrase repays attention.
 "Complex tasks" — also called *intelligent* or *complex reasoning* tasks — is
@@ -88,7 +88,7 @@ reason capably within a narrow, well-defined domain — and it was transparent
 almost by construction, since its logic could be read off the page.
 
 Its limitation was equally fundamental: it was not data-driven, and it could not
-adapt or learn from new information. Interestingly, the lecture observes that the
+adapt or learn from new information. Interestingly, the
 *ideas* for large language models were already present in this era; what was
 missing was the data and the compute to make them learn. The first wave could
 describe the world, but only in the words a human had already given it.
@@ -98,7 +98,7 @@ describe the world, but only in the words a human had already given it.
 Then the world changed. The **second wave** is data-centric AI — machine
 learning, and above all neural networks and deep learning. Rather than being told
 the rules, these systems infer them from vast quantities of data. The good news,
-as the lecture puts it bluntly, is that never before were AI agents so accurate
+put bluntly, is that never before were AI agents so accurate
 and so powerful.
 
 The bad news is a discomfort that now defines the field: humans are uneasy about
@@ -121,7 +121,7 @@ decision-making rather than a person and an oracle.
 
 ## AI Enters the Science-and-Technology Cycle
 
-The lecture grounds this arc in a concrete arena: the **science and technology
+This arc plays out in a concrete arena: the **science and technology
 cycle**. In its simplest telling, government funds research, scientists and
 engineers make discoveries, and people benefit through useful products,
 services, and ideas — money in, knowledge out, value returned. It is a cycle

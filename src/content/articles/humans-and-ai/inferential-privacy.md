@@ -2,7 +2,7 @@
 course: humans-and-ai
 lectureId: W8
 title: "What the Machine Decides You Are"
-deck: "Week 8 moves privacy past the question of what data an organization holds to the harder one — what it concludes about you from data it was allowed to collect, and whether you have any standing to argue."
+deck: "This feature moves privacy past the question of what data an organization holds to the harder one — what it concludes about you from data it was allowed to collect, and whether you have any standing to argue."
 order: 8
 readingTime: 14
 tags: ["privacy", "inference", "surveillance", "accountability", "copyright"]
@@ -41,12 +41,12 @@ camouflaged tanks. It worked beautifully on held-out images and then collapsed o
 fresh batch. The tank photographs, someone eventually realized, had been shot on
 cloudy days and the empty landscapes on sunny ones. The network had learned the
 weather. It is the perfect parable of a model that is right for the wrong reason,
-and it has been retold in classrooms and keynotes for forty years. Week 8 tells it
+and it has been retold in classrooms and keynotes for forty years. This feature tells it
 and then asks the question that matters: **did it actually happen?** Nobody
 repeating it has checked. We accept it because it delivers the lesson we already
 wanted — which is, precisely, the failure mode the story is about.
 
-That is the week's method in miniature. Hold the comfortable account up to the
+That is the method in miniature. Hold the comfortable account up to the
 light and ask what is actually established.
 
 ## The Risk Is No Longer the Data
@@ -68,8 +68,8 @@ figure's mouth, or raises the question of posthumous consent when a documentary
 synthesizes the voice of Anthony Bourdain. Nothing private was breached. The harm
 required no breach.
 
-**Algorithmic physiognomy** is the second, and the lecture is pointed about its
-lineage: models claiming to read criminality or sexual orientation off a
+**Algorithmic physiognomy** is the second, and its lineage is worth stating
+plainly: models claiming to read criminality or sexual orientation off a
 photograph, classroom software inferring whether students are paying attention from
 their faces, vocal-analysis products such as DeepScore scoring trustworthiness for
 lenders and insurers. These are phrenology's claims with a confusion matrix
@@ -126,8 +126,8 @@ whether you can argue back.
 
 Hence the proposed **right to reasonable inferences** — protection not merely from
 inaccurate inputs but from unjustified conclusions drawn from accurate ones, and
-what Wachter frames as a right to *be seen well*. The central question the lecture
-puts is deceptively plain: should you be able to know, challenge, and correct what
+what Wachter frames as a right to *be seen well*. The central question
+is deceptively plain: should you be able to know, challenge, and correct what
 an algorithm claims to know about you?
 
 ## Scraped, Reused, Leaked
@@ -150,7 +150,7 @@ annotation layer is a privacy surface nobody puts on the architecture diagram.
 
 ## Why the Mathematics Does Not Rescue You
 
-This is the week's sharpest technical claim, and it lands directly on the field's
+This is the sharpest technical claim here, and it lands directly on the field's
 favourite reassurances. Differential privacy and federated learning genuinely
 reduce the risk of establishing whether a particular person's record sat in a
 training set. Neither asks whether the system should have been built, whether its
@@ -172,7 +172,7 @@ services you cannot forgo, and passive tracking you never see. Smart cities,
 traffic sensors, connected vehicles, and instrumented workplaces gather
 continuously and offer no exit. Consent obtained under those conditions is not a
 decision; it is paperwork that moves liability onto the person with the least power
-to refuse. The lecture's conclusion is that the burden has to move to the
+to refuse. The conclusion is that the burden has to move to the
 organizations collecting and monetizing the data.
 
 <figure>
@@ -214,7 +214,7 @@ than another automated system, and a real path to correction, scaled to the stak
 used, documentation of limits and responsible parties, outcome audits over time, and
 enough access for independent evaluation); and **proactive risk assessment**
 proportionate to impact — a recommendation engine and a sentencing tool should not
-face the same bar. The lecture is careful with the legal specifics: the GDPR
+face the same bar. The legal specifics need care: the GDPR
 constrains certain solely automated decisions with significant effects but does not
 guarantee a full technical explanation, and the Algorithmic Accountability Act
 remains proposed, not law.
@@ -244,7 +244,7 @@ pooling it improves the model and surrenders control. The proposed "third way" �
 keeping proprietary data in place, exchanging trained models or approved insights
 rather than raw records, and recording provenance in auditable registries — is
 promising and not automatically safe, since shared models can leak their training
-data, carry bias across organizations, and blur liability. As the lecture notes,
+data, carry bias across organizations, and blur liability. Put simply,
 a ledger can record a provenance claim; it cannot make the claim true.
 
 On creative work, jurisdictions have split. The United States and the EU require
@@ -257,8 +257,8 @@ before generative models and largely untested against them.
 
 ## Why It Matters
 
-Week 6 argued that a black box must be answerable and Week 7 that failure is a
-design surface. Week 8 supplies the thing both were circling: the object of
+Explainability argues that a black box must be answerable, and error handling that failure is a
+design surface. Inferential privacy supplies the thing both were circling: the object of
 governance is not the data an organization holds but the conclusions it
 manufactures and acts on. That reframes the design brief. It is not enough to ask
 what your system stores. Ask what it *infers*, whether the person can see that

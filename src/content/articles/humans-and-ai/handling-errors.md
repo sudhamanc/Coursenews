@@ -33,7 +33,7 @@ concepts:
     definition: "Using the error moment to reset the user's mental model — acknowledging the mistake with humility, explaining what the system can and cannot do, and inviting the feedback that improves it."
 ---
 
-The chapter that anchors this week opens not with a model but with a scam. A
+The chapter at the center of this piece opens not with a model but with a scam. A
 student, hunting a laptop at half price, wires two hundred dollars to a stranger,
 then a hundred more, then discovers the seller has deleted their account. He never
 gets the money back. What he gets instead is a permanently revised policy about
@@ -214,7 +214,7 @@ safely*, and the answer is written in what happens after the mistake. A system t
 errs and does nothing loses more than the one that errs and explains. That is why
 the same chapter that catalogues data pipelines ends on empathy: acknowledge the
 mistake, communicate at the right register, offer a way forward, and let the person
-correct you. It is also the practical bridge from this week's theory to a design
+correct you. It is also the practical bridge from theory to a design
 brief. Any project can specify the happy path. The measure of a finished design is
 whether it specifies the other one — and whether, on the day it fails, the person
 on the other side still has somewhere to go.

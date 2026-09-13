@@ -243,8 +243,8 @@ thrives in high dimensions, and makes an excellent baseline.
 ## Cutting Features to the Bone
 
 More features are not always better. Feature selection guards against overfitting
-and data leakage, speeds prediction, and makes a model legible. The lecture
-sorts the approaches three ways. *Unsupervised* selection drops constant or
+and data leakage, speeds prediction, and makes a model legible. The approaches
+sort three ways. *Unsupervised* selection drops constant or
 near-zero-variance columns and prunes highly correlated ones, in the spirit of
 PCA. *Univariate supervised* selection scores each feature against the target
 with a statistical test — `f_regression`, `f_classif`, or `chi2` — and keeps the

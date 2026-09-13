@@ -29,7 +29,7 @@ concepts:
 ---
 
 The transformer conquered language by learning to pay attention to every word at
-once. This lecture follows that same machinery as it escapes text and turns to
+once. This feature follows that same machinery as it escapes text and turns to
 images — and then keeps going, into a family of *generative* models that do not
 merely classify what they see but learn to manufacture it. The arc runs from the
 Vision Transformer, which teaches attention to read a photograph, through
@@ -101,7 +101,7 @@ thereby reduced to a sentence of visual tokens.
 
 ## Squeeze, Then Rebuild
 
-The generative half of the lecture is built on a humbler idea. An **autoencoder**
+The generative half of the story is built on a humbler idea. An **autoencoder**
 learns to *encode* an input into some new, usually compressed representation and
 then *decode* that representation back into the original data. What happens inside
 the encoder and decoder is task dependent, but the overarching goal is
@@ -201,7 +201,7 @@ trivial; learning to reverse it is where the magic lives.
 
 ## Bolting On New Skills
 
-The lecture closes by returning to adaptation. Transfer learning, seen earlier,
+The story closes by returning to adaptation. Transfer learning, seen earlier,
 removed the end of a pretrained network and replaced it with a new trainable
 piece, optionally freezing the rest. **Adapters** generalize this: instead of only
 swapping the head, they *inject* additional trainable weights into the network to

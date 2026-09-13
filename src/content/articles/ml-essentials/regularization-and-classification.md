@@ -33,7 +33,7 @@ concepts:
 
 A classifier that is right ninety-five percent of the time sounds like a triumph
 — until you learn that nine of every ten images were never the target to begin
-with, or that the model quietly saw the answer during training. This lecture is
+with, or that the model quietly saw the answer during training. This feature is
 about honesty: constraining models so they generalize, converting their raw
 scores into calibrated probabilities, and — above all — measuring them with
 metrics that cannot be gamed by an unbalanced dataset or sabotaged by leaked
@@ -257,7 +257,7 @@ audit are the last lines of defense.
 ## Why It Matters
 
 Regularization, logistic regression, and the metrics of classification are the
-everyday tools of applied machine learning, but the lecture's deeper lesson is
+everyday tools of applied machine learning, but the deeper lesson is
 skepticism. A model's reported accuracy is only as trustworthy as the data
 discipline behind it. Knowing that L1 selects features and L2 shrinks them, that
 logistic regression's convex loss guarantees a clean optimum, that precision and

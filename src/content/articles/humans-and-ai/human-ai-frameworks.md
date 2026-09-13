@@ -36,7 +36,7 @@ concepts:
 Ask a designer when an AI should act on its own and when it should stop and ask,
 and you have posed one of the hardest questions in the field. Answer it by instinct
 and you will be wrong often. Answer it with a **framework** — a structured model of
-how humans and machines should share work — and you at least have a map. This week
+how humans and machines should share work — and you at least have a map. This feature
 hands out a whole atlas of them, ranging from a decision rule you can nearly write
 as an equation to a design practice that trades entirely in fiction. None is *the*
 answer; each is a lens for a different question.

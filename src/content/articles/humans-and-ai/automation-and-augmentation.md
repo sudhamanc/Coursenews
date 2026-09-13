@@ -32,13 +32,13 @@ belonged entirely to people. In the process it has quietly rewritten the central
 question of software design. The old question was technical: *what can the system
 compute?* The new question is human: *how should people and intelligent systems
 think, work, and decide together?* That question is the whole subject of Human–AI
-Interaction, and it is where this course opens.
+Interaction, and it is where this section opens.
 
 ## Five Pillars of a New Discipline
 
 Human–AI Interaction (HAII) is the offspring of a much older field,
 human-computer interaction, grown up in an age when the computer can talk back.
-The course frames the discipline around five foundational areas. The first is the
+The discipline rests on five foundational areas. The first is the
 **evolution of AI capabilities and agents** — the arc from simple automation
 toward autonomous and semi-autonomous systems that can act on a user's behalf.
 The second is **frameworks for human-AI collaboration**, the models that describe
@@ -92,8 +92,8 @@ statement about what human work is for.
 
 ## Who Holds the Initiative?
 
-If AI is going to share our tasks, someone has to hold the initiative — and the
-course is emphatic that it should often be the human. **Human agency** describes
+If AI is going to share our tasks, someone has to hold the initiative — and
+that someone should often be the human. **Human agency** describes
 the roles people can occupy alongside a machine: decision-maker, supervisor, or
 collaborator. Each implies a different balance of control, and a different failure
 mode when that balance is wrong.
@@ -104,7 +104,7 @@ better positioned to act. Neither pole is ideal on its own: full automation stri
 the human of agency and accountability, while making the person do everything
 wastes the machine's speed and reach. The interesting designs live in between,
 where the system proposes and the person disposes — or the reverse — as the moment
-demands. It is a principle that will return, formalized, later in the course.
+demands. It is a principle that returns, formalized, in later features.
 
 <figure>
 <svg viewBox="0 0 620 300" role="img" aria-label="A mixed-initiative cycle drawn as a loop: the human hands off to the AI when the AI is better positioned, and the AI returns control to the human when judgment is needed.">
@@ -134,7 +134,7 @@ demands. It is a principle that will return, formalized, later in the course.
 
 ## Mirror and Prediction Engine
 
-The lecture closes on a deceptively simple provocation: is AI a **mirror** or a
+It all comes down to a deceptively simple provocation: is AI a **mirror** or a
 **partner**? The honest answer is that it is both, and understanding why is the
 key to designing it responsibly. AI is a mirror because it is trained on the data,
 behaviors, and decisions we have already made; it reflects our past back at us,
@@ -185,7 +185,7 @@ work, learn, and decide for years. That is precisely why the leverage point is t
 interface around it strips users of agency, hides its reasoning, or quietly nudges
 them toward the machine's defaults.
 
-The rest of the course builds the toolkit for acting on that responsibility —
+The rest of this section builds the toolkit for acting on that responsibility —
 prototyping and testing new interfaces, using methods such as speculative design
 and usability testing, and learning to advocate for the fairness and accessibility
 of the systems we help create. The first lesson is the orientation itself: to be

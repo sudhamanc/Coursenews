@@ -35,7 +35,7 @@ concepts:
 
 Ask a newcomer what it takes to build an artificial-intelligence application and
 the answer usually names a model — a neural network, a large language model,
-something that learns. The second lecture of Applied AI insists that the model is
+something that learns. This feature insists that the model is
 almost the *last* thing to worry about. Long before a line of training code is
 written, a successful application must know what problem it solves, for whom,
 with what data or knowledge, and to what end. This is the anatomy lesson: the
@@ -47,8 +47,8 @@ An AI application lives inside an **application domain** and serves an
 **organization of users**. At its core is an AI application system made of one or
 more **AI methods**, built with **data, knowledge, or both**. It exists to
 deliver **value** by solving a **problem** that entails one or more **complex
-tasks**, and in doing so it produces **impacts**. An application, the lecture
-notes, may or may not be deployed, but it usually has a name, an audience, a
+tasks**, and in doing so it produces **impacts**. An application
+may or may not be deployed, but it usually has a name, an audience, a
 value, and a problem at its heart.
 
 <figure>
@@ -90,7 +90,7 @@ much a part of the engineering as choosing an algorithm.
 
 ## A Catalogue of Complex Tasks
 
-What exactly does an AI method *do*? The lecture answers with a sprawling list of
+What exactly does an AI method *do*? The answer is a sprawling list of
 **complex tasks**, also called intelligent tasks: classification, regression, and
 clustering; planning, configuration, and design; speech recognition and
 synthesis; object and image recognition, segmentation, and transfer; machine
@@ -128,7 +128,7 @@ generation and selection of a solution — are the true essence of complex tasks
 Crucially, a problem is only *solved* when a decision is implemented, whether by a
 human, a business process, or a robot. The **analytics cycle** is the recipe that
 lets domain experts who are not AI experts apply data-oriented methods with
-existing libraries; learning to run that cycle, the lecture says, is the core of
+existing libraries; learning to run that cycle is the core of
 data science.
 
 <figure>
@@ -161,7 +161,7 @@ data science.
 
 ## The Enduring Logic of Expert Systems
 
-If the second wave belongs to data, this lecture makes a point of honoring the
+If the second wave belongs to data, it is worth honoring the
 knowledge-based tradition that preceded it. **Expert systems** were the buzzword
 of the 1980s, most often built as rule-based reasoning — some with frames and
 methods, a few even with neural networks. That methodology has not vanished; it
@@ -235,7 +235,7 @@ temperature control.
 
 ## Knowing When to Reach for Rules
 
-When *should* an engineer choose rule-based reasoning? The lecture offers a set
+When *should* an engineer choose rule-based reasoning? A set
 of tests: Is there a cheaper or more certain mathematical solution? Is the domain
 well bounded or fuzzy? Is the necessary domain knowledge available, could it
 instead be learned from data, and is it permanent? It closes with a builder's
@@ -248,7 +248,7 @@ real data from the operating environment.
 ## Why It Matters
 
 In an era of trillion-parameter models, it is tempting to treat every problem as
-a nail for the deep-learning hammer. This lecture is a corrective. An
+a nail for the deep-learning hammer. This is a corrective. An
 application's success is decided by the *fit* among problem, task, method, data,
 and value — not by the glamour of the algorithm. The rule-based systems of the
 1980s still steer robots and regulate factories precisely because someone matched

@@ -32,7 +32,7 @@ concepts:
 ---
 
 Every supervised model begins with the same humble ambition: draw a function
-through a cloud of points so that it predicts the next one well. This lecture
+through a cloud of points so that it predicts the next one well. This feature
 takes that ambition apart. It starts with the straight line of linear regression,
 shows two ways to fit it, confronts the tension between a model that is too rigid
 and one too eager, and ends with the plumbing — cross-validation, hyperparameter
@@ -191,7 +191,7 @@ noise no model can remove.
 </figure>
 
 The tell-tale sign of overfitting is a model whose training error keeps dropping
-while its validation error climbs. The lecture's diagnostic recipe: if you cannot
+while its validation error climbs. The diagnostic recipe: if you cannot
 even fit the training data (high bias), reach for a more powerful model, better
 features, or less regularization; if you fit training data but fail on validation
 (high variance), simplify the model, gather more data, or add regularization.
@@ -304,7 +304,7 @@ Only after the winner is chosen does it meet the test set — and that set is
 ## Putting Features on Equal Footing
 
 Gradient descent converges faster, and distance-based methods behave sensibly,
-only when features share a scale. The lecture surveys four **feature scaling**
+only when features share a scale. There are four common **feature scaling**
 methods. **Standardization** centers each feature and divides by its spread,
 $x' = \frac{x - \text{mean}(x)}{\text{std}(x)}$, producing zero mean and unit
 variance. **Min–max scaling** squeezes values into $[0,1]$ via
@@ -316,10 +316,10 @@ $x' = \frac{x}{\sqrt{x_1^2 + x_2^2 + \cdots + x_k^2}}$.
 
 ## Why It Matters
 
-This lecture is the mechanical heart of applied machine learning. Gradient
+This is the mechanical heart of applied machine learning. Gradient
 descent, in its batch, stochastic, and mini-batch forms, is the same engine that
 trains deep neural networks with billions of parameters; the bias–variance
 decomposition is the lens through which every modeling decision is judged; and
 cross-validation with disciplined hyperparameter search is what separates a
 number you can trust from one you merely hope for. Master the humble line and the
-descent that fits it, and much of the rest of the course is elaboration.
+descent that fits it, and much of the rest of machine learning is elaboration.

@@ -6,7 +6,7 @@ import { COURSES } from '../lib/courses';
 const articles = await getCollection('articles');
 
 const featurePath = (a: (typeof articles)[number]) =>
-  `/courses/${a.data.course}/${a.id.split('/').pop()}`;
+  `/sections/${a.data.course}/${a.id.split('/').pop()}`;
 
 const featuresFor = (slug: string) =>
   articles
@@ -76,7 +76,7 @@ const topStories = COURSES.map((c) => featuresFor(c.slug)[0]).filter(Boolean);
         desks.map(({ course, count, preview }) => (
           <article class="desk">
             <h3 class="headline headline--md">
-              <a href={`/courses/${course.slug}`}>{course.title}</a>
+              <a href={`/sections/${course.slug}`}>{course.title}</a>
             </h3>
             <p class="card__excerpt">{course.blurb}</p>
             {preview.length > 0 && (
@@ -89,7 +89,7 @@ const topStories = COURSES.map((c) => featuresFor(c.slug)[0]).filter(Boolean);
               </ul>
             )}
             <p>
-              <a class="readmore" href={`/courses/${course.slug}`}>
+              <a class="readmore" href={`/sections/${course.slug}`}>
                 All {count} features →
               </a>
             </p>

@@ -34,14 +34,14 @@ concepts:
     definition: "Training a neural reward model from human preferences between pairs of model outputs, then using reinforcement learning to optimize a language model against that learned reward."
 ---
 
-Every other model in this course learns from answers: here is an input, here is
+Nearly every other model in this section learns from answers: here is an input, here is
 the correct label, minimize the gap. Reinforcement learning throws that comfort
 away. Its agent is set loose in a world with no answer key, only *consequences* —
 it acts, the world changes, and now and then a number arrives to say whether
 things are going well. From that thin signal the agent must infer an entire
 strategy for behaving. It is the framework behind machines that learned to play
 Atari from raw pixels and to master Go, and, more recently, the machinery used to
-make large language models helpful. This lecture builds it from the ground up.
+make large language models helpful. This feature builds it from the ground up.
 
 ## An Agent, a World, and a Number
 
@@ -112,7 +112,7 @@ Q^\pi(s, a) = \mathbb{E}_\pi\!\left[G_t \mid S_t = s,\, A_t = a\right]
 $$
 
 scores a *state–action pair*: how much return to expect from taking action $a$ in
-state $s$ and behaving well afterward. In the discrete world of this lecture these
+state $s$ and behaving well afterward. In the small, discrete worlds considered here these
 $Q$ values live in a **Q-table**, one row per state, one column per action. Such a
 table implicitly defines a policy — in each state, take the action with the
 largest $Q$ value.
@@ -208,7 +208,7 @@ chasing a target that shifts as fast as it learns.
 
 ## From Games to Chatbots
 
-The lecture's final turn is why any of this appears in a language course.
+The final turn is why any of this matters for language models.
 Reinforcement learning now aligns large language models through **RL from human
 feedback**. First, humans are shown pairs of model outputs and asked which they
 prefer; those judgments train a neural network to *predict* human preference — a

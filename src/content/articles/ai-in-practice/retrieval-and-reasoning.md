@@ -35,7 +35,7 @@ summarizing clinical notes jumped from 93.25% to 99.25% — and it did so withou
 single change to the model's weights. The improvement came entirely from what was
 placed *around* the model at the moment of the query. Strip that scaffolding away
 and the same system reverted to confidently inventing plausible, wrong medical
-facts. This lecture was a tour of that scaffolding: the techniques — retrieval,
+facts. This feature is a tour of that scaffolding: the techniques — retrieval,
 repeated sampling, explicit reasoning, and standardized tool access — that make a
 fixed language model behave as though it were smarter, better informed, and more
 honest than it actually is on its own.
@@ -258,8 +258,8 @@ None of these methods touch the underlying model, and that is exactly the point.
 Retraining a frontier model is slow and ruinously expensive; the scaffolding
 around it is cheap, fast, and auditable. In a hospital, that distinction is not
 academic — a retrieved, cited medical note is defensible in a way that a model's
-internal recall never can be. Yet the same lecture kept sounding a note of caution:
-these techniques are, in one student's phrase, "band-aids" over foundation models
+internal recall never can be. Yet a note of caution belongs here too:
+these techniques are, in one skeptic's phrase, "band-aids" over foundation models
 that still hallucinate and still cannot reliably reason. They make today's systems
 usable in high-stakes settings. Whether they are a bridge to more capable
 architectures, or a permanent exoskeleton the models will always need, is the open

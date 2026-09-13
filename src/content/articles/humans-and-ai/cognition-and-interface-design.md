@@ -36,7 +36,7 @@ we see, and click the thing that looks clickable — all without deliberation. T
 design for people, and especially to design the interfaces through which people
 now meet artificial intelligence, you have to understand the machinery that makes
 those 35,000 micro-choices possible. That machinery is the subject of **cognitive
-psychology**, and this week turns it into a designer's toolkit.
+psychology**, and this feature turns it into a designer's toolkit.
 
 ## The Science of the Thinking User
 
@@ -208,7 +208,7 @@ of *effective challenge* that questions design decisions rigorously.
 
 ## Modeling the Mind
 
-The week's final idea turns the lens around. **Cognitive modeling** is the
+The final idea turns the lens around. **Cognitive modeling** is the
 multidisciplinary attempt to replicate and simulate human cognitive processes —
 problem solving, decision-making, learning, memory — in order to understand how
 people perceive, interpret, and respond. It is also, quietly, a description of

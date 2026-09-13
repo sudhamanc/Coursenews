@@ -2,7 +2,7 @@
 course: ai-in-practice
 lectureId: W5
 title: "Learning From Yes and No: The Two Machines That Generalize"
-deck: "Decision trees ask questions and neural networks add up evidence — this lecture shows how both turn labeled examples into predictions, and how a single number called loss teaches a network to improve."
+deck: "Decision trees ask questions and neural networks add up evidence — here is how both turn labeled examples into predictions, and how a single number called loss teaches a network to improve."
 order: 5
 readingTime: 8
 tags: ["inductive-learning", "decision-trees", "neural-networks", "gradient-descent", "loss"]
@@ -29,7 +29,7 @@ concepts:
 
 There are two ways to teach a machine to tell a fraudster from an honest filer, or
 an eight from a six. You can hand it a rulebook, or you can show it examples and let
-it write the rulebook itself. This lecture is about the second path — **inductive
+it write the rulebook itself. This feature is about the second path — **inductive
 learning** — and the two workhorse methods that walk it: decision trees, which learn
 by asking questions, and neural networks, which learn by weighing evidence. What
 unites them is a dependence on labeled examples and a willingness to be told, over
@@ -40,7 +40,7 @@ and over, exactly how wrong they are.
 **Inductive learning** examines both positive and negative labeled instances to learn
 a concept. The presence of labels is precisely what makes it *supervised*: each
 example arrives tagged with the right answer, and the learner's job is to find a rule
-that reproduces those answers and generalizes to new cases. The lecture frames
+that reproduces those answers and generalizes to new cases. Think of
 decision trees and neural networks as two approaches to this same task — one symbolic
 and legible, the other numeric and distributed — and much of the intellectual payoff
 comes from seeing them side by side.
@@ -52,10 +52,10 @@ taxpayer described by whether they received a refund, their marital status, and 
 taxable income, and labeled as to whether they cheated — the induction algorithm
 looks for the single feature that best separates the classes, and splits on it.
 
-The lecture works the example by hand. Refund turns out to correlate cleanly with the
+Work the example by hand. Refund turns out to correlate cleanly with the
 label, so it becomes the first question: *Was there a refund?* Everyone who received
 one falls into a pure group labeled "no cheat," and that branch is finished. Marital
-status would have separated the data equally well, but the instructor deliberately
+status would have separated the data equally well, but the example deliberately
 passes it over for the first split — it has three values, and numeric features are
 undesirable at the top of the tree — choosing the cleaner binary cut instead. That
 preference is a practical heuristic: simpler, lower-cardinality splits near the root
@@ -106,7 +106,7 @@ ending in labels.
 <figcaption><b>Decision-tree induction.</b> Each internal node splits on the feature that best purifies the data; following the yes/no answers from the root lands every example on a labeled leaf.</figcaption>
 </figure>
 
-The lecture is honest about the tree's blind spot: by lumping every unmarried person
+Be honest about the tree's blind spot: by lumping every unmarried person
 together, it never distinguishes the divorced from the single, and a differently
 built tree might. The principled version of "best separates the classes" is
 **information gain**, the reduction in label entropy
@@ -121,8 +121,8 @@ that most purifies what remains.
 
 ## Neurons, Weights, and a Threshold
 
-A **neural network** reaches the same kind of decision by a different road. The
-lecture builds one to recognize crude handwritten digits represented as nine cells —
+A **neural network** reaches the same kind of decision by a different road. Build
+one to recognize crude handwritten digits represented as nine cells —
 nine input **neurons**, some active ($1$) and some inactive ($0$). Those inputs
 connect to a hidden neuron, and each connection carries a **weight**. The hidden
 neuron's value is the sum of each input times its weight, offset by a **bias**:
@@ -131,7 +131,7 @@ $$
 h = \sum_{i=1}^{9} a_i w_i - b.
 $$
 
-The bias acts as a threshold — the instructor's phrasing is that the neuron should not
+The bias acts as a threshold — put plainly, the neuron should not
 activate "unless this sum is greater than 2," so $b = 2$. With the pattern for an
 eight active and the given weights, the arithmetic runs
 
@@ -144,7 +144,7 @@ each computing $y_j = a_h w_{2j} - b_j$. For this input the raw outputs come out
 $12.8$, $5.4$, and $8.1$, which, normalized to a distribution, become $0.49$, $0.21$,
 and $0.31$. The largest points to digit "3." Feed the network the patterns for six or
 eight, though, and — with these arbitrary starting weights — it points to the wrong
-answers. The lecture's verdict is blunt: **this network needs to learn.**
+answers. The verdict is blunt: **this network needs to learn.**
 
 <figure>
 <svg viewBox="0 0 820 260" role="img" aria-label="A feedforward network: nine input cells feed one hidden neuron computing a weighted sum minus a bias, which feeds three output neurons whose largest score is the prediction.">
@@ -200,8 +200,8 @@ answers. The lecture's verdict is blunt: **this network needs to learn.**
 ## Measuring How Wrong
 
 Learning begins by quantifying failure. The **loss** is the gap between what the
-network predicted and what it should have. For an input, the lecture squares the
-difference on each output and sums:
+network predicted and what it should have. For an input, square the
+difference on each output and sum:
 
 $$
 L = \sum_{j} (\hat{y}_j - y_j)^2.
@@ -216,8 +216,8 @@ $$
 $$
 
 That single number is the output of the **loss function**, and its inputs are every
-weight and bias in the network. Change them, and the average loss changes — the
-lecture shows one set of weights scoring $0.70$, another $0.65$, another $0.53$.
+weight and bias in the network. Change them, and the average loss changes — one
+set of weights scores $0.70$, another $0.65$, another $0.53$.
 Learning is nothing more than the search for the weights that drive this number down.
 
 ## Rolling Downhill

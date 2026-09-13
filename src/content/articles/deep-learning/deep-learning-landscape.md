@@ -10,7 +10,7 @@ tags: ["overview", "computer-vision", "generative-ai", "nlp", "deep-learning"]
 concepts:
   - id: gradient-based-learning
     term: Gradient-Based Learning
-    definition: "The unifying training paradigm of modern AI: adjust a model's parameters by repeatedly nudging them in the direction that most reduces a loss function. Every architecture in this course is trained this way."
+    definition: "The unifying training paradigm of modern AI: adjust a model's parameters by repeatedly nudging them in the direction that most reduces a loss function. Every architecture in this section is trained this way."
   - id: computer-vision
     term: Computer Vision
     definition: "The application area concerned with teaching machines to interpret images, spanning hand-engineered features like HOG through deep convolutional networks."
@@ -63,17 +63,17 @@ Every field has a moment before the real work begins — the unrolling of the ma
   <text x="695" y="265" text-anchor="middle" font-size="13" font-weight="700">Reinforcement Learning</text>
   <text x="695" y="283" text-anchor="middle" font-size="10" class="dgm-muted">agent · reward · RLHF</text>
 </svg>
-<figcaption><b>The map of provinces</b> Every application area in the course is trained the same way — by descending the gradient of a loss — so one engine drives them all.</figcaption>
+<figcaption><b>The map of provinces</b> Every application area here is trained the same way — by descending the gradient of a loss — so one engine drives them all.</figcaption>
 </figure>
 
-## Three Courses, One Idea
+## Three Layers, One Idea
 
-This course sits in the middle of a trilogy. The first, a course in the *fundamentals*, is a breadth survey of traditional machine learning: objective functions, evaluation, generalization, and the classic algorithms that came before the deep-learning era. The third is a deep dive into *deep learning* itself — the inner machinery of forward and backward propagation, adaptive learning rates, and the modular building blocks of modern architectures.
+Applications sit in the middle of a three-layer stack. Beneath them are the *fundamentals*: a breadth survey of traditional machine learning — objective functions, evaluation, generalization, and the classic algorithms that came before the deep-learning era. Above them is a deep dive into *deep learning* itself — the inner machinery of forward and backward propagation, adaptive learning rates, and the modular building blocks of modern architectures.
 
 We occupy the applications tier. Our job is to introduce **gradient-based learning**, then tour the places it has conquered: the common applications of machine learning, a closer look at generative AI, a survey of the landmark papers, and hands-on use and training of the architectures that define the state of the art. The through-line — the road that connects every province on the map — is that all of these systems learn the same way. They define a measure of how wrong they are and then descend its gradient, step by step, until the errors shrink. Vision, language, generation: different destinations, identical vehicle.
 
 <figure>
-<svg viewBox="0 0 820 175" role="img" aria-label="A three-stage course arc: fundamentals, then applications (the current course, highlighted), then deep learning.">
+<svg viewBox="0 0 820 175" role="img" aria-label="A three-layer arc: fundamentals, then applications (this section, highlighted), then deep learning.">
   <defs>
     <marker id="arw-arc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" class="dgm-fill"/>
@@ -93,7 +93,7 @@ We occupy the applications tier. Our job is to introduce **gradient-based learni
   <text x="690" y="84" text-anchor="middle" font-size="14" font-weight="700">Deep Learning</text>
   <text x="690" y="104" text-anchor="middle" font-size="10" class="dgm-muted">forward/back-prop internals</text>
 </svg>
-<figcaption><b>The three-course arc</b> This applications course sits between a breadth survey of the fundamentals and a deep dive into the internals of deep learning.</figcaption>
+<figcaption><b>The three-layer arc</b> Applications sit between a breadth survey of the fundamentals and a deep dive into the internals of deep learning.</figcaption>
 </figure>
 
 ## The Eye: Computer Vision
@@ -152,7 +152,7 @@ That better idea grew out of **natural language processing**, a province with it
 
 At the frontier, the question is no longer only how to *train* these giants but how to *steer* them. A family of **adapters** now bends pretrained models to new purposes without retraining them wholesale: LoRA (Low-Rank Adaptation) fine-tunes a language model cheaply; IP-Adapter conditions image generation on a reference; Sora extends generation to video; and ControlNet grants precise, controllable guidance over what a generator produces.
 
-Beyond this course's core provinces lies another major territory on the wider map — **reinforcement learning**, where an agent learns not from labeled examples but by acting in an environment and chasing a reward. It is the paradigm behind game-playing systems and an increasingly important ingredient in aligning large models to human preferences. We will keep it in view even as we focus our expedition on vision, generation, and language.
+Beyond these core provinces lies another major territory on the wider map — **reinforcement learning**, where an agent learns not from labeled examples but by acting in an environment and chasing a reward. It is the paradigm behind game-playing systems and an increasingly important ingredient in aligning large models to human preferences. We will keep it in view even as we focus our expedition on vision, generation, and language.
 
 ## Why It Matters
 

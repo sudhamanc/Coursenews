@@ -32,7 +32,7 @@ concepts:
 
 Ask three people to buy health insurance for the coming year and you will get
 three different answers — not because two of them are wrong, but because there is
-no single right one. This lecture used exactly that scenario to open a difficult
+no single right one. That scenario opens a difficult
 subject: how do we align artificial intelligence with human values when humans
 themselves cannot agree on what is good? The answer that emerged was not a single
 target but a hierarchy of them. Alignment, it turns out, is really three problems
@@ -42,7 +42,7 @@ satisfy no one.
 
 ## Three Scales of Alignment
 
-The lecture drew the landscape as nested regions. At the broadest scale sits
+Picture the landscape as nested regions. At the broadest scale sits
 **machine ethics** — the attempt to give machines universal moral principles. Around
 it lies **AI alignment**, concerned with a pluralistic consensus of human values.
 And at the finest grain sits **decision-maker alignment**, tuned to a single
@@ -86,7 +86,7 @@ $$
 
 Each framing is legitimate; each implies a different training target and a
 different notion of success. "Universal" alignment, by contrast, seeks one answer
-for everyone — and the lecture was frank that this default usually collapses into
+for everyone — and, frankly, that default usually collapses into
 the preferences of whoever labeled the data.
 
 ## The Person in the Loop: Decision-Maker Alignment
@@ -99,7 +99,7 @@ nothing to align to. It is precisely under uncertainty, time pressure, and limit
 resources that people fall back on **cognitive attributes** such as risk tolerance,
 and their choices diverge.
 
-The lecture made this concrete with three synthetic actors choosing a health plan,
+Make this concrete with three synthetic actors choosing a health plan,
 distinguished by a risk-aversion parameter $A$. *Aleks* is maximally risk-averse
 ($A = 1$) and buys the plan that hedges against the worst case; *Chad* is
 risk-neutral ($A = 0$) and buys the cheapest, betting he will need little care;
@@ -157,7 +157,7 @@ principled; every one breaks down somewhere when applied to a real decision.
 
 ## Top-Down, Bottom-Up, or Both
 
-Given a framework, how do you build the machine? The lecture laid out three
+Given a framework, how do you build the machine? There are three
 **implementation approaches**. *Top-down* systems encode rules agreed before
 construction — Asimov's laws are the archetype — but rules are rigid, they
 conflict, and any required agreement leaves someone out. *Bottom-up* systems are
@@ -220,7 +220,7 @@ confidence and quietly imports its own assumptions.
 ## Why It Matters
 
 The temptation in AI ethics is to search for the one correct value system and
-install it. This lecture's quiet argument is that no such system exists, and that
+install it. The quiet argument here is that no such system exists, and that
 pretending otherwise is itself a failure mode — it smuggles the labelers' values in
 under the banner of universality. The more honest architecture is layered: fixed
 constraints where we truly agree, pluralistic representation where reasonable

@@ -36,10 +36,10 @@ concepts:
     definition: "The Bush–Engelbart tradition of using computing to expand human capability rather than replicate it, which human-centered design returns to as the limits of general machine intelligence become clearer."
 ---
 
-The course ends where it is hardest to end a course about technology: on the
-question of what the technology is *for*. Week 10's answer is deliberately
+The hardest place to end any account of technology is the
+question of what the technology is *for*. The answer here is deliberately
 uncomfortable for anyone hoping the models will settle it. The future of human–AI
-interaction, the lecture argues, is not determined by what AI can do. It is
+interaction, the argument runs, is not determined by what AI can do. It is
 determined by what people choose to delegate, preserve, question, and redesign. Every
 capability is an invitation to a decision, and the decision is ours.
 
@@ -59,7 +59,7 @@ familiar arrangements: **supervised learning**, where humans label data and trai
 test, tune, and validate; **unsupervised learning**, where models find structure in
 unlabeled data; and **interactive machine learning**, where people iteratively guide
 and correct the model. Deep learning then extended reach across images, speech, and
-text — and introduced the cost that defines the rest of this course. Complex neural
+text — and introduced the cost that defines everything that follows. Complex neural
 networks are difficult to interpret, so determining *why* a model produced a result,
 or which features drove it, becomes hard exactly when the stakes justify asking.
 Deep learning remains excellent at statistical pattern recognition and short on
@@ -77,7 +77,7 @@ professionals at the center — ethically aligned design that promotes fairness 
 avoids unnecessary human replacement, human-like intelligence that better reflects
 human cognition, and human-factors design that keeps systems explainable,
 understandable, useful, and usable. His prescription that HCI practitioners should
-develop deep AI expertise draws the lecture's practical caveat: UX professionals
+develop deep AI expertise draws a practical caveat: UX professionals
 tend to be more effective collaborating closely with data scientists than trying to
 become machine-learning experts themselves.
 
@@ -85,7 +85,7 @@ become machine-learning experts themselves.
 safe, and trustworthy systems, and his framework is the most operational of the
 three: combine high human control with high automation, identify the cases where
 full human or full computer control is genuinely appropriate, and avoid excessive
-reliance on either. The critique the lecture offers is worth holding onto — an
+reliance on either. One critique is worth holding onto — an
 engineering orientation leaves less room to question how "good performance" was
 defined in the first place. A design-centered view surfaces the tradeoffs that
 metric hides: diagnostic accuracy bought at the price of physician deskilling, for
@@ -138,7 +138,7 @@ Development is global; governance is not.
 
 ## The Spectrum, Not the Switch
 
-Against that backdrop the lecture offers the framework most likely to survive
+Against that backdrop sits the framework most likely to survive
 contact with real design work. The human–AI relationship is not a binary between
 automated and manual. It is a spectrum defined by who holds agency, how decisions
 get made, and where control sits.
@@ -209,7 +209,7 @@ generates alternatives, and leaves the interpreting to them.
 
 ## Winter, Autumn, and What Actually Shipped
 
-The lecture is pointed about the gap between marketing and engineering. Earlier AI
+Be pointed about the gap between marketing and engineering. Earlier AI
 winters followed inflated promises resting on thin capability; the current moment
 looks more like an **AI autumn**, where the exaggerated claims cool while the
 practical, human-centered applications keep working. Four claims illustrate the gap:
@@ -218,8 +218,8 @@ structure learning; fully autonomous vehicles were predicted for 2020 and did no
 arrive; assistants such as Alexa recognize commands without conducting genuine
 conversation; and AI still lacks common sense, causal reasoning, and reliable
 transfer across domains. Modern AI is better understood as statistical pattern
-recognition than general intelligence — deep learning remains, in the lecture's
-borrowed phrase, greedy, brittle, opaque, and shallow. Those limits surface hardest
+recognition than general intelligence — deep learning remains, in a
+widely borrowed phrase, greedy, brittle, opaque, and shallow. Those limits surface hardest
 where human behavior is unpredictable, which is why a vehicle that performs well
 under controlled conditions still struggles with the improvisation and social
 judgment that ordinary driving requires. When a system ignores situated human
@@ -292,17 +292,18 @@ genuinely helps is where the remaining value sits.
 
 ## Why It Matters
 
-Ten weeks built toward a single reframing. Week 2 established that people bring
-cognitive expectations to systems that do not share them; Weeks 3 and 4 gave the
-frameworks and the prototyping methods; Week 5 asked whose values were encoded;
-Week 6 demanded that a black box be answerable; Week 7 treated failure as a design
-surface; Week 8 moved the object of governance from stored data to manufactured
-inference; Week 9 showed that the argument between replacement and partnership has
-been running since 1960. Week 10 closes it by refusing to treat the outcome as a
+Every feature on this desk builds toward a single reframing. Cognitive psychology
+establishes that people bring expectations to systems that do not share them; the
+frameworks and prototyping methods give designers a map; information architecture
+asks whose values are encoded; explainability demands that a black box be answerable;
+error handling treats failure as a design surface; inferential privacy moves the object
+of governance from stored data to manufactured inference; and the field's history
+shows that the argument between replacement and partnership has been running since
+1960. This closing piece refuses to treat the outcome as a
 forecast. The systems will keep improving, and improvement answers none of the
 questions that matter: which decisions stay human, what the system does when it is
 unsure, who is harmed when it is confidently wrong, and whether the people affected
-had any say in its design. The lecture's closing question is the whole course
+had any say in its design. The closing question is the whole desk
 compressed to one line — *what kind of human–AI relationship do you want to help
 create?* — and it is addressed to designers because they are among the few people in
 the room whose job description includes answering it.

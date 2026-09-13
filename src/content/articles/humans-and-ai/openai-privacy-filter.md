@@ -141,8 +141,8 @@ limitations.
 
 ## What It Does Not Claim
 
-The limitations section is unusually direct, and reading it beside the Week 8
-lecture is the point of assigning it. Privacy Filter is "not an anonymization tool,
+The limitations section is unusually direct, and it is worth reading beside the
+inferential-privacy argument. Privacy Filter is "not an anonymization tool,
 a compliance certification, or a substitute for policy review in high-stakes
 settings." Its behavior reflects the taxonomy it was trained on, so organizations
 wanting different masking policies need in-domain evaluation or fine-tuning.
@@ -153,8 +153,8 @@ runs on. In legal, medical, and financial workflows, human review remains necess
 
 ## Why It Matters
 
-Set this next to the week's central argument and the fit is exact — including where
-it stops. The lecture's sharpest technical claim is that differential privacy,
+Set this next to the inferential-privacy argument and the fit is exact — including where
+it stops. That argument's sharpest technical claim is that differential privacy,
 federated learning, and audit tooling protect data *inside* a system while leaving
 its purpose, its collection practices, its inferences, and its deployment
 untouched. Privacy Filter belongs to that same category. It is a genuinely good
@@ -166,7 +166,7 @@ downstream will infer from redacted text the very things the redaction removed.
 
 OpenAI states the goal as models that "learn about the world, not about private
 individuals." That is a statement about training data, and this tool serves it well.
-Week 8's argument is that the harms which matter most now are downstream of
+The inferential-privacy argument is that the harms which matter most now are downstream of
 training — in what a deployed system concludes about a person and what institutions
 do with that conclusion. A redactor is a necessary instrument. The distance between
-necessary and sufficient is the week's entire syllabus.
+necessary and sufficient is the whole subject.

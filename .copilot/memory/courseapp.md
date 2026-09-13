@@ -587,3 +587,36 @@ NO RAG. Articles authored directly (no build-time API cost).
 - VERIFIED by replaying the 11 Sep 13:00Z refresh through old vs new prefilters (esbuild bundle, mocked
   Date.now): old = Agents API absent from both wires; new = present via HN in research, via HN + OpenAI
   RSS in ecosystem. Live fetch of all sources 2.3s. Ranker (Haiku) not exercised locally.
+
+## Session 9: Latent Inference rename, grouped nav, /sections URLs, prose sweep
+- USER DIRECTION: the site must not read like coursework anywhere. Name is now "Latent Inference"
+  (home-screen "Latent"). The L icon set stays; the OG card draws no name, so no PNG regeneration.
+- SECTIONS renamed to topics in courses.config.json: intro-to-ai -> ai-foundations, applied-ai ->
+  ai-in-practice, advanced-ai -> agents-and-autonomy, human-ai -> humans-and-ai,
+  applied-ml-data-science -> ml-essentials, applications-of-ml -> deep-learning; llm-canon unchanged.
+  Internal names were KEPT on purpose: courses.config.json, COURSES, the `course` frontmatter key,
+  chat `context.course` (stored Blobs threads carry them).
+- URLS: src/pages/sections/[section].astro + [section]/[article].astro. 40 course-style article files
+  renamed to topic slugs (l08-transformers -> transformers, lecture-04-1 -> support-vector-machines,
+  week5-haii -> information-architecture, ...). public/_redirects: explicit renamed-article 301s, then
+  per-section splats, then a /courses/* catch-all (first match wins). Astro copies it to dist and the
+  netlify adapter leaves it alone. VERIFIED by simulating the rules: all 96 old URLs land on built pages.
+  GOTCHA: index.astro built `/courses/` links in its own templates; grep src for route prefixes, not
+  just the moved pages.
+- CHAT: validate.ts LEGACY_SLUGS maps old slugs forward (verified by bundling validate.ts with esbuild
+  and running it in node). Prompt persona no longer mentions teaching assistant, lecture notes, or
+  coursework. threads.ts transcript header says "Section:".
+- lectureId (W3/L08/R2) is NEVER displayed now: displayId() in src/lib/courses.ts shows only 4-digit
+  years (canon papers). The ids stay as ordering and chat-context keys.
+- NAV: config `groups` [{id,label,short}] plus per-section `group`, `tagline`, optional `navShort`.
+  Disclosure pattern (button aria-expanded + panel); the inline script toggles, Escape refocuses the
+  trigger, outside click and focusout close; hover-open is CSS only (hover:hover and pointer:fine).
+  Group names shorten to AI/ML at <=960px; every label shortens at <=640px, where panels span the
+  column (.topnav__group becomes position:static). VERIFIED one row at 1024/768/375, overflow 0.
+- DATE: .masthead__dateline removed. <time data-today> sits top-left in the masthead (hidden <=900px,
+  where it collides with the centred title) and in the footer; window.__latentToday() rewrites all.
+- PROSE SWEEP: ~180 lecture/course/semester/week/reading references rewritten across 40 articles
+  (decks, concept definitions, figcaptions, SVG aria-labels included). Remaining scanner hits are
+  domain uses to leave alone: CSP "assignment", sliding windows, distillation "student", Turing's
+  "homework" quote, Professor Jefferson / Lister Oration.
+- NOT CHANGED (user-owned settings): GitHub repo name Coursenews, Netlify subdomain coursenews.netlify.app.

@@ -184,7 +184,7 @@ handed back explicitly.
 
 ## Reading in Both Directions
 
-The final act of the lecture is the **bidirectional encoder**, embodied by BERT.
+The final act of the story is the **bidirectional encoder**, embodied by BERT.
 A decoder-style language model is inherently left-to-right: it predicts the next
 word and must not peek at the future. But many tasks — classification, question
 answering, named-entity recognition — benefit from seeing the *whole* sentence.

@@ -2,7 +2,7 @@
 course: humans-and-ai
 lectureId: W6
 title: "The Right to an Explanation"
-deck: "Week 6 turns to Explainable AI — why a black box is not answerable, how local, cohort, and global explanations differ, and why 'being an explanation' is not a property of a statement but an interaction with a person who has to decide."
+deck: "A tour of Explainable AI — why a black box is not answerable, how local, cohort, and global explanations differ, and why 'being an explanation' is not a property of a statement but an interaction with a person who has to decide."
 order: 6
 readingTime: 12
 tags: ["explainable-ai", "xai", "trust", "interpretability", "responsible-ai"]
@@ -40,7 +40,7 @@ algorithm was a trade secret, neither Loomis nor the judge could examine how it
 reached its verdict. The Wisconsin Supreme Court let the score stand but wrapped
 it in warnings — about its secrecy, its group-based predictions, its unvalidated
 accuracy, its possible racial disparities. Which exposes the question at the
-center of Week 6: if neither the defendant nor the judge can see how a number was
+center of explainable AI: if neither the defendant nor the judge can see how a number was
 produced, can it be meaningfully challenged at all? **A warning about a black box
 does not make the black box explainable.**
 
@@ -105,13 +105,13 @@ understood) — criteria that deep networks fail on every count.
 <figcaption><b>Transparent vs. opaque.</b> A transparent model lets you follow inputs to an output; a black box shows only its ends, so understanding it takes a separate post-hoc explanation.</figcaption>
 </figure>
 
-The vocabulary here is slippery, and the lecture is careful about it.
+The vocabulary here is slippery, and worth being careful about.
 *Interpretability* is a passive property a system either has or lacks;
 *explainability* is an active interface or procedure that makes a system
 understandable to a person; *comprehensibility* is the model's ability to render
 its knowledge in human terms. In practice the three words are used almost
 interchangeably — but the distinction between a property and an *interaction* is
-the one that matters most this week.
+the one that matters most here.
 
 ## Whose Explanation? Local, Cohort, Global
 
@@ -179,7 +179,7 @@ systematic disparity that no single case could show.
 
 ## What Counts as an Explanation
 
-Here the course makes its most human-centered move. Borrow Aristotle's four
+Here comes the most human-centered move. Borrow Aristotle's four
 causes and ask a child *why she was late to class*: because atoms carried her
 there at a finite speed; because of traffic and physics; because she could not
 decide what to wear; or because she has a date afterward and lost track of time.
@@ -280,7 +280,7 @@ spelling out why an application was rejected; the draft EU AI Act demands that
 users of high-risk systems be able to interpret and appropriately use their
 output. Return to Loomis. The deepest problem was never that COMPAS was
 necessarily wrong — it was that the score was *unanswerable*, and a right you
-cannot exercise is not a right. Week 6's lesson, and the reason it follows Week
-5's reckoning with fairness, is that explainability is where a black box becomes
+cannot exercise is not a right. The lesson, and the reason explainability follows
+any reckoning with fairness, is that explainability is where a black box becomes
 accountable. The measure of an explanation is not how sophisticated it looks, but
 whether the person on the other side can understand it, question it, and act.

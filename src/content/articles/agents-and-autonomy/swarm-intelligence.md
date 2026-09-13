@@ -2,20 +2,20 @@
 course: agents-and-autonomy
 lectureId: W1
 title: "A Crowd of Minds: The Case Against the Monolith"
-deck: "Advanced AI's opening lecture reframes the frontier as a contest between one giant model and a swarm of simple, arguing agents — and makes the case for the crowd."
+deck: "This feature reframes the frontier as a contest between one giant model and a swarm of simple, arguing agents — and makes the case for the crowd."
 order: 1
 readingTime: 7
 tags: ["agentic-ai", "swarm-intelligence", "multi-agent", "ensembles", "wisdom-of-crowds"]
 concepts:
   - id: agentic-ai
     term: Agentic AI
-    definition: "An approach that treats intelligence as the product of many autonomous agents that each sense, decide, and act, rather than a single monolithic model; the course adopts it as an open, deliberately loose organizing theme."
+    definition: "An approach that treats intelligence as the product of many autonomous agents that each sense, decide, and act, rather than a single monolithic model; this feature treats it as an open, deliberately loose organizing theme."
   - id: hebbian-learning
     term: Hebbian Learning
     definition: "The principle that a connection strengthens when one neuron repeatedly helps fire another — 'cells that fire together wire together' — the biological seed of the weight updates used throughout machine learning."
   - id: ensemble-learning
     term: Ensemble Learning
-    definition: "Combining many limited models through bagging, boosting, or random forests into one stronger predictor; the lecture frames it as a rough, algorithmic version of the wisdom of crowds."
+    definition: "Combining many limited models through bagging, boosting, or random forests into one stronger predictor — a rough, algorithmic version of the wisdom of crowds."
   - id: mixture-of-experts
     term: Mixture of Experts
     definition: "A hybrid of deep networks and ensembles in which specialized sub-models live inside a larger network and a router activates only the relevant expert for each input, as in Google's Switch Transformer."
@@ -30,11 +30,10 @@ concepts:
     definition: "A multi-agent classifier of hundreds to thousands of small MLP agents that hold diverse features, trade trust and certainty through social interaction, and reach a confidence-rated verdict via a bee-inspired scout–watcher vote; its meta-swarm variant can absorb any external prediction, including a large language model's."
 ---
 
-Most graduate courses on advanced artificial intelligence begin where the
+Most accounts of advanced artificial intelligence begin where the
 textbooks do — with deeper networks, larger transformers, and more data. This
-one begins with a heresy. After the housekeeping, the first real slide is
-titled, flatly, *An Alternative Approach to Deep Learning*, and the semester's
-organizing obsession turns out not to be a single model at all but a crowd of
+one begins with a heresy. Its opening claim is titled, flatly, *An Alternative
+Approach to Deep Learning*, and its organizing obsession turns out not to be a single model at all but a crowd of
 them. The throughline is **agentic AI**: intelligence assembled from many
 autonomous parts that each sense, decide, and act, then negotiate a collective
 answer. The term is introduced and then, pointedly, left loose — defined but not
@@ -109,14 +108,14 @@ modern learning algorithms.
 ## Why Not Just One Big Model?
 
 If a lone neuron is the atom, the field's default molecule has become the very
-large network. The lecture's counter-move is to ask what you gain by refusing to
+large network. The counter-move is to ask what you gain by refusing to
 pour all your faith into one. The first answer is **ensemble learning**. Rather
 than train a single classifier, train many limited ones and combine their votes:
 **bagging**, as in random forests, whose "random" trees are only loosely so; or
 **boosting** — AdaBoost, XGBoost — which grows models in sequence so each fixes
 its predecessor's mistakes. Ensembles earn their keep precisely where deep
 learning struggles: limited data, poorly curated data, or a compute budget
-better spent on many small models than one giant one. The lecture is blunt about
+better spent on many small models than one giant one. There is no hiding
 the family resemblance — an ensemble is a crude, algorithmic version of the
 wisdom of crowds.
 
@@ -160,7 +159,7 @@ climbing fail: noisy, nonlinear, non-differentiable landscapes.
 
 ## Building a Swarm of Classifiers
 
-The course's own research turns these instincts into a working classifier:
+One research program turns these instincts into a working classifier:
 **Wisdom-of-Crowds Bots**, or WoC-Bots. Hundreds to thousands of deliberately
 simple agents each train a small multilayer perceptron — two to ten input
 features, one to three hidden layers — on a slice of the problem. Diversity is
@@ -237,13 +236,13 @@ airline-passenger satisfaction, the swarm holds its own.
 
 ## Why It Matters
 
-The opening lecture is really a map, and it deliberately points away from the
+This opening map deliberately points away from the
 field's center of gravity. Where most of AI is consolidating intelligence into
-single, ever-larger models, this course insists the frontier also runs the other
+single, ever-larger models, this view insists the frontier also runs the other
 way — toward many small, diverse, autonomous agents whose intelligence is
 *emergent* rather than engineered. That agentic stance is more than aesthetic. It
 buys graceful behavior under incomplete data, distribution across cheap hardware,
 updates without retraining, model-agnostic aggregation, and privacy by
 construction — precisely the places a monolith turns brittle. Whether the future
 belongs to the giant model, the crowd, or some negotiated peace between them is
-left, like the definition of agentic AI itself, as the semester's open question.
+left, like the definition of agentic AI itself, as the open question.

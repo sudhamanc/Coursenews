@@ -32,7 +32,7 @@ For most of computing's history, to program a machine was to dictate to it: spel
 out every rule, every branch, every exception, and the computer would obey.
 Machine learning inverts that contract. Instead of handing the computer a
 procedure, we hand it examples and a goal and let it discover the procedure
-itself. This opening lecture of Applied Machine Learning lays down the vocabulary
+itself. This opening feature lays down the vocabulary
 and the map — what learning means, the forms it takes, and the disciplined
 workflow that separates a real model from a lucky guess.
 
@@ -45,7 +45,7 @@ engineer's checklist: a program learns from experience $E$ with respect to a tas
 $T$ and a performance measure $P$ if its performance at $T$, as measured by $P$,
 improves with $E$. A spam filter's task $T$ is labeling email; its measure $P$
 might be classification accuracy; its experience $E$ is the corpus of messages
-users have already marked. Every project in this course can be written as such a
+users have already marked. Every project in this section can be written as such a
 triple $\langle T, P, E\rangle$.
 
 Why bother? Traditional programming excels when we can specify the rules —
@@ -59,7 +59,7 @@ there are atoms in the observable universe, are the same idea at different scale
 
 ## Four Ways a Machine Can Learn
 
-The lecture divides learning into four **paradigms** by the kind of feedback
+Learning divides into four **paradigms** by the kind of feedback
 available.
 
 **Supervised learning** is learning with an answer key: each training example
@@ -133,7 +133,7 @@ and flexibility against generalization and speed.
 
 ## The Life Cycle of a Model
 
-A model is not the project; it is one stage of it. The lecture presents machine
+A model is not the project; it is one stage of it. Think of machine
 learning as a five-part **lifecycle**:
 
 1. **Define the project** — What problem are we solving? What is the evaluation
@@ -184,7 +184,7 @@ misleading or worthless.
 
 ## The Grammar of Scikit-Learn
 
-Applied work in this course runs on Python's scikit-learn, whose design is
+Applied work in this section runs on Python's scikit-learn, whose design is
 remarkably consistent. Every object is an **estimator**: it learns parameters
 from data through a `fit()` method, with any choices you make in advance held as
 *hyperparameters*. Objects that clean or reshape data are **transformers**,
@@ -202,7 +202,7 @@ model.predict(X_new)         # a predictor produces answers
 ```
 
 This uniformity means that swapping one algorithm for another is often a one-line
-change — the reason the course can range across a dozen algorithms without
+change — the reason this section can range across a dozen algorithms without
 rewriting the scaffolding each time.
 
 ## Too Simple, Too Complex
@@ -210,20 +210,20 @@ rewriting the scaffolding each time.
 The recurring hazard of the whole enterprise is **generalization**. A model that
 is too simple **underfits** — it cannot capture the real pattern. A model that is
 too complex **overfits** — it memorizes noise and stumbles on data it has never
-seen. The lecture flags the usual culprits: too little data, poor-quality or
+seen. The usual culprits: too little data, poor-quality or
 non-representative samples, careless feature engineering. The defense, previewed
-here and developed in later lectures, is to hold data back: split off a test set,
+here and developed in later features, is to hold data back: split off a test set,
 and use cross-validation on the training data to choose hyperparameters honestly
 before a single final evaluation.
 
 ## Why It Matters
 
-This first lecture is a map, not a destination, but the map is the point. Machine
+This first feature is a map, not a destination, but the map is the point. Machine
 learning is less a bag of algorithms than a disciplined process for turning data
 into decisions — one that can mislead as easily as it can illuminate when the
 workflow is sloppy. Fixing the vocabulary early (task, measure, experience;
 supervised versus unsupervised; instance- versus model-based), internalizing the
 lifecycle, and learning the grammar of the tools are what make the rest of the
-course — regression, regularization, evaluation, deep learning — legible rather
+section — regression, regularization, evaluation, deep learning — legible rather
 than magical. Everything that follows is a variation on one theme: given data and
 a goal, find the function that generalizes.

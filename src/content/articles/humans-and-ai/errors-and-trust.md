@@ -2,7 +2,7 @@
 course: humans-and-ai
 lectureId: W7
 title: "The Humble Machine"
-deck: "Week 7 accepts what probabilistic systems guarantee — that they will be wrong — and asks the harder design question: what should a system do in the moment after it fails, when the user's task quietly becomes trust repair?"
+deck: "Probabilistic systems are guaranteed to be wrong, which leaves the harder design question: what should a system do in the moment after it fails, when the user's task quietly becomes trust repair?"
 order: 7
 readingTime: 13
 tags: ["errors", "trust", "failure", "bias", "recovery"]
@@ -44,13 +44,13 @@ around the impossible rows, invented the missing ones, and later admitted they
 missed the strange asymmetries when they returned to well-behaved human designs.
 That is one of two things a failing AI can produce. The other is a hiring tool
 that ranks qualified women below comparable men, or a skin-cancer detector that
-works less reliably on darker skin. **Week 7's argument is that the difference
+works less reliably on darker skin. **The argument here is that the difference
 between those outcomes is almost never the error rate. It is the context, and it
 is the design of the moment after.**
 
 ## An Error Is a Result; Bias Is a Pattern
 
-Begin with a distinction the lecture is precise about. An **error** is a single
+Begin with a distinction worth being precise about. An **error** is a single
 incorrect output, traceable to limits in the data, the model, the context, or the
 user's input; it may be isolated and unpredictable. **Bias** is a systematic
 pattern that consistently advantages, disadvantages, or misrepresents certain
@@ -73,7 +73,7 @@ consequence.
 
 ## Where Things Break
 
-The lecture's taxonomy is worth holding onto because it separates failures of the
+The taxonomy is worth holding onto because it separates failures of the
 technology from failures of the interaction. On the system side: **data errors**,
 where training material is mislabeled, incomplete, or unrepresentative — a
 healthcare model trained on heart conditions that cannot recognize kidney stones;
@@ -150,7 +150,7 @@ accidents**, where a technical failure yields something useful or delightful.
 One class of failure deserves separate billing because it is structural. Systems
 that retain only a limited **context window** eventually push earlier details out
 of view — and once the original instruction is gone, output remains locally
-fluent while drifting globally incoherent. The lecture's example is a recipe
+fluent while drifting globally incoherent. One example is a recipe
 generator that started on "clam frosting," forgot its own subject partway through,
 and continued adding unrelated ingredients with perfect confidence. The knitting
 patterns fail the same way, one order harder: stitch counts on row forty depend on
@@ -273,7 +273,7 @@ person.
 <figcaption><b>The three obligations.</b> A useful error experience tells the user what happened, why it happened, and what they can do next — anything less converts a recoverable mistake into abandonment.</figcaption>
 </figure>
 
-Around that chain sits a posture the lecture calls the **humble machine**: a
+Around that chain sits a posture best called the **humble machine**: a
 system that states its limitations, signals when it is uncertain, admits it can be
 wrong and may improve, and treats corrections as dialogue rather than telemetry —
 thumbs, edits, overrides that visibly change something. Humility is not
@@ -331,8 +331,8 @@ system where being wrong hurts someone.
 
 ## Why It Matters
 
-Weeks 5 and 6 established that AI systems must be fair and answerable. Week 7
-supplies the part that survives contact with reality: they will still be wrong,
+Fairness and explainability establish that AI systems must be fair and answerable. Error
+handling supplies the part that survives contact with reality: they will still be wrong,
 and the failure is the design surface. That reframes the deliverable. A concept is
 not finished when the happy path works; it is finished when you can say what the
 system does when it is uncertain, how the user notices, how they override it, who

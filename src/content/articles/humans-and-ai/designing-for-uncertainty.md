@@ -35,7 +35,7 @@ returns the same output twice; its behavior is a fixed function you can wirefram
 mock up, and test. Artificial intelligence keeps no such promise. It is
 probabilistic, adaptive, and only as predictable as the data it was trained on —
 which means the designer's job now includes designing for a system that won't sit
-still. This week is about how to do that responsibly.
+still. This feature is about how to do that responsibly.
 
 ## Two Kinds of Uncertainty
 

@@ -32,7 +32,7 @@ A modern language model arrives at the end of pretraining as a spectacularly
 capable generalist and a frustrating amateur at everything specific. It has read
 a library's worth of text and absorbed the deep structure of language, yet it has
 never seen your legal contracts, your support tickets, or your particular idea of
-a helpful answer. The question that organizes this lecture is deceptively simple:
+a helpful answer. The question that organizes this feature is deceptively simple:
 given one enormous pretrained model, how do you make it *yours*? The answer is not
 a single technique but a spectrum — running from surgery on the network's weights
 to a single example murmured inside a prompt — and choosing the right point on
@@ -41,7 +41,7 @@ machine learning.
 
 ## Four Paradigms, One Trajectory
 
-The lecture frames roughly twenty-four years of natural-language processing as
+It helps to frame roughly twenty-four years of natural-language processing as
 four successive paradigms, each shifting where human effort is spent. In the era
 of **feature engineering** (before 2013), fully supervised models such as
 conditional random fields dominated, and the work was manually specifying how to
@@ -143,7 +143,7 @@ cheese =>                        <- the actual query
 ```
 
 This is **in-context learning**: the model infers the pattern on the fly, its
-weights untouched. The lecture's most important empirical note is that this
+weights untouched. The most important empirical note is that this
 ability scales — *larger models make dramatically better use of in-context
 information*, so the same prompt that baffles a small model can steer a large one
 with precision. Prompting is the cheapest adaptation of all, requiring neither
@@ -218,7 +218,7 @@ plain-English request.
 
 ## Why It Matters
 
-The through-line of this lecture is that adaptation is a spectrum, not a switch.
+The through-line here is that adaptation is a spectrum, not a switch.
 At one end, full fine-tuning rewrites the whole network for maximum performance
 and maximum cost; at the other, a zero-shot prompt reshapes behavior for the price
 of a sentence. In between sit feature extraction, adapters, LoRA, and instruction

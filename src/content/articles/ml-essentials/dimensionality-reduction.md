@@ -34,7 +34,7 @@ concepts:
 High-dimensional data is deceptively hostile. A dataset with hundreds of features
 looks rich, but most of those features are correlated, noisy, or nearly constant,
 and the sheer number of them makes models slow to train, prone to overfitting, and
-impossible to plot. This lecture is about fighting back on two fronts: first by
+impossible to plot. This feature is about fighting back on two fronts: first by
 **reducing** dimensions to the handful of directions that actually carry signal,
 and then by **discovering** structure — class boundaries and natural groupings —
 inside that leaner space.
@@ -261,8 +261,8 @@ compares each point's mean distance to its own cluster ($a$) against its distanc
 the nearest rival cluster ($b$); scores near 1 mean tight, well-separated clusters.
 For large datasets, **Mini-batch K-Means** trades a little accuracy for speed by
 updating on random subsets. K-Means remains simple and fast, but it assumes clusters
-are roughly round and equally sized — an assumption the next lecture sets out to
-break.
+are roughly round and equally sized — an assumption that density-based and
+probabilistic clustering set out to break.
 
 ## Why It Matters
 

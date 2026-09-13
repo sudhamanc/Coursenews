@@ -2,7 +2,7 @@
 course: humans-and-ai
 lectureId: R2
 title: "It Was Never Going to Be Malice"
-deck: "The machines will not rise against us — they have no wants at all. What should worry us, this reading argues, is far more mundane and far more likely: brittle systems, borrowed prejudice, and goals we specified badly."
+deck: "The machines will not rise against us — they have no wants at all. What should worry us, this piece argues, is far more mundane and far more likely: brittle systems, borrowed prejudice, and goals we specified badly."
 order: 12
 readingTime: 12
 tags: ["ai-risk", "robustness", "bias", "goal-misspecification", "trust"]
@@ -39,7 +39,7 @@ a coordinated group fed it racism and it began broadcasting racism back. There i
 no line of code in which Tay decided anything. It ingested a distribution and
 reproduced it — which is what these systems do, and the sole reason the outcome
 felt like a betrayal is that we had imagined something behind the text. **The
-argument of this reading is that the risks worth worrying about are not the ones
+argument of this piece is that the risks worth worrying about are not the ones
 science fiction taught us to expect. They come from systems that want nothing at
 all.**
 
@@ -64,7 +64,7 @@ and sets the kitchen alight on the tenth is not nine-tenths of a product.
 
 ## Nine Ways It Actually Goes Wrong
 
-The reading's inventory of real risks is worth keeping intact.
+Its inventory of real risks is worth keeping intact.
 
 The first is the **overattribution error** — reading a mind into a system, and
 letting success in one setting vouch for reliability in another. Its clearest
@@ -181,8 +181,8 @@ on something.
 
 ## Why It Matters
 
-For a course about designing human–AI interaction, this reading is the sober floor
-under the week. It says the interface is not merely relaying a system's answers; it
+For anyone designing human–AI interaction, this piece is the sober floor
+under the design work. It says the interface is not merely relaying a system's answers; it
 is managing the distance between what the system can do and what a person will
 assume from a fluent response. Humans reading the same data do not conclude that
 almost all fathers are white or that a soccer player's job is to vibrate. That gap

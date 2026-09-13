@@ -2,7 +2,7 @@
 course: ai-in-practice
 lectureId: W6
 title: "The Turn Toward Representation: Deep Learning's Quiet Revolution"
-deck: "Once networks stopped merely performing tasks and started learning representations, autoencoders, computer vision, and even Netflix's recommender were never the same — this lecture follows that shift from bottleneck to blockbuster."
+deck: "Once networks stopped merely performing tasks and started learning representations, autoencoders, computer vision, and even Netflix's recommender were never the same — this feature follows that shift from bottleneck to blockbuster."
 order: 6
 readingTime: 9
 tags: ["deep-learning", "autoencoders", "representation-learning", "computer-vision", "recommenders"]
@@ -30,23 +30,23 @@ concepts:
     definition: "The gap in which gains on offline training metrics fail to translate into improved real-user behavior, a central obstacle in deploying deep recommenders."
 ---
 
-Somewhere between last week's handwritten-digit network and today's material, the
+Somewhere between the early handwritten-digit networks and today's systems, the
 goal of a neural network quietly changed. The old ambition was to *perform a task* —
 to classify a digit, to flag a fraudster. The new ambition, and the one that defines
 **deep learning**, is to *learn a representation*: an internal encoding of the data
-so rich that many tasks can be built on top of it. This lecture follows that shift
+so rich that many tasks can be built on top of it. This feature follows that shift
 through three of its clearest expressions — the autoencoder, the deep vision stack,
 and Netflix's decade-long bet that deep learning could remake recommendation.
 
 ## From Doing the Task to Learning to See
 
-The lecture marks the boundary explicitly. Last week a network learned to *execute* a
+The boundary is worth marking. A simple network learns to *execute* a
 task, classifying handwritten digits. Deep learning reframes the objective as learning
 good **representations** — and, counterintuitively, it was discovered that a task
 cannot be *too easy* if the network is to learn representations worth having. You will
 not always take those representations and use them directly; rather, it is the quality
 of the representation that quietly determines whether the eventual solution succeeds.
-The places where representations are used most visibly, the lecture notes, are
+The places where representations are used most visibly are
 language and vision models.
 
 ## The Bottleneck That Teaches
@@ -96,7 +96,7 @@ Because the bottleneck is narrower than the input, the network cannot simply cop
 must discover a compact code that preserves what matters. That makes the autoencoder a
 tool for **dimensionality reduction** — the bottleneck $Wx$ can be sized to the purpose
 — and it is agnostic to data type, working on tabular records, text, images, or time
-series alike. Its two defining features, the lecture stresses, are exactly this
+series alike. Its two defining features are exactly this
 **bottleneck representation** and the **reconstruction objective**; that pairing is
 what separates an autoencoder from other encoder–decoder models, such as transformers,
 that share the shape but not the goal.
@@ -155,7 +155,7 @@ dramatic accuracy gains and made real-time perception practical.
 <figcaption><b>A convolutional hierarchy.</b> A CNN turns raw pixels into progressively more abstract features — edges, then textures, then object parts — before a softmax converts the final scores into a class.</figcaption>
 </figure>
 
-The lecture lays out vision as a ladder of increasingly demanding tasks. **Image
+Vision is best laid out as a ladder of increasingly demanding tasks. **Image
 classification** names the dominant object. **Classification with localization** adds
 a box — labeling an x-ray as cancerous *and* drawing a box around the lesion.
 **Object detection** does this for many objects at once, benchmarked on datasets like
@@ -173,7 +173,7 @@ $$
 
 These gains carry real caveats. CNNs demand vast labeled datasets and heavy
 computation, and they stumble under domain shift or biased data. And perception is
-only half of any embodied system: the lecture contrasts the CNN that answers "what do
+only half of any embodied system: contrast the CNN that answers "what do
 I see?" with the deep **reinforcement learning** that answers "what should I do?" An
 autonomous vehicle needs both — a CNN for the eyes, an RL policy for the driving —
 because recognizing a pedestrian tells you nothing, by itself, about whether to brake
@@ -181,7 +181,7 @@ or swerve.
 
 ## Netflix's Deep Bet
 
-The lecture's capstone is a case study in applied AI: deep learning for recommendation
+The capstone is a case study in applied AI: deep learning for recommendation
 at Netflix, whose task is plainly **recommendation** and whose value is measured in
 hours watched and the share of recommended titles actually played. The guiding
 question was whether "the wave of deep learning would also wash over recommenders."
@@ -193,7 +193,7 @@ ahead only once **heterogeneous contextual features** — time, device, content 
 — were folded in, letting the network learn the complex non-linear relationships among
 diverse, multimodal signals.
 
-The lecture draws a useful contrast in how user history is modeled. **Bag-of-items**
+There is a useful contrast in how user history is modeled. **Bag-of-items**
 models ignore order, treating a viewing history as a set and encoding it as a sparse
 user-by-item matrix of implicit signals (plays, clicks) or explicit ones (thumbs up or
 down) — a good approximation of stable, long-term taste. **Sequential** models instead
@@ -248,8 +248,8 @@ transformers such as BERT; attention, in particular, offers a bonus, a built-in 
 </figure>
 
 Two hard lessons close the study. The first is **offline–online metric misalignment**:
-improvements on offline metrics often fail to move real user behavior, a gap the
-lecture proposes to narrow with better proxy metrics, richer features, dampened
+improvements on offline metrics often fail to move real user behavior, a gap that
+can be narrowed with better proxy metrics, richer features, dampened
 feedback loops, and human-in-the-loop tuning. The second is practical: the biggest
 early win from deep learning was simply adopting frameworks like TensorFlow, Keras, and
 PyTorch, whose automatic differentiation, GPU/TPU scaling, and built-in monitoring

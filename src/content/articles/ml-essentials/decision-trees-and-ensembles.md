@@ -32,7 +32,7 @@ A decision tree makes its reasoning embarrassingly easy to audit: it is nothing
 but a cascade of yes-or-no questions, and any prediction can be traced back to
 the questions that produced it. That transparency is also its weakness. Left to
 grow unchecked, a tree memorizes its training data down to the last quirk. The
-remedy this lecture builds toward is counterintuitive — stop trusting any single
+remedy this feature builds toward is counterintuitive — stop trusting any single
 tree, and start trusting crowds of them.
 
 ## Twenty Questions, Asked Optimally
@@ -117,7 +117,7 @@ A one-percent edge per toss becomes a three-in-four certainty in aggregate — t
 wisdom of the crowd. A `VotingClassifier` exploits this by polling diverse models
 such as logistic regression, a random forest, and an SVM. *Hard* voting takes the
 majority label; *soft* voting averages predicted probabilities and usually edges
-ahead. In the lecture's run the ensemble reached $91.2\%$, beating every member.
+ahead. In one worked run the ensemble reached $91.2\%$, beating every member.
 
 ## Bagging, Forests, and Extra Randomness
 

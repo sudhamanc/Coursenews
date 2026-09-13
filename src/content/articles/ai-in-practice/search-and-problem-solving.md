@@ -2,7 +2,7 @@
 course: ai-in-practice
 lectureId: W4
 title: "Charting the Solution Space: How AI Turns a Problem Into a Search"
-deck: "Before a machine can solve anything it must first draw a map — this lecture traces the path from state-space search to constraint satisfaction and the recommenders they quietly power."
+deck: "Before a machine can solve anything it must first draw a map — this feature traces the path from state-space search to constraint satisfaction and the recommenders they quietly power."
 order: 4
 readingTime: 7
 tags: ["search", "state-space", "constraint-satisfaction", "recommenders", "problem-solving"]
@@ -31,14 +31,14 @@ For a computer, the hardest part of solving a problem is often recognizing that
 it *has* one. A human real-estate agent glances at a block of houses and intuits
 a price; a doctor hears a cluster of symptoms and begins forming a diagnosis. A
 machine can do neither until someone has recast the situation into something it
-can manipulate: states, moves, and a definition of success. This lecture is about
+can manipulate: states, moves, and a definition of success. This feature is about
 that translation — the unglamorous but decisive act of **problem formulation** —
 and the two great families of technique it unlocks: search and constraint
 satisfaction.
 
 ## When a Problem Is a Problem a Computer Can Solve
 
-Not every problem yields to the same treatment. The lecture draws a sharp line
+Not every problem yields to the same treatment. There is a sharp line
 between **well-structured** and **ill-structured** problems. Chess is
 well-structured: sixteen pieces, each with a precisely defined way to move, and an
 unambiguous notion of winning. Planning a route from one address to another is
@@ -61,7 +61,7 @@ to recognize when it is solved (the **goal**), you must be able to characterize 
 from one state to another.
 
 Cast this way, a problem becomes a graph. Nodes are states; edges are legal moves.
-The lecture is careful about vocabulary: a **graph** is a set of nodes connected by
+Vocabulary matters here: a **graph** is a set of nodes connected by
 edges in which several paths may converge on the same node, while a **tree** is the
 special case in which exactly one path reaches each node, usually drawn hanging from
 a root.
@@ -114,7 +114,7 @@ cost in a form an algorithm can consume.
 
 ## Strategies for the Search
 
-Once the map exists, the question becomes how to walk it. The lecture surveys two
+Once the map exists, the question becomes how to walk it. There are two
 families. **Uninformed** strategies explore blindly, using no knowledge beyond the
 graph itself: breadth-first search, uniform-cost search, depth-first search,
 depth-limited search, iterative deepening, and bidirectional search. They differ in
@@ -158,7 +158,7 @@ $$
 where $g(n)$ is the path cost from the start to node $n$ and $h(n)$ is the heuristic
 estimate of the remaining distance. Hill-climbing and simulated annealing round out
 the family, trading completeness for speed by following the local gradient of an
-evaluation function. The three-step recipe the lecture prescribes is disarmingly
+evaluation function. The three-step recipe is disarmingly
 simple: **formulate** the problem with the state space model, **define** the search
 space, then **select** an algorithm to find the solution.
 
@@ -172,7 +172,7 @@ to those variables. Formally a CSP is a triple $\langle X, D, C \rangle$: variab
 $X$, their candidate domains $D$, and constraints $C$ that any valid assignment must
 respect.
 
-The general algorithm the lecture lays out is a loop of assign-and-check: start from
+The general algorithm is a loop of assign-and-check: start from
 initial (or random) values, expand the set of possible values, let the variables
 change, and test whether the current assignment is **consistent** — does it violate
 any constraint? If not, continue; then test whether it is **complete** — are all
@@ -227,10 +227,10 @@ six"), and **product constraints** that govern products internally ("if the prod
 is a savings account, the expected return rate is fixed").
 
 This is the same reasoning as a CSP, dressed for commerce. Its cousin is **case-based
-reasoning**, which the lecture frames as the recommender's other engine: rather than
+reasoning**, the recommender's other engine: rather than
 reason from constraints, retrieve the most similar past problem and adapt its stored
 solution — matching a new buyer to the item whose features best fit their
-preferences. The lecture is candid about the trade-offs. Constraints are easy to
+preferences. The trade-offs are real. Constraints are easy to
 elicit in dialogue, transparent, and naturally explainable, and a feasible
 recommendation can always be considered correct. But the knowledge is expensive to
 acquire and maintain, multiple feasible solutions may demand a second method to break
@@ -241,7 +241,7 @@ explainability — are the standing challenges of every recommender system.
 ## Why It Matters
 
 It is tempting to think of modern AI as a story of ever-larger neural networks, but
-this lecture is a reminder that the field's oldest idea still runs underneath
+this is a reminder that the field's oldest idea still runs underneath
 everything: to solve a problem, first represent it. State-space search and constraint
 satisfaction are not relics. They are the reasoning layer that turns a vague human
 want — a safe investment, a movie for tonight, a viable configuration — into

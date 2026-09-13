@@ -35,7 +35,7 @@ K-means is fast, simple, and quietly opinionated. Underneath its arithmetic sits
 assumption that clusters are convex, roughly spherical, and about the same size —
 that every direction matters equally. Real data rarely obliges. Points curl into
 crescents, wander along filaments, nest inside one another, and blur at their edges.
-This lecture assembles three clustering methods that each relax a different one of
+This feature assembles three clustering methods that each relax a different one of
 k-means' assumptions: density-based clustering that follows arbitrary shapes,
 hierarchical clustering that builds a tree instead of a flat partition, and
 probabilistic mixtures that admit a point can partly belong to several groups at once.

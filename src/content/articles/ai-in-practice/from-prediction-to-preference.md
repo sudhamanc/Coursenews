@@ -2,7 +2,7 @@
 course: ai-in-practice
 lectureId: W7
 title: "The Long Road From Prediction to Preference"
-deck: "One dense lecture traces how machines graduate from reconstructing missing movie ratings, to predicting the next word, to finally learning what people actually prefer."
+deck: "How machines graduate from reconstructing missing movie ratings, to predicting the next word, to finally learning what people actually prefer."
 order: 7
 readingTime: 11
 tags: ["autoencoders", "llms", "reinforcement-learning", "rlhf", "recommendation"]
@@ -32,8 +32,8 @@ concepts:
 
 Most machine learning stories are told as if a model simply "learns from data,"
 but that phrase hides the interesting part: *what, exactly, is the learning
-signal?* This lecture answered that question three different ways in a single
-sitting. It began with an autoencoder learning to fill in ratings it had never
+signal?* That question gets three different answers here, told in
+sequence. The story began with an autoencoder learning to fill in ratings it had never
 seen, moved to a language model learning to predict the next word across the
 open internet, and ended with a model learning something far more slippery — the
 preferences of the humans reading its output. The through-line is a steady
@@ -206,7 +206,7 @@ update policy to increase future reward
 <figcaption><b>The agent–environment loop</b> The agent acts on the environment; the environment returns the next state and a reward, and that reward — not any labeled answer — is the learning signal.</figcaption>
 </figure>
 
-That loop surfaces two distinctions the lecture stressed. First, the
+That loop surfaces two distinctions worth stressing. First, the
 **exploration–exploitation dilemma**: an agent must exploit actions known to pay
 off while still trying unfamiliar ones that might pay off more. Second, and
 subtler, the gap between a **reward function** and a **value function**. A reward
