@@ -37,6 +37,13 @@
       "blurb": "Agentic systems, neuro-symbolic reasoning, and the frontier of autonomous, responsible artificial intelligence."
     },
     {
+      "slug": "intro-to-ai",
+      "title": "Introduction to Artificial Intelligence",
+      "shortTitle": "Intro to AI",
+      "dir": "IntroductionToAI",
+      "blurb": "Rational agents, search, games, uncertainty, and learning — the classical foundations of artificial intelligence, from Turing's question onward."
+    },
+    {
       "slug": "llm-canon",
       "title": "The Foundational Papers of Modern AI",
       "shortTitle": "Foundational Papers",

@@ -543,3 +543,26 @@ NO RAG. Articles authored directly (no build-time API cost).
   a category that still cannot ask whether the pipeline should exist.
 - The figscroll rehype plugin picked up all 3 new diagrams automatically — no per-article work.
   VERIFIED 375px: both W8 figures 760/304 swipeable, svg text 11px, page overflow 0.
+
+## Session 8: live dateline fix + Intro to AI desk
+- DATELINE BUG (user screenshot: live site said Wed Sep 2 on Sep 13). Root cause: the masthead date was
+  `new Date()` in Newspaper.astro FRONTMATTER = BUILD time, so static output froze it at the last deploy
+  (and auto-publish is OFF, so it can lag further). FIX: `<time id="dateline">` keeps the build value as
+  the no-JS fallback, and an inline script placed right after it rewrites text + datetime from the
+  reader's clock before paint. CSP already allows 'unsafe-inline'. VERIFIED: a copy of the built home
+  page with a stale "Wednesday, September 2, 2026" baked in rendered "Sunday, September 13, 2026".
+- NEW COURSE `intro-to-ai` ("Introduction to Artificial Intelligence" / "Intro to AI", dir
+  IntroductionToAI), inserted before llm-canon in courses.config.json. Source was a Markdown study-notes
+  file, not a PDF, so there is no extract step (Documents/IntroductionToAI does not exist; the extractor
+  skips it with a warning).
+- intro-to-ai/week1.md (W1, order 1, ~9.2k words, readingTime 38, 10 concepts, 1 diagram). USER RULE for
+  this desk: strip course code, university, instructor and TA names, syllabus and academic-honesty
+  material. Kept textbook "Week N" cross-references (the desk is organized by week) and Turing's own
+  citation of "Professor Jefferson".
+- MERMAID IS NOT SUPPORTED by the markdown pipeline (it would render as a code block). The agent-types
+  mermaid graph was redrawn as an inline SVG figure (viewBox 600, fonts 14-16).
+- Heading ids follow github-slugger, so a GitHub-style TOC works as-is ("§1 The Imitation Game" ->
+  #1-the-imitation-game, "Part 0 — Acronyms expanded" -> #part-0--acronyms-expanded). VERIFIED 19/19.
+- LOCAL TOOLING: host is Node v26 / npm 11, and `npm ci` rejects the lock ("Missing @emnapi/runtime").
+  Used `npm install` then `git checkout -- package-lock.json` to keep lock churn out of commits. Netlify
+  (Node 22) is unaffected. macOS has no `timeout` binary.
