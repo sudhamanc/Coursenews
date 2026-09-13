@@ -135,5 +135,5 @@ story toward the optimizer.
 
 ## Lineage
 
-- **Builds on:** [Chain-of-Thought](/courses/llm-canon/chain-of-thought) for thinking in tokens and [Tree of Thoughts](/courses/llm-canon/tree-of-thoughts) for search, [GRPO](/courses/llm-canon/grpo) for the reinforcement-learning route to the same behavior, and [Speculative Decoding](/courses/llm-canon/speculative-decoding) with [PagedAttention (vLLM)](/courses/llm-canon/paged-attention-vllm), which make long generations affordable.
-- **Leads to:** [Muon](/courses/llm-canon/muon) and the renewed interest in optimizers that make the underlying training cheaper, as inference-heavy reasoning models raise the value of every saved training dollar.
+- **Builds on:** [Chain-of-Thought](/sections/llm-canon/chain-of-thought) for thinking in tokens and [Tree of Thoughts](/sections/llm-canon/tree-of-thoughts) for search, [GRPO](/sections/llm-canon/grpo) for the reinforcement-learning route to the same behavior, and [Speculative Decoding](/sections/llm-canon/speculative-decoding) with [PagedAttention (vLLM)](/sections/llm-canon/paged-attention-vllm), which make long generations affordable.
+- **Leads to:** [Muon](/sections/llm-canon/muon) and the renewed interest in optimizers that make the underlying training cheaper, as inference-heavy reasoning models raise the value of every saved training dollar.

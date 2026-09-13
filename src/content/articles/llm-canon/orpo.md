@@ -163,5 +163,5 @@ back toward reinforcement learning, for the problems this family cannot solve.
 
 ## Lineage
 
-- **Builds on:** [DPO](/courses/llm-canon/dpo), whose reference-based contrast it replaces with an internal one, and [InstructGPT](/courses/llm-canon/instructgpt-rlhf), whose supervised stage it absorbs into the preference loss.
+- **Builds on:** [DPO](/sections/llm-canon/dpo), whose reference-based contrast it replaces with an internal one, and [InstructGPT](/sections/llm-canon/instructgpt-rlhf), whose supervised stage it absorbs into the preference loss.
 - **Leads to:** a terminal point — the cheapest credible rung on the alignment cost curve, and part of the broader "simplify the stack" family with SimPO and KTO.

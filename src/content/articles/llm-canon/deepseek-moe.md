@@ -171,5 +171,5 @@ its architecture.
 
 ## Lineage
 
-- **Builds on:** [Switch Transformer](/courses/llm-canon/switch-transformer), whose routing framework it re-parameterizes for granularity, and [GRPO](/courses/llm-canon/grpo), the reinforcement-learning method from the same lab that its model series is trained with.
-- **Leads to:** [KV Cache Compression](/courses/llm-canon/kv-cache-compression), with which it forms the DeepSeek-V2/V3 architecture, and [Muon](/courses/llm-canon/muon), the optimizer that pushes the same MoE line further.
+- **Builds on:** [Switch Transformer](/sections/llm-canon/switch-transformer), whose routing framework it re-parameterizes for granularity, and [GRPO](/sections/llm-canon/grpo), the reinforcement-learning method from the same lab that its model series is trained with.
+- **Leads to:** [KV Cache Compression](/sections/llm-canon/kv-cache-compression), with which it forms the DeepSeek-V2/V3 architecture, and [Muon](/sections/llm-canon/muon), the optimizer that pushes the same MoE line further.

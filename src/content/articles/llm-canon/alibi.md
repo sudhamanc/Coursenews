@@ -133,5 +133,5 @@ of defeat.
 
 ## Lineage
 
-- **Builds on:** [Attention Is All You Need](/courses/llm-canon/attention-is-all-you-need), whose positional problem ALiBi answers by removal rather than by a better encoding.
-- **Leads to:** [BLOOM](/courses/llm-canon/bloom), the open multilingual model that adopted it.
+- **Builds on:** [Attention Is All You Need](/sections/llm-canon/attention-is-all-you-need), whose positional problem ALiBi answers by removal rather than by a better encoding.
+- **Leads to:** [BLOOM](/sections/llm-canon/bloom), the open multilingual model that adopted it.

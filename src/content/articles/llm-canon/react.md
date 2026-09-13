@@ -133,5 +133,5 @@ Searching over trajectories instead of walking a single one is the natural next 
 
 ## Lineage
 
-- **Builds on:** [Chain-of-Thought](/courses/llm-canon/chain-of-thought) for the reasoning half, and [RAG](/courses/llm-canon/rag) for the retrieval half — recast from a fixed preprocessing step into an action the model decides to take.
-- **Leads to:** [Tree of Thoughts](/courses/llm-canon/tree-of-thoughts), which searches over the trace instead of following one linear path, and the broader move toward [Test-Time Scaling](/courses/llm-canon/test-time-scaling).
+- **Builds on:** [Chain-of-Thought](/sections/llm-canon/chain-of-thought) for the reasoning half, and [RAG](/sections/llm-canon/rag) for the retrieval half — recast from a fixed preprocessing step into an action the model decides to take.
+- **Leads to:** [Tree of Thoughts](/sections/llm-canon/tree-of-thoughts), which searches over the trace instead of following one linear path, and the broader move toward [Test-Time Scaling](/sections/llm-canon/test-time-scaling).

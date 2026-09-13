@@ -184,7 +184,7 @@ const edges = PAPERS.filter((p) => p.parent && pos[p.parent]).map((p) => {
     <!-- nodes -->
     {
       PAPERS.map((p) => (
-        <a class="canon-map__node" href={`/courses/llm-canon/${p.slug}`}>
+        <a class="canon-map__node" href={`/sections/llm-canon/${p.slug}`}>
           <rect
             x={pos[p.slug].x - NODE_W / 2}
             y={pos[p.slug].y - NODE_H / 2}
@@ -225,7 +225,7 @@ const edges = PAPERS.filter((p) => p.parent && pos[p.parent]).map((p) => {
                 .sort((a, b) => a.year - b.year || a.label.localeCompare(b.label))
                 .map((p) => (
                   <li>
-                    <a href={`/courses/llm-canon/${p.slug}`}>
+                    <a href={`/sections/llm-canon/${p.slug}`}>
                       <span class="canon-index__label">{p.label}</span>
                       <span class="canon-index__year">{p.year}</span>
                     </a>

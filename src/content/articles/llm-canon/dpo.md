@@ -163,5 +163,5 @@ the reason reinforcement learning did not actually die here.
 
 ## Lineage
 
-- **Builds on:** [InstructGPT](/courses/llm-canon/instructgpt-rlhf), whose KL-constrained objective DPO solves analytically instead of by reinforcement learning.
-- **Leads to:** [ORPO](/courses/llm-canon/orpo), which deletes even the reference model and the separate supervised stage, and [GRPO](/courses/llm-canon/grpo), which brings reinforcement learning back for the verifiable-reward tasks DPO cannot reach.
+- **Builds on:** [InstructGPT](/sections/llm-canon/instructgpt-rlhf), whose KL-constrained objective DPO solves analytically instead of by reinforcement learning.
+- **Leads to:** [ORPO](/sections/llm-canon/orpo), which deletes even the reference model and the separate supervised stage, and [GRPO](/sections/llm-canon/grpo), which brings reinforcement learning back for the verifiable-reward tasks DPO cannot reach.

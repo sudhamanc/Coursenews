@@ -1,29 +1,87 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Course Ledger — courses configuration",
-  "description": "Single source of truth for the courses in the site. Add or edit an entry here to add/rename a course; then drop the source PDFs in Documents/<dir>/ and run `npm run extract`.",
+  "title": "Latent Inference — sections configuration",
+  "description": "Single source of truth for the site's sections (kept under the historical `courses` key). Add or edit an entry to add or rename a section. `group` puts a section in that nav pull-down; a section without a group gets its own top-level nav link. Source PDFs live in Documents/<dir>/ (`npm run extract`).",
   "type": "object",
-  "required": ["courses"],
+  "required": [
+    "groups",
+    "courses"
+  ],
   "properties": {
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "short"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "description": "Referenced by a section's `group`."
+          },
+          "label": {
+            "type": "string",
+            "description": "Menu label, e.g. `Artificial Intelligence`."
+          },
+          "short": {
+            "type": "string",
+            "description": "Label on narrow screens, e.g. `AI`."
+          }
+        }
+      }
+    },
     "courses": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["slug", "title", "shortTitle", "dir", "blurb"],
+        "required": [
+          "slug",
+          "title",
+          "shortTitle",
+          "dir",
+          "tagline",
+          "blurb"
+        ],
         "additionalProperties": false,
         "properties": {
           "slug": {
             "type": "string",
             "pattern": "^[a-z0-9-]+$",
-            "description": "URL-safe identifier, e.g. `applied-ai`. Used in routes and validated server-side."
+            "description": "URL-safe identifier used in /sections/<slug> and validated server-side."
           },
-          "title": { "type": "string", "description": "Full display title." },
-          "shortTitle": { "type": "string", "description": "Compact title for nav and cards." },
+          "title": {
+            "type": "string",
+            "description": "Full display title."
+          },
+          "shortTitle": {
+            "type": "string",
+            "description": "Compact title for nav and cards."
+          },
           "dir": {
             "type": "string",
-            "description": "Source folder name under `Documents/` holding this course's PDFs."
+            "description": "Source folder name under `Documents/` holding this section's PDFs."
           },
-          "blurb": { "type": "string", "description": "One-line standfirst shown on the section front." }
+          "group": {
+            "type": "string",
+            "description": "Nav group id from `groups`. Omit for a top-level nav link."
+          },
+          "navShort": {
+            "type": "string",
+            "description": "Top-level nav label on narrow screens (ungrouped sections only)."
+          },
+          "tagline": {
+            "type": "string",
+            "description": "One-line description shown in the nav menu."
+          },
+          "blurb": {
+            "type": "string",
+            "description": "One-line standfirst shown on the section front."
+          }
         }
       }
     }

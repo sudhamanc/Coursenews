@@ -149,4 +149,4 @@ one that hardware could actually attack.
 ## Lineage
 
 - **Builds on:** the starting point of this collection — the first sequence model with no recurrence at all.
-- **Leads to:** [GPT-1](/courses/llm-canon/gpt-1) and [BERT](/courses/llm-canon/bert) (keep the decoder; keep the encoder), plus the efficiency line of [RoPE](/courses/llm-canon/rope), [ALiBi](/courses/llm-canon/alibi), [Multi-Query Attention](/courses/llm-canon/multi-query-attention), [FlashAttention](/courses/llm-canon/flashattention), [Switch Transformer](/courses/llm-canon/switch-transformer), [RAG](/courses/llm-canon/rag), and [Speculative Decoding](/courses/llm-canon/speculative-decoding).
+- **Leads to:** [GPT-1](/sections/llm-canon/gpt-1) and [BERT](/sections/llm-canon/bert) (keep the decoder; keep the encoder), plus the efficiency line of [RoPE](/sections/llm-canon/rope), [ALiBi](/sections/llm-canon/alibi), [Multi-Query Attention](/sections/llm-canon/multi-query-attention), [FlashAttention](/sections/llm-canon/flashattention), [Switch Transformer](/sections/llm-canon/switch-transformer), [RAG](/sections/llm-canon/rag), and [Speculative Decoding](/sections/llm-canon/speculative-decoding).

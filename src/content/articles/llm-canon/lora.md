@@ -153,5 +153,5 @@ walks through.
 
 ## Lineage
 
-- **Builds on:** [GPT-3](/courses/llm-canon/gpt-3), the model whose sheer size made per-task full copies unmanageable, and [LLaMA](/courses/llm-canon/llama), the open base that most LoRAs are trained against.
-- **Leads to:** [QLoRA](/courses/llm-canon/qlora), which quantizes that frozen base to four bits so the whole thing fits on a single GPU.
+- **Builds on:** [GPT-3](/sections/llm-canon/gpt-3), the model whose sheer size made per-task full copies unmanageable, and [LLaMA](/sections/llm-canon/llama), the open base that most LoRAs are trained against.
+- **Leads to:** [QLoRA](/sections/llm-canon/qlora), which quantizes that frozen base to four bits so the whole thing fits on a single GPU.

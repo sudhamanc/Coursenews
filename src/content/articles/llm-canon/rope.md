@@ -142,5 +142,5 @@ idea now ships with a tuned hyperparameter.
 
 ## Lineage
 
-- **Builds on:** [Attention Is All You Need](/courses/llm-canon/attention-is-all-you-need), the permutation-invariant core that must be told about order.
-- **Leads to:** [PaLM](/courses/llm-canon/palm) and [LLaMA](/courses/llm-canon/llama), which adopt it as standard, and [KV Cache Compression](/courses/llm-canon/kv-cache-compression), which has to engineer around it.
+- **Builds on:** [Attention Is All You Need](/sections/llm-canon/attention-is-all-you-need), the permutation-invariant core that must be told about order.
+- **Leads to:** [PaLM](/sections/llm-canon/palm) and [LLaMA](/sections/llm-canon/llama), which adopt it as standard, and [KV Cache Compression](/sections/llm-canon/kv-cache-compression), which has to engineer around it.

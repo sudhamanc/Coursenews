@@ -178,5 +178,5 @@ different paper.
 
 ## Lineage
 
-- **Builds on:** [FlashAttention-2](/courses/llm-canon/flashattention-2), whose hardware-first framing it lifts from computation up to allocation, and [Multi-Query Attention](/courses/llm-canon/multi-query-attention), which first named the KV cache as the serving bottleneck.
-- **Leads to:** [KV Cache Compression](/courses/llm-canon/kv-cache-compression), which attacks the cache's intrinsic size once paging has removed the waste, and [Test-Time Scaling](/courses/llm-canon/test-time-scaling), which the resulting throughput makes affordable.
+- **Builds on:** [FlashAttention-2](/sections/llm-canon/flashattention-2), whose hardware-first framing it lifts from computation up to allocation, and [Multi-Query Attention](/sections/llm-canon/multi-query-attention), which first named the KV cache as the serving bottleneck.
+- **Leads to:** [KV Cache Compression](/sections/llm-canon/kv-cache-compression), which attacks the cache's intrinsic size once paging has removed the waste, and [Test-Time Scaling](/sections/llm-canon/test-time-scaling), which the resulting throughput makes affordable.

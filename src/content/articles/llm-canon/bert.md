@@ -153,5 +153,5 @@ permanently, that understanding wants to read both ways.
 
 ## Lineage
 
-- **Builds on:** [Attention Is All You Need](/courses/llm-canon/attention-is-all-you-need) — the Transformer encoder — and [GPT-1](/courses/llm-canon/gpt-1)'s pretrain-then-finetune structure, run in the opposite direction.
-- **Leads to:** [RAG](/courses/llm-canon/rag), whose dense retrievers are built from encoders of exactly this kind.
+- **Builds on:** [Attention Is All You Need](/sections/llm-canon/attention-is-all-you-need) — the Transformer encoder — and [GPT-1](/sections/llm-canon/gpt-1)'s pretrain-then-finetune structure, run in the opposite direction.
+- **Leads to:** [RAG](/sections/llm-canon/rag), whose dense retrievers are built from encoders of exactly this kind.

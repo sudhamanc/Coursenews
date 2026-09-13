@@ -130,5 +130,5 @@ is exactly what FlashAttention-2 and -3 went on to deliver.
 
 ## Lineage
 
-- **Builds on:** [Attention Is All You Need](/courses/llm-canon/attention-is-all-you-need), reorganized around the memory hierarchy rather than the math.
-- **Leads to:** [FlashAttention-2](/courses/llm-canon/flashattention-2) (better GPU scheduling) and [PagedAttention / vLLM](/courses/llm-canon/paged-attention-vllm), which applies the same hardware-first mindset to memory allocation at serving time.
+- **Builds on:** [Attention Is All You Need](/sections/llm-canon/attention-is-all-you-need), reorganized around the memory hierarchy rather than the math.
+- **Leads to:** [FlashAttention-2](/sections/llm-canon/flashattention-2) (better GPU scheduling) and [PagedAttention / vLLM](/sections/llm-canon/paged-attention-vllm), which applies the same hardware-first mindset to memory allocation at serving time.

@@ -1,53 +1,79 @@
 {
   "$schema": "./courses.schema.json",
+  "groups": [
+    {
+      "id": "ai",
+      "label": "Artificial Intelligence",
+      "short": "AI"
+    },
+    {
+      "id": "ml",
+      "label": "Machine Learning",
+      "short": "ML"
+    }
+  ],
   "courses": [
     {
-      "slug": "applications-of-ml",
-      "title": "Applications of Machine Learning",
-      "shortTitle": "Applications of ML",
-      "dir": "ApplicationsofML",
-      "blurb": "Computer vision, natural language, transformers, diffusion, and reinforcement learning — machine learning put to work."
+      "slug": "ai-foundations",
+      "title": "AI Foundations",
+      "shortTitle": "AI Foundations",
+      "dir": "IntroductionToAI",
+      "group": "ai",
+      "tagline": "Rational agents, problem-solving, and Turing's test",
+      "blurb": "Rational agents, search, games, uncertainty, and learning — the classical foundations of artificial intelligence, from Turing's question onward."
     },
     {
-      "slug": "applied-ai",
-      "title": "Applied AI",
-      "shortTitle": "Applied AI",
+      "slug": "ai-in-practice",
+      "title": "AI in Practice",
+      "shortTitle": "AI in Practice",
       "dir": "AppliedAI",
-      "blurb": "Foundations and applied techniques across the modern artificial-intelligence landscape."
+      "group": "ai",
+      "tagline": "Search, recommenders, and the systems around models",
+      "blurb": "How artificial intelligence gets built and put to work — from the three waves of AI to search, recommenders, retrieval, and alignment."
     },
     {
-      "slug": "applied-ml-data-science",
-      "title": "Applied Machine Learning for Data Science",
-      "shortTitle": "Applied ML for Data Science",
-      "dir": "AppliedMachineLearningforDataScience",
-      "blurb": "Practical, end-to-end machine-learning workflows for the working data scientist."
-    },
-    {
-      "slug": "human-ai",
-      "title": "Human-AI Interaction",
-      "shortTitle": "Human-AI",
-      "dir": "HumanAI",
-      "blurb": "Designing systems where people and artificial intelligence collaborate effectively and responsibly."
-    },
-    {
-      "slug": "advanced-ai",
-      "title": "Advanced AI",
-      "shortTitle": "Advanced AI",
+      "slug": "agents-and-autonomy",
+      "title": "Agents & Autonomy",
+      "shortTitle": "Agents & Autonomy",
       "dir": "AdvancedAI",
+      "group": "ai",
+      "tagline": "Agentic systems, swarms, and neuro-symbolic AI",
       "blurb": "Agentic systems, neuro-symbolic reasoning, and the frontier of autonomous, responsible artificial intelligence."
     },
     {
-      "slug": "intro-to-ai",
-      "title": "Introduction to Artificial Intelligence",
-      "shortTitle": "Intro to AI",
-      "dir": "IntroductionToAI",
-      "blurb": "Rational agents, search, games, uncertainty, and learning — the classical foundations of artificial intelligence, from Turing's question onward."
+      "slug": "humans-and-ai",
+      "title": "Humans & AI",
+      "shortTitle": "Humans & AI",
+      "dir": "HumanAI",
+      "group": "ai",
+      "tagline": "Designing for people and AI together",
+      "blurb": "Designing systems where people and artificial intelligence collaborate effectively and responsibly."
+    },
+    {
+      "slug": "ml-essentials",
+      "title": "Machine Learning Essentials",
+      "shortTitle": "ML Essentials",
+      "dir": "AppliedMachineLearningforDataScience",
+      "group": "ml",
+      "tagline": "Regression, trees, SVMs, clustering, and calibration",
+      "blurb": "The core machine-learning toolkit, end to end — from regression and decision trees to clustering, neural networks, and calibrated predictions."
+    },
+    {
+      "slug": "deep-learning",
+      "title": "Deep Learning",
+      "shortTitle": "Deep Learning",
+      "dir": "ApplicationsofML",
+      "group": "ml",
+      "tagline": "Vision, language, transformers, diffusion, and RL",
+      "blurb": "Computer vision, natural language, transformers, diffusion, and reinforcement learning — machine learning put to work."
     },
     {
       "slug": "llm-canon",
       "title": "The Foundational Papers of Modern AI",
       "shortTitle": "Foundational Papers",
       "dir": "LLMCanon",
+      "navShort": "Papers",
+      "tagline": "The papers that built the large language model",
       "blurb": "Thirty-seven groundbreaking papers that built the large language model — from attention to the optimizer frontier — read as one connected lineage."
     }
   ]

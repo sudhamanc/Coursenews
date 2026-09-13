@@ -154,5 +154,5 @@ memory to the inference-time cost that dominates serving.
 
 ## Lineage
 
-- **Builds on:** [LoRA](/courses/llm-canon/lora) for the adapters, [LLaMA](/courses/llm-canon/llama) as the open model worth adapting, and [Self-Instruct](/courses/llm-canon/self-instruct), whose data lineage feeds the Guanaco training set.
-- **Leads to:** [KV Cache Compression](/courses/llm-canon/kv-cache-compression), where the same quantize-store discipline is pushed into inference-time memory.
+- **Builds on:** [LoRA](/sections/llm-canon/lora) for the adapters, [LLaMA](/sections/llm-canon/llama) as the open model worth adapting, and [Self-Instruct](/sections/llm-canon/self-instruct), whose data lineage feeds the Guanaco training set.
+- **Leads to:** [KV Cache Compression](/sections/llm-canon/kv-cache-compression), where the same quantize-store discipline is pushed into inference-time memory.

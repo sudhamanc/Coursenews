@@ -1,0 +1,62 @@
+# Permanent redirects from the old /courses/ URLs to /sections/.
+# Netlify applies the first rule that matches: renamed articles, then whole
+# sections, then a catch-all for anything else under /courses/.
+
+/courses/advanced-ai/week1                             /sections/agents-and-autonomy/swarm-intelligence               301
+/courses/applications-of-ml/l01-intro                  /sections/deep-learning/deep-learning-landscape                301
+/courses/applications-of-ml/l02-mlpautograd            /sections/deep-learning/mlps-and-autograd                      301
+/courses/applications-of-ml/l03-imageclassification    /sections/deep-learning/image-classification                   301
+/courses/applications-of-ml/l05-imagesegmentation      /sections/deep-learning/image-segmentation                     301
+/courses/applications-of-ml/l06-objectdetection        /sections/deep-learning/object-detection                       301
+/courses/applications-of-ml/l07-nlp                    /sections/deep-learning/word-embeddings-and-language-models    301
+/courses/applications-of-ml/l08-transformers           /sections/deep-learning/transformers                           301
+/courses/applications-of-ml/l09-tuninglms              /sections/deep-learning/fine-tuning-language-models            301
+/courses/applications-of-ml/l10-vt-diffusion-adapters  /sections/deep-learning/vision-transformers-and-diffusion      301
+/courses/applications-of-ml/l11-reinforcementlearning  /sections/deep-learning/reinforcement-learning                 301
+/courses/applied-ai/week-1                             /sections/ai-in-practice/three-waves-of-ai                     301
+/courses/applied-ai/week-2                             /sections/ai-in-practice/anatomy-of-an-ai-application          301
+/courses/applied-ai/week-3                             /sections/ai-in-practice/recommender-systems                   301
+/courses/applied-ai/week-4                             /sections/ai-in-practice/search-and-problem-solving            301
+/courses/applied-ai/week-5                             /sections/ai-in-practice/inductive-learning                    301
+/courses/applied-ai/week-6                             /sections/ai-in-practice/representation-learning               301
+/courses/applied-ai/week-7                             /sections/ai-in-practice/from-prediction-to-preference         301
+/courses/applied-ai/week-8                             /sections/ai-in-practice/retrieval-and-reasoning               301
+/courses/applied-ai/week-9                             /sections/ai-in-practice/ai-alignment                          301
+/courses/applied-ml-data-science/week1lectureslides    /sections/ml-essentials/what-is-machine-learning               301
+/courses/applied-ml-data-science/lecture-02-1          /sections/ml-essentials/linear-regression                      301
+/courses/applied-ml-data-science/lecture-03-1          /sections/ml-essentials/regularization-and-classification      301
+/courses/applied-ml-data-science/lecture-04-1          /sections/ml-essentials/support-vector-machines                301
+/courses/applied-ml-data-science/lecture-05-1          /sections/ml-essentials/decision-trees-and-ensembles           301
+/courses/applied-ml-data-science/lecture-06-1          /sections/ml-essentials/perceptrons-and-neural-networks        301
+/courses/applied-ml-data-science/lecture-07-1          /sections/ml-essentials/convolutional-networks                 301
+/courses/applied-ml-data-science/lecture-08-1          /sections/ml-essentials/dimensionality-reduction               301
+/courses/applied-ml-data-science/lecture-09-1          /sections/ml-essentials/clustering                             301
+/courses/applied-ml-data-science/lecture-10-1          /sections/ml-essentials/probability-calibration                301
+/courses/human-ai/week1-haii                           /sections/humans-and-ai/automation-and-augmentation            301
+/courses/human-ai/week2-haii                           /sections/humans-and-ai/cognition-and-interface-design         301
+/courses/human-ai/week3-haii                           /sections/humans-and-ai/human-ai-frameworks                    301
+/courses/human-ai/week4-haii                           /sections/humans-and-ai/designing-for-uncertainty              301
+/courses/human-ai/week5-haii                           /sections/humans-and-ai/information-architecture               301
+/courses/human-ai/week6-haii                           /sections/humans-and-ai/explainable-ai                         301
+/courses/human-ai/week7-haii                           /sections/humans-and-ai/errors-and-trust                       301
+/courses/human-ai/week8-haii                           /sections/humans-and-ai/inferential-privacy                    301
+/courses/human-ai/week9-haii                           /sections/humans-and-ai/human-computer-symbiosis               301
+/courses/human-ai/week10-haii                          /sections/humans-and-ai/human-centered-ai                      301
+/courses/intro-to-ai/week1                             /sections/ai-foundations/rational-agent-and-imitation-game     301
+
+/courses/intro-to-ai                                   /sections/ai-foundations                                       301
+/courses/intro-to-ai/*                                 /sections/ai-foundations/:splat                                301
+/courses/applied-ai                                    /sections/ai-in-practice                                       301
+/courses/applied-ai/*                                  /sections/ai-in-practice/:splat                                301
+/courses/advanced-ai                                   /sections/agents-and-autonomy                                  301
+/courses/advanced-ai/*                                 /sections/agents-and-autonomy/:splat                           301
+/courses/human-ai                                      /sections/humans-and-ai                                        301
+/courses/human-ai/*                                    /sections/humans-and-ai/:splat                                 301
+/courses/applied-ml-data-science                       /sections/ml-essentials                                        301
+/courses/applied-ml-data-science/*                     /sections/ml-essentials/:splat                                 301
+/courses/applications-of-ml                            /sections/deep-learning                                        301
+/courses/applications-of-ml/*                          /sections/deep-learning/:splat                                 301
+/courses/llm-canon                                     /sections/llm-canon                                            301
+/courses/llm-canon/*                                   /sections/llm-canon/:splat                                     301
+
+/courses/*                                             /sections/:splat                                               301

@@ -141,5 +141,5 @@ including the unflattering parts — a legitimate way to do frontier research.
 
 ## Lineage
 
-- **Builds on:** [GPT-3](/courses/llm-canon/gpt-3), whose configuration OPT replicated in the open.
-- **Leads to:** [BLOOM](/courses/llm-canon/bloom), which pushed the open process further into governance and multiple languages, and [LLaMA](/courses/llm-canon/llama), whose open weights reshaped the field.
+- **Builds on:** [GPT-3](/sections/llm-canon/gpt-3), whose configuration OPT replicated in the open.
+- **Leads to:** [BLOOM](/sections/llm-canon/bloom), which pushed the open process further into governance and multiple languages, and [LLaMA](/sections/llm-canon/llama), whose open weights reshaped the field.

@@ -128,7 +128,7 @@ const LAUNCH_TITLE =
  * Reddit rejects unfamiliar user agents on its feed endpoints, so identify the
  * client honestly but with the conventional Mozilla-compatible prefix.
  */
-const UA = 'Mozilla/5.0 (compatible; CourseLedgerBot/1.0; +https://github.com/sudhamanc/Coursenews)';
+const UA = 'Mozilla/5.0 (compatible; LatentInferenceBot/1.0; +https://github.com/sudhamanc/Coursenews)';
 
 const TRACKED_WINDOW_MS = 21 * 24 * 60 * 60 * 1000; // releases are sparse; look back 3 weeks
 const DISCOVER_WINDOW_MS = 5 * 24 * 60 * 60 * 1000;

@@ -153,5 +153,5 @@ spend that scale efficiently.
 
 ## Lineage
 
-- **Builds on:** [GPT-3](/courses/llm-canon/gpt-3), whose scale-and-prompt approach PaLM pushed further with an efficiency-tuned architecture.
-- **Leads to:** [Chain-of-Thought](/courses/llm-canon/chain-of-thought), whose headline results run on PaLM, and the architectural line of [RoPE](/courses/llm-canon/rope) and [Multi-Query Attention](/courses/llm-canon/multi-query-attention) it helped popularize.
+- **Builds on:** [GPT-3](/sections/llm-canon/gpt-3), whose scale-and-prompt approach PaLM pushed further with an efficiency-tuned architecture.
+- **Leads to:** [Chain-of-Thought](/sections/llm-canon/chain-of-thought), whose headline results run on PaLM, and the architectural line of [RoPE](/sections/llm-canon/rope) and [Multi-Query Attention](/sections/llm-canon/multi-query-attention) it helped popularize.

@@ -166,5 +166,5 @@ your biases — outlived the specific bytes.
 
 ## Lineage
 
-- **Builds on:** [GPT-3](/courses/llm-canon/gpt-3), whose described-but-unreleased corpus left the gap the Pile set out to fill.
-- **Leads to:** [BLOOM](/courses/llm-canon/bloom), which carried the documentation-and-governance norm into a multilingual corpus, and [LLaMA](/courses/llm-canon/llama), whose public-data-only pretraining inherited its philosophy.
+- **Builds on:** [GPT-3](/sections/llm-canon/gpt-3), whose described-but-unreleased corpus left the gap the Pile set out to fill.
+- **Leads to:** [BLOOM](/sections/llm-canon/bloom), which carried the documentation-and-governance norm into a multilingual corpus, and [LLaMA](/sections/llm-canon/llama), whose public-data-only pretraining inherited its philosophy.

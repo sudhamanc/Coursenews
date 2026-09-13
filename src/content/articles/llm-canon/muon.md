@@ -153,5 +153,5 @@ remains thin relative to the empirical claims.
 
 ## Lineage
 
-- **Builds on:** the training stacks of [LLaMA](/courses/llm-canon/llama)-lineage and [DeepSeekMoE](/courses/llm-canon/deepseek-moe)-lineage models — modern mixture-of-experts Transformers are where Muon was validated — and the inference-heavy economics of [Test-Time Scaling](/courses/llm-canon/test-time-scaling), which raises the value of every training dollar saved.
+- **Builds on:** the training stacks of [LLaMA](/sections/llm-canon/llama)-lineage and [DeepSeekMoE](/sections/llm-canon/deepseek-moe)-lineage models — modern mixture-of-experts Transformers are where Muon was validated — and the inference-heavy economics of [Test-Time Scaling](/sections/llm-canon/test-time-scaling), which raises the value of every training dollar saved.
 - **Leads to:** a terminal node in this collection — but not a dead end. Muon reopened optimizer design as a live research area, with variants, theoretical analyses of why orthogonalization works, and extensions to the very parameters it currently excludes now under active study.

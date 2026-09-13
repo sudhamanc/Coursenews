@@ -142,5 +142,5 @@ realization cheap enough for everyone to adopt at once.
 
 ## Lineage
 
-- **Builds on:** [Multi-Query Attention](/courses/llm-canon/multi-query-attention), generalized from a single shared head into tunable groups, and [Attention Is All You Need](/courses/llm-canon/attention-is-all-you-need), whose multi-head design sits at one end of the dial.
-- **Leads to:** [LLaMA](/courses/llm-canon/llama), which made it the open-model default, and [KV Cache Compression](/courses/llm-canon/kv-cache-compression), which attacks the linear growth grouped-query attention leaves intact.
+- **Builds on:** [Multi-Query Attention](/sections/llm-canon/multi-query-attention), generalized from a single shared head into tunable groups, and [Attention Is All You Need](/sections/llm-canon/attention-is-all-you-need), whose multi-head design sits at one end of the dial.
+- **Leads to:** [LLaMA](/sections/llm-canon/llama), which made it the open-model default, and [KV Cache Compression](/sections/llm-canon/kv-cache-compression), which attacks the linear growth grouped-query attention leaves intact.

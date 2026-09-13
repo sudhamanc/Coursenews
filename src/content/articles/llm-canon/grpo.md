@@ -168,5 +168,5 @@ now the default recipe for turning a capable base model into a reasoner.
 
 ## Lineage
 
-- **Builds on:** [InstructGPT](/courses/llm-canon/instructgpt-rlhf), whose PPO it simplifies; [DPO](/courses/llm-canon/dpo), whose efficiency goal it answers differently; and [Constitutional AI](/courses/llm-canon/constitutional-ai), whose use of a model-generated training signal it inherits.
-- **Leads to:** [Test-Time Scaling](/courses/llm-canon/test-time-scaling) and the reasoning-model line it launched, and [DeepSeekMoE](/courses/llm-canon/deepseek-moe), the architecture it was paired with inside DeepSeek's systems.
+- **Builds on:** [InstructGPT](/sections/llm-canon/instructgpt-rlhf), whose PPO it simplifies; [DPO](/sections/llm-canon/dpo), whose efficiency goal it answers differently; and [Constitutional AI](/sections/llm-canon/constitutional-ai), whose use of a model-generated training signal it inherits.
+- **Leads to:** [Test-Time Scaling](/sections/llm-canon/test-time-scaling) and the reasoning-model line it launched, and [DeepSeekMoE](/sections/llm-canon/deepseek-moe), the architecture it was paired with inside DeepSeek's systems.

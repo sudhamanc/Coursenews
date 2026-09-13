@@ -13,6 +13,17 @@ export const COURSES: Record<string, string> = Object.fromEntries(
   coursesConfig.courses.map((c) => [c.slug, c.title]),
 );
 
+/** Section slugs from before the site dropped its course naming. Chat threads
+ *  saved under an old slug still send it, so map it forward instead of rejecting. */
+const LEGACY_SLUGS: Record<string, string> = {
+  'intro-to-ai': 'ai-foundations',
+  'applied-ai': 'ai-in-practice',
+  'advanced-ai': 'agents-and-autonomy',
+  'human-ai': 'humans-and-ai',
+  'applied-ml-data-science': 'ml-essentials',
+  'applications-of-ml': 'deep-learning',
+};
+
 export const MAX_INPUT_CHARS = Number(process.env.CHAT_MAX_INPUT_CHARS || 4000);
 const MAX_HISTORY_ECHO = 20; // hard cap on stored/echoed turns
 
@@ -56,9 +67,12 @@ export function validateChatBody(raw: unknown): ValidationResult<ChatBody> {
   }
 
   const ctxRaw = (b.context ?? {}) as Record<string, unknown>;
-  const course = clampString(ctxRaw.course, 80);
+  const rawCourse = clampString(ctxRaw.course, 80);
+  const course = Object.prototype.hasOwnProperty.call(LEGACY_SLUGS, rawCourse)
+    ? LEGACY_SLUGS[rawCourse]
+    : rawCourse;
   if (!Object.prototype.hasOwnProperty.call(COURSES, course)) {
-    return { ok: false, error: 'Unknown course.' };
+    return { ok: false, error: 'Unknown section.' };
   }
 
   const threadId = b.threadId === undefined || b.threadId === null ? undefined : clampString(b.threadId, 80);

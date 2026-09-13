@@ -130,5 +130,5 @@ loop entirely.
 
 ## Lineage
 
-- **Builds on:** [GPT-3](/courses/llm-canon/gpt-3) as the base model to be aligned.
-- **Leads to:** [Constitutional AI](/courses/llm-canon/constitutional-ai) (replace human labels with AI feedback), [Self-Instruct](/courses/llm-canon/self-instruct) (remove the human demonstrations), and [DPO](/courses/llm-canon/dpo) (remove the reward model and the reinforcement-learning loop).
+- **Builds on:** [GPT-3](/sections/llm-canon/gpt-3) as the base model to be aligned.
+- **Leads to:** [Constitutional AI](/sections/llm-canon/constitutional-ai) (replace human labels with AI feedback), [Self-Instruct](/sections/llm-canon/self-instruct) (remove the human demonstrations), and [DPO](/sections/llm-canon/dpo) (remove the reward model and the reinforcement-learning loop).

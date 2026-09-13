@@ -142,5 +142,5 @@ almost everything before it, LLaMA remained English-dominant.
 
 ## Lineage
 
-- **Builds on:** [Chinchilla](/courses/llm-canon/chinchilla), whose scaling analysis it deliberately exceeds; [PaLM](/courses/llm-canon/palm), whose architecture it distills; [RoPE](/courses/llm-canon/rope) for positions; and [The Pile](/courses/llm-canon/the-pile) for its public-data philosophy.
-- **Leads to:** [LoRA](/courses/llm-canon/lora) and [QLoRA](/courses/llm-canon/qlora), which became mainstream once there was a model worth adapting; [Grouped-Query Attention](/courses/llm-canon/grouped-query-attention), which arrives in Llama 2; and [Muon](/courses/llm-canon/muon).
+- **Builds on:** [Chinchilla](/sections/llm-canon/chinchilla), whose scaling analysis it deliberately exceeds; [PaLM](/sections/llm-canon/palm), whose architecture it distills; [RoPE](/sections/llm-canon/rope) for positions; and [The Pile](/sections/llm-canon/the-pile) for its public-data philosophy.
+- **Leads to:** [LoRA](/sections/llm-canon/lora) and [QLoRA](/sections/llm-canon/qlora), which became mainstream once there was a model worth adapting; [Grouped-Query Attention](/sections/llm-canon/grouped-query-attention), which arrives in Llama 2; and [Muon](/sections/llm-canon/muon).

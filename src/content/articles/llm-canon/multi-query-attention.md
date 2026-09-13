@@ -169,5 +169,5 @@ moves the least data.
 
 ## Lineage
 
-- **Builds on:** [Attention Is All You Need](/courses/llm-canon/attention-is-all-you-need), keeping multi-head attention on the query side and discarding it on the key and value side.
-- **Leads to:** [Grouped-Query Attention](/courses/llm-canon/grouped-query-attention), which softens the trade-off; [PaLM](/courses/llm-canon/palm), an early large adopter; and [KV Cache Compression](/courses/llm-canon/kv-cache-compression), which compresses the cache rather than sharing it.
+- **Builds on:** [Attention Is All You Need](/sections/llm-canon/attention-is-all-you-need), keeping multi-head attention on the query side and discarding it on the key and value side.
+- **Leads to:** [Grouped-Query Attention](/sections/llm-canon/grouped-query-attention), which softens the trade-off; [PaLM](/sections/llm-canon/palm), an early large adopter; and [KV Cache Compression](/sections/llm-canon/kv-cache-compression), which compresses the cache rather than sharing it.

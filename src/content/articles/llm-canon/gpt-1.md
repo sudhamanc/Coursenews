@@ -144,5 +144,5 @@ and BERT accepted it within months.
 
 ## Lineage
 
-- **Builds on:** [Attention Is All You Need](/courses/llm-canon/attention-is-all-you-need) — the Transformer decoder stack, stripped of its encoder and cross-attention.
-- **Leads to:** [GPT-2](/courses/llm-canon/gpt-2), which asks whether the fine-tuning stage can be dropped entirely, and [BERT](/courses/llm-canon/bert), which argues the pretraining stage should be bidirectional.
+- **Builds on:** [Attention Is All You Need](/sections/llm-canon/attention-is-all-you-need) — the Transformer decoder stack, stripped of its encoder and cross-attention.
+- **Leads to:** [GPT-2](/sections/llm-canon/gpt-2), which asks whether the fine-tuning stage can be dropped entirely, and [BERT](/sections/llm-canon/bert), which argues the pretraining stage should be bidirectional.

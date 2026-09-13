@@ -160,5 +160,5 @@ of the human labor in alignment was a component, and that it too could be remove
 
 ## Lineage
 
-- **Builds on:** [InstructGPT](/courses/llm-canon/instructgpt-rlhf), whose RLHF pipeline this keeps while replacing the human harmlessness labels with AI feedback.
-- **Leads to:** [DPO](/courses/llm-canon/dpo), which consumes the machine-made preference pairs this normalizes, and [GRPO](/courses/llm-canon/grpo), whose reward design inherits the idea of a model-generated training signal.
+- **Builds on:** [InstructGPT](/sections/llm-canon/instructgpt-rlhf), whose RLHF pipeline this keeps while replacing the human harmlessness labels with AI feedback.
+- **Leads to:** [DPO](/sections/llm-canon/dpo), which consumes the machine-made preference pairs this normalizes, and [GRPO](/sections/llm-canon/grpo), whose reward design inherits the idea of a model-generated training signal.

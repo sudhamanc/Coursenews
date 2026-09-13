@@ -155,5 +155,5 @@ drained, but the water had to come from somewhere.
 
 ## Lineage
 
-- **Builds on:** [InstructGPT](/courses/llm-canon/instructgpt-rlhf), whose demonstration-tuning stage this keeps and whose human authors it removes, and [GPT-3](/courses/llm-canon/gpt-3), the base model pressed into writing its own curriculum.
-- **Leads to:** [LLaMA](/courses/llm-canon/llama) fine-tunes such as Alpaca, and the synthetic-data pipelines behind [QLoRA](/courses/llm-canon/qlora)'s Guanaco and modern frontier post-training.
+- **Builds on:** [InstructGPT](/sections/llm-canon/instructgpt-rlhf), whose demonstration-tuning stage this keeps and whose human authors it removes, and [GPT-3](/sections/llm-canon/gpt-3), the base model pressed into writing its own curriculum.
+- **Leads to:** [LLaMA](/sections/llm-canon/llama) fine-tunes such as Alpaca, and the synthetic-data pipelines behind [QLoRA](/sections/llm-canon/qlora)'s Guanaco and modern frontier post-training.

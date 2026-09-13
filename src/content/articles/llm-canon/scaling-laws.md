@@ -129,5 +129,5 @@ entire industry before anyone catches it.
 
 ## Lineage
 
-- **Builds on:** [GPT-2](/courses/llm-canon/gpt-2), whose observed log-linear trend this paper makes rigorous.
-- **Leads to:** [GPT-3](/courses/llm-canon/gpt-3), the direct application of the allocation, and [Chinchilla](/courses/llm-canon/chinchilla), the correction to it.
+- **Builds on:** [GPT-2](/sections/llm-canon/gpt-2), whose observed log-linear trend this paper makes rigorous.
+- **Leads to:** [GPT-3](/sections/llm-canon/gpt-3), the direct application of the allocation, and [Chinchilla](/sections/llm-canon/chinchilla), the correction to it.

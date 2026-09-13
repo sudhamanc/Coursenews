@@ -150,5 +150,5 @@ and backtrack is the problem the next paper takes up.
 
 ## Lineage
 
-- **Builds on:** [GPT-3](/courses/llm-canon/gpt-3) for the in-context learning that makes few-shot prompting possible, and [PaLM](/courses/llm-canon/palm), whose scale is what let the effect emerge.
-- **Leads to:** [Tree of Thoughts](/courses/llm-canon/tree-of-thoughts) (add search over thoughts), [ReAct](/courses/llm-canon/react) (add actions between thoughts), and [Test-Time Scaling](/courses/llm-canon/test-time-scaling), which turns thinking in tokens into a second scaling axis.
+- **Builds on:** [GPT-3](/sections/llm-canon/gpt-3) for the in-context learning that makes few-shot prompting possible, and [PaLM](/sections/llm-canon/palm), whose scale is what let the effect emerge.
+- **Leads to:** [Tree of Thoughts](/sections/llm-canon/tree-of-thoughts) (add search over thoughts), [ReAct](/sections/llm-canon/react) (add actions between thoughts), and [Test-Time Scaling](/sections/llm-canon/test-time-scaling), which turns thinking in tokens into a second scaling axis.

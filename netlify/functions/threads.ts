@@ -33,7 +33,10 @@ function extractThreadId(path: string, query: Record<string, string | undefined>
 function transcriptToText(t: Thread): string {
   const header = [
     `# ${t.title || 'Conversation'}`,
-    `Course: ${t.context.courseTitle} — ${t.context.lectureTitle} (${t.context.lectureId})`,
+    `Section: ${t.context.courseTitle} — ${t.context.lectureTitle}${
+      // Only publication years are meaningful ids; W3/L08-style ordering keys are not shown.
+      /^\d{4}$/.test(t.context.lectureId) ? ` (${t.context.lectureId})` : ''
+    }`,
     `Started: ${t.createdAt}`,
     `Updated: ${t.updatedAt}`,
     '',

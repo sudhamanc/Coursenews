@@ -1,5 +1,5 @@
 /* ============================================================================
-   The Course Ledger — newspaper design system
+   Latent Inference — newspaper design system
    FT-style salmon paper, serif-forward, column rules. Light is the default
    theme; dark is opt-in via [data-theme="dark"]. Foundational styles; individual
    components layer on top.
@@ -181,6 +181,7 @@ img {
 
 /* ---- Masthead ------------------------------------------------------------ */
 .masthead {
+  position: relative;
   text-align: center;
   padding: 0.9rem 0 0.5rem;
 }
@@ -191,121 +192,206 @@ img {
   margin: 0.35rem 0 0.4rem;
   letter-spacing: -0.01em;
 }
-.masthead__dateline {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+/* The date sits in the top-left corner, level with the theme toggle opposite,
+   instead of taking a ruled line of its own. It repeats in the footer, which is
+   the only place it shows once the title needs the corner's width. */
+.masthead__date {
+  position: absolute;
+  left: 0;
+  top: calc(1.6rem + env(safe-area-inset-top));
   font-family: var(--sans);
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  font-size: 0.68rem;
+  font-size: 0.64rem;
+  line-height: 1;
   color: var(--muted);
-  border-top: 1px solid var(--rule-strong);
-  border-bottom: 1px solid var(--rule-strong);
-  padding: 0.4rem 0;
-  margin-top: 0.5rem;
+}
+@media (max-width: 900px) {
+  .masthead__date {
+    display: none;
+  }
 }
 
 /* ---- Top navigation ------------------------------------------------------ */
+/* One line at every width: Front Page, one pull-down per section group
+   (`groups` in courses.config.json), ungrouped sections, then Latest in AI.
+   Groups follow the disclosure-navigation pattern: a button toggles a panel of
+   plain links (script in Newspaper.astro), and pointer devices also open it on
+   hover. Nothing here scrolls, so the absolutely positioned panels can't be
+   clipped by an overflow container. */
+.topnav-wrap {
+  position: relative;
+  border-top: 1px solid var(--rule-strong);
+  margin-top: 0.35rem;
+}
 .topnav {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.35rem 1.4rem;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 1.6rem;
   font-family: var(--sans);
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-size: 0.72rem;
+  white-space: nowrap;
   padding: 0.6rem 0;
 }
 .topnav a {
   border-bottom: none;
   color: var(--ink-soft);
 }
-.topnav a:hover,
-.topnav a[aria-current="page"] {
+.topnav__link:hover,
+.topnav__link[aria-current="page"] {
   color: var(--accent);
 }
-
-/* Below the tablet breakpoint the eight section links wrap to five or six
-   centred rows — 130-160px of chrome above the fold on a phone, and it grows
-   with every new desk. Turn it into a horizontal scroll strip instead: one row,
-   ~28px, every section still one tap away. A scrolling section rail is what a
-   newspaper nav is anyway. CSS-only; the layout script centres the current
-   item on load. */
-@media (max-width: 767px) {
-  .topnav {
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x proximity;
-    gap: 1.15rem;
-    scrollbar-width: none;
-    /* Leave room for the chevrons drawn on .topnav-wrap. */
-    padding-inline: 0.85rem;
-    scroll-padding-inline: 0.85rem;
-  }
-  .topnav::-webkit-scrollbar {
-    display: none;
-  }
-  .topnav a {
-    white-space: nowrap;
-    scroll-snap-align: start;
-  }
-
-  /* Chevrons live on the wrapper, which does NOT scroll, and appear only on the
-     side that still has sections off-screen (attributes set in Newspaper.astro).
-     The edge fade alone proved too subtle to read as "there's more". */
-  .topnav-wrap::before,
-  .topnav-wrap::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    width: 7px;
-    height: 7px;
-    border-style: solid;
-    border-color: var(--accent);
-    border-width: 0;
-    opacity: 0;
-    transition: opacity 140ms ease;
-    pointer-events: none;
-  }
-  .topnav-wrap::before {
-    left: 1px;
-    border-left-width: 1.6px;
-    border-bottom-width: 1.6px;
-    transform: translateY(-50%) rotate(45deg);
-  }
-  .topnav-wrap::after {
-    right: 1px;
-    border-right-width: 1.6px;
-    border-top-width: 1.6px;
-    transform: translateY(-50%) rotate(45deg);
-  }
-  .topnav-wrap[data-more-left]::before,
-  .topnav-wrap[data-more-right]::after {
-    opacity: 1;
-  }
-  /* Only fade the edge that is actually cut off, so the chevron never sits on
-     top of a half-faded word. */
-  .topnav-wrap[data-more-right] .topnav {
-    mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
-    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2rem), transparent);
-  }
-  .topnav-wrap[data-more-left] .topnav {
-    mask-image: linear-gradient(to right, transparent, #000 2rem);
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 2rem);
-  }
-  .topnav-wrap[data-more-left][data-more-right] .topnav {
-    mask-image: linear-gradient(to right, transparent, #000 2rem, #000 calc(100% - 2rem), transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 2rem, #000 calc(100% - 2rem), transparent);
-  }
+.topnav__short {
+  display: none;
 }
 
-.topnav-wrap {
+.topnav__group {
   position: relative;
+}
+.topnav__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: var(--ink-soft);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.topnav__trigger:hover,
+.topnav__trigger[aria-current],
+.topnav__group[data-open] .topnav__trigger {
+  color: var(--accent);
+}
+.topnav__caret {
+  width: 9px;
+  height: 6px;
+  transition: transform 140ms ease;
+}
+.topnav__group[data-open] .topnav__caret {
+  transform: rotate(180deg);
+}
+
+.topnav__panel {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 20;
+  transform: translateX(-50%);
+  min-width: 21rem;
+  /* Transparent bridge across the gap, so hover survives the trip from the
+     trigger down to the card. */
+  padding-top: 0.65rem;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+}
+.topnav__group[data-open] .topnav__panel {
+  display: block;
+}
+@media (hover: hover) and (pointer: fine) {
+  .topnav__group:hover .topnav__panel {
+    display: block;
+  }
+  .topnav__group:hover .topnav__caret {
+    transform: rotate(180deg);
+  }
+}
+.topnav__card {
+  text-align: left;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-top: 2px solid var(--accent);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--ink) 14%, transparent);
+  padding: 0.8rem 1rem 0.5rem;
+}
+.topnav__panel-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.topnav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.topnav__list li + li {
+  border-top: 1px solid var(--rule);
+}
+.topnav__list a {
+  display: block;
+  margin: 0 -0.6rem;
+  padding: 0.5rem 0.6rem 0.5rem 0.5rem;
+  border-left: 2px solid transparent;
+}
+.topnav__list a:hover {
+  background: color-mix(in srgb, var(--accent) 6%, transparent);
+}
+.topnav__list a[aria-current="page"] {
+  border-left-color: var(--accent);
+}
+.topnav__item-title {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+.topnav__list a:hover .topnav__item-title,
+.topnav__list a[aria-current="page"] .topnav__item-title {
+  color: var(--accent);
+}
+.topnav__item-tagline {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+/* Tablet: group names shorten to AI / ML. */
+@media (max-width: 960px) {
+  .topnav__trigger .topnav__full {
+    display: none;
+  }
+  .topnav__trigger .topnav__short {
+    display: inline;
+  }
+}
+/* Phone: every label shortens, and panels span the full column instead of
+   centring under a trigger that may sit near the edge. */
+@media (max-width: 640px) {
+  .topnav {
+    gap: 1.1rem;
+  }
+  .topnav__link .topnav__full {
+    display: none;
+  }
+  .topnav__link .topnav__short {
+    display: inline;
+  }
+  .topnav__group {
+    position: static;
+  }
+  .topnav__panel {
+    left: 0;
+    right: 0;
+    transform: none;
+    min-width: 0;
+  }
 }
 
 /* Reserve the theme toggle's gutter so the masthead title wraps beside it
@@ -519,6 +605,11 @@ img {
   padding: 2rem 0 0;
   margin-top: 3rem;
   border-top: 3px double var(--rule-strong);
+}
+
+.footer__date {
+  margin-top: 0.35rem;
+  font-size: 0.64rem;
 }
 
 /* ---- Focus visibility (a11y) -------------------------------------------- */

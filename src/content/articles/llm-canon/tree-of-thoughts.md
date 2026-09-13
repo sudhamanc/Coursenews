@@ -146,5 +146,5 @@ replaced it.
 
 ## Lineage
 
-- **Builds on:** [Chain-of-Thought](/courses/llm-canon/chain-of-thought), generalized from a single chain to a tree, and [ReAct](/courses/llm-canon/react), whose insight that intermediate states can be inspected and acted on it turns into search.
-- **Leads to:** [Test-Time Scaling](/courses/llm-canon/test-time-scaling), where deliberate search and self-evaluation become part of how models spend compute at inference — though often folded into a single generation rather than an explicit tree.
+- **Builds on:** [Chain-of-Thought](/sections/llm-canon/chain-of-thought), generalized from a single chain to a tree, and [ReAct](/sections/llm-canon/react), whose insight that intermediate states can be inspected and acted on it turns into search.
+- **Leads to:** [Test-Time Scaling](/sections/llm-canon/test-time-scaling), where deliberate search and self-evaluation become part of how models spend compute at inference — though often folded into a single generation rather than an explicit tree.

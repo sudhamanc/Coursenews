@@ -139,5 +139,5 @@ enormous — the process is admirable precisely because it is so hard to repeat.
 
 ## Lineage
 
-- **Builds on:** [GPT-3](/courses/llm-canon/gpt-3) for the underlying recipe, [OPT](/courses/llm-canon/opt) for the open-weights precedent, and [The Pile](/courses/llm-canon/the-pile) for its documentation norms.
-- **Leads to:** [LLaMA](/courses/llm-canon/llama), whose open weights ultimately spread further and faster than BLOOM's careful governance could.
+- **Builds on:** [GPT-3](/sections/llm-canon/gpt-3) for the underlying recipe, [OPT](/sections/llm-canon/opt) for the open-weights precedent, and [The Pile](/sections/llm-canon/the-pile) for its documentation norms.
+- **Leads to:** [LLaMA](/sections/llm-canon/llama), whose open weights ultimately spread further and faster than BLOOM's careful governance could.

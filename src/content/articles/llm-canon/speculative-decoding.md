@@ -151,5 +151,5 @@ hardware had compute to spare and was starved of a way to use it.
 
 ## Lineage
 
-- **Builds on:** [Attention Is All You Need](/courses/llm-canon/attention-is-all-you-need), whose autoregressive decoder creates the serial bottleneck this method routes around.
-- **Leads to:** [Test-Time Scaling](/courses/llm-canon/test-time-scaling), whose long reasoning generations depend on exactly this kind of cheap, lossless token throughput.
+- **Builds on:** [Attention Is All You Need](/sections/llm-canon/attention-is-all-you-need), whose autoregressive decoder creates the serial bottleneck this method routes around.
+- **Leads to:** [Test-Time Scaling](/sections/llm-canon/test-time-scaling), whose long reasoning generations depend on exactly this kind of cheap, lossless token throughput.

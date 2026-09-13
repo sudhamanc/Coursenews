@@ -178,5 +178,5 @@ trade-offs disappear.
 
 ## Lineage
 
-- **Builds on:** [Multi-Query Attention](/courses/llm-canon/multi-query-attention) and [Grouped-Query Attention](/courses/llm-canon/grouped-query-attention) (head sharing), [RoPE](/courses/llm-canon/rope) (which it must work around), [PagedAttention (vLLM)](/courses/llm-canon/paged-attention-vllm) (which manages whatever cache you produce), and [QLoRA](/courses/llm-canon/qlora) (whose quantization technique it borrows).
-- **Leads to:** [DeepSeekMoE](/courses/llm-canon/deepseek-moe), with which MLA forms the DeepSeek-V2/V3 architecture, and [Test-Time Scaling](/courses/llm-canon/test-time-scaling), whose long generations it makes affordable.
+- **Builds on:** [Multi-Query Attention](/sections/llm-canon/multi-query-attention) and [Grouped-Query Attention](/sections/llm-canon/grouped-query-attention) (head sharing), [RoPE](/sections/llm-canon/rope) (which it must work around), [PagedAttention (vLLM)](/sections/llm-canon/paged-attention-vllm) (which manages whatever cache you produce), and [QLoRA](/sections/llm-canon/qlora) (whose quantization technique it borrows).
+- **Leads to:** [DeepSeekMoE](/sections/llm-canon/deepseek-moe), with which MLA forms the DeepSeek-V2/V3 architecture, and [Test-Time Scaling](/sections/llm-canon/test-time-scaling), whose long generations it makes affordable.

@@ -155,5 +155,5 @@ where the next generation of MoE research went to work.
 
 ## Lineage
 
-- **Builds on:** [Attention Is All You Need](/courses/llm-canon/attention-is-all-you-need), whose feed-forward sublayer it replaces with a bank of routed experts.
-- **Leads to:** [DeepSeekMoE](/courses/llm-canon/deepseek-moe), which reworks the expert granularity to chase the specialization that coarse experts leave on the table.
+- **Builds on:** [Attention Is All You Need](/sections/llm-canon/attention-is-all-you-need), whose feed-forward sublayer it replaces with a bank of routed experts.
+- **Leads to:** [DeepSeekMoE](/sections/llm-canon/deepseek-moe), which reworks the expert granularity to chase the specialization that coarse experts leave on the table.

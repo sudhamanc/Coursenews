@@ -142,5 +142,5 @@ Pile, OPT, and BLOOM would race to fill.
 
 ## Lineage
 
-- **Builds on:** [GPT-2](/courses/llm-canon/gpt-2)'s zero-shot findings and [Scaling Laws](/courses/llm-canon/scaling-laws)' compute-optimal allocation — error and all.
-- **Leads to:** [The Pile](/courses/llm-canon/the-pile) and [OPT](/courses/llm-canon/opt) (open replication of the data and the model), [PaLM](/courses/llm-canon/palm) (scaling further), [InstructGPT](/courses/llm-canon/instructgpt-rlhf) (making it usable), and [Chain-of-Thought](/courses/llm-canon/chain-of-thought) (a prompting technique only this scale unlocks).
+- **Builds on:** [GPT-2](/sections/llm-canon/gpt-2)'s zero-shot findings and [Scaling Laws](/sections/llm-canon/scaling-laws)' compute-optimal allocation — error and all.
+- **Leads to:** [The Pile](/sections/llm-canon/the-pile) and [OPT](/sections/llm-canon/opt) (open replication of the data and the model), [PaLM](/sections/llm-canon/palm) (scaling further), [InstructGPT](/sections/llm-canon/instructgpt-rlhf) (making it usable), and [Chain-of-Thought](/sections/llm-canon/chain-of-thought) (a prompting technique only this scale unlocks).

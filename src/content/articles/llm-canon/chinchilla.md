@@ -139,5 +139,5 @@ training.
 
 ## Lineage
 
-- **Builds on:** [Scaling Laws](/courses/llm-canon/scaling-laws), rerun with matched schedules, and [GPT-3](/courses/llm-canon/gpt-3), the oversized model it corrected.
-- **Leads to:** [LLaMA](/courses/llm-canon/llama), which accepts Chinchilla's analysis and then deliberately overtrains past it because serving cost dominates a model's life.
+- **Builds on:** [Scaling Laws](/sections/llm-canon/scaling-laws), rerun with matched schedules, and [GPT-3](/sections/llm-canon/gpt-3), the oversized model it corrected.
+- **Leads to:** [LLaMA](/sections/llm-canon/llama), which accepts Chinchilla's analysis and then deliberately overtrains past it because serving cost dominates a model's life.

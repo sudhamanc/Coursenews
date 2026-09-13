@@ -155,5 +155,5 @@ preprocessing step — is exactly the gap the next paper closes.
 
 ## Lineage
 
-- **Builds on:** [Attention Is All You Need](/courses/llm-canon/attention-is-all-you-need) for the seq2seq generator, and [BERT](/courses/llm-canon/bert) for the dense query and passage encoders that make semantic retrieval possible.
-- **Leads to:** [ReAct](/courses/llm-canon/react), which turns retrieval from a fixed preprocessing step into an action the model chooses to take inside a reasoning loop.
+- **Builds on:** [Attention Is All You Need](/sections/llm-canon/attention-is-all-you-need) for the seq2seq generator, and [BERT](/sections/llm-canon/bert) for the dense query and passage encoders that make semantic retrieval possible.
+- **Leads to:** [ReAct](/sections/llm-canon/react), which turns retrieval from a fixed preprocessing step into an action the model chooses to take inside a reasoning loop.

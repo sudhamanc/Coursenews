@@ -140,5 +140,5 @@ Kaplan and colleagues set out to close next.
 
 ## Lineage
 
-- **Builds on:** [GPT-1](/courses/llm-canon/gpt-1) — the same recipe, unchanged in principle, pushed on scale and data quality.
-- **Leads to:** [Scaling Laws](/courses/llm-canon/scaling-laws), which turns the log-linear trend into a formula, and [GPT-3](/courses/llm-canon/gpt-3), which drives it two orders of magnitude further.
+- **Builds on:** [GPT-1](/sections/llm-canon/gpt-1) — the same recipe, unchanged in principle, pushed on scale and data quality.
+- **Leads to:** [Scaling Laws](/sections/llm-canon/scaling-laws), which turns the log-linear trend into a formula, and [GPT-3](/sections/llm-canon/gpt-3), which drives it two orders of magnitude further.

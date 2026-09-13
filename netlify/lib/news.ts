@@ -85,7 +85,7 @@ export async function fetchArxiv(): Promise<NewsItem[]> {
   try {
     const res = await fetch(url, {
       signal: to.signal,
-      headers: { 'User-Agent': 'CourseLedger/1.0 (AI news digest)' },
+      headers: { 'User-Agent': 'LatentInference/1.0 (AI news digest)' },
     });
     if (!res.ok) return [];
     const xml = await res.text();

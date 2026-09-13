@@ -1,18 +1,18 @@
 ---
 import '../styles/newspaper.css';
 import 'katex/dist/katex.min.css';
-import { COURSES } from '../lib/courses';
+import { COURSES, COURSE_BY_SLUG, GROUPS, sectionsInGroup } from '../lib/courses';
 
 export interface Props {
   title?: string;
   description?: string;
-  /** Section flag shown in nav highlight, e.g. a course slug or "latest". */
+  /** Section flag shown in nav highlight, e.g. a section slug or "latest". */
   section?: string;
 }
 
 const {
-  title = 'The Course Ledger',
-  description = 'A newspaper of the AI, machine-learning, and data-science concepts from my graduate coursework — explained in depth.',
+  title = 'Latent Inference',
+  description = 'In-depth explainers on the ideas behind modern AI and machine learning, with an assistant in the margin.',
   section,
 } = Astro.props;
 
@@ -21,6 +21,7 @@ const {
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL('/og.png', Astro.site);
 
+// Build-time fallback only; the inline script below swaps in the reader's date.
 const now = new Date();
 const dateLine = now.toLocaleDateString('en-US', {
   weekday: 'long',
@@ -28,6 +29,11 @@ const dateLine = now.toLocaleDateString('en-US', {
   month: 'long',
   day: 'numeric',
 });
+const dateAttr = now.toISOString().slice(0, 10);
+
+// Nav: grouped sections become pull-downs; ungrouped ones get their own link.
+const currentGroup = section ? COURSE_BY_SLUG[section]?.group : undefined;
+const topLevelSections = COURSES.filter((c) => !c.group);
 ---
 
 <!doctype html>
@@ -79,10 +85,10 @@ const dateLine = now.toLocaleDateString('en-US', {
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Ledger" />
+    <meta name="apple-mobile-web-app-title" content="Latent" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="The Course Ledger" />
+    <meta property="og:site_name" content="Latent Inference" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -107,48 +113,90 @@ const dateLine = now.toLocaleDateString('en-US', {
         </svg>
       </button>
       <header class="masthead">
-        <h1 class="masthead__title"><a href="/" style="color:inherit;border:none;">The Course Ledger</a></h1>
-        <div class="masthead__dateline">
-          <time id="dateline" datetime={now.toISOString().slice(0, 10)}>{dateLine}</time>
-          <script is:inline>
-            // The page is static, so the build-time date above freezes at the last
-            // deploy. Rewrite it with the reader's own date before first paint; the
-            // server-rendered value stays as the no-JS fallback.
-            (function () {
-              var el = document.getElementById('dateline');
-              if (!el) return;
-              var d = new Date();
-              el.textContent = d.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              });
-              var pad = function (n) { return (n < 10 ? '0' : '') + n; };
-              el.setAttribute('datetime', d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()));
-            })();
-          </script>
-        </div>
+        <time class="masthead__date" data-today datetime={dateAttr}>{dateLine}</time>
+        <h1 class="masthead__title"><a href="/" style="color:inherit;border:none;">Latent Inference</a></h1>
       </header>
+      <script is:inline>
+        // The page is static, so the build-time date freezes at the last deploy.
+        // Rewrite every time[data-today] with the reader's own date: here, before
+        // the masthead paints, and again after the footer. The server-rendered
+        // value stays as the no-JS fallback.
+        (function () {
+          window.__latentToday = function () {
+            var d = new Date();
+            var text = d.toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            });
+            var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+            var iso = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+            var els = document.querySelectorAll('time[data-today]');
+            for (var i = 0; i < els.length; i++) {
+              els[i].textContent = text;
+              els[i].setAttribute('datetime', iso);
+            }
+          };
+          window.__latentToday();
+        })();
+      </script>
 
-      {/* The wrapper is what carries the scroll-affordance chevrons: it stays put
-          while .topnav scrolls beneath it. data-more-left / data-more-right are
-          set by the script at the bottom of this file. */}
       <div class="topnav-wrap">
-      <nav class="topnav" aria-label="Sections">
-        <a href="/" aria-current={section === 'home' ? 'page' : undefined}>Front Page</a>
-        {
-          COURSES.map((c) => (
-            <a
-              href={`/courses/${c.slug}`}
-              aria-current={section === c.slug ? 'page' : undefined}
-            >
-              {c.shortTitle}
-            </a>
-          ))
-        }
-        <a href="/latest" aria-current={section === 'latest' ? 'page' : undefined}>Latest in AI</a>
-      </nav>
+        <nav class="topnav" aria-label="Sections">
+          <a class="topnav__link" href="/" aria-current={section === 'home' ? 'page' : undefined}>
+            <span class="topnav__full">Front Page</span><span class="topnav__short">Front</span>
+          </a>
+          {
+            GROUPS.map((g) => (
+              <div class="topnav__group">
+                <button
+                  type="button"
+                  class="topnav__trigger"
+                  aria-expanded="false"
+                  aria-controls={`topnav-${g.id}`}
+                  aria-current={currentGroup === g.id ? 'true' : undefined}
+                >
+                  <span class="topnav__full">{g.label}</span>
+                  <span class="topnav__short">{g.short}</span>
+                  <svg class="topnav__caret" viewBox="0 0 10 6" aria-hidden="true">
+                    <path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4" />
+                  </svg>
+                </button>
+                <div class="topnav__panel" id={`topnav-${g.id}`}>
+                  <div class="topnav__card">
+                    <span class="topnav__panel-label">{g.label}</span>
+                    <ul class="topnav__list">
+                      {sectionsInGroup(g.id).map((c) => (
+                        <li>
+                          <a href={`/sections/${c.slug}`} aria-current={section === c.slug ? 'page' : undefined}>
+                            <span class="topnav__item-title">{c.title}</span>
+                            <span class="topnav__item-tagline">{c.tagline}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ))
+          }
+          {
+            topLevelSections.map((c) => (
+              <a
+                class="topnav__link"
+                href={`/sections/${c.slug}`}
+                aria-current={section === c.slug ? 'page' : undefined}
+              >
+                <span class="topnav__full">{c.shortTitle}</span>
+                <span class="topnav__short">{c.navShort ?? c.shortTitle}</span>
+              </a>
+            ))
+          }
+          <a class="topnav__link" href="/latest" aria-current={section === 'latest' ? 'page' : undefined}>
+            <span class="topnav__full">Latest in AI</span><span class="topnav__short">Latest</span>
+          </a>
+        </nav>
       </div>
       <hr class="rule rule--heavy" />
 
@@ -157,8 +205,12 @@ const dateLine = now.toLocaleDateString('en-US', {
       </main>
 
       <footer class="footer">
-        <p>The Course Ledger — the ideas behind modern AI, explained in depth.</p>
+        <p>Latent Inference — the ideas behind modern AI, explained in depth.</p>
+        <p class="footer__date"><time data-today datetime={dateAttr}>{dateLine}</time></p>
       </footer>
+      <script is:inline>
+        window.__latentToday && window.__latentToday();
+      </script>
     </div>
 
     <script is:inline>
@@ -187,32 +239,44 @@ const dateLine = now.toLocaleDateString('en-US', {
         sync();
       })();
 
-      // On narrow screens .topnav is a horizontal scroll strip. Two jobs here:
-      // bring the current section into view, and tell the reader there are more
-      // sections off-screen — a fade alone isn't a strong enough signal, so the
-      // wrapper draws a chevron on whichever side still has content.
+      // Section pull-downs (disclosure pattern). A trigger toggles its panel and
+      // closes any other; Escape closes and returns focus to the trigger; a click
+      // outside or focus leaving the group closes it. Hover-to-open on pointer
+      // devices is CSS-only.
       (function () {
-        var strip = document.querySelector('.topnav');
-        var wrap = document.querySelector('.topnav-wrap');
-        if (!strip || !wrap) return;
+        var groups = Array.prototype.slice.call(document.querySelectorAll('.topnav__group'));
+        if (!groups.length) return;
 
-        function update() {
-          // 2px of slack absorbs sub-pixel rounding at the extremes.
-          var max = strip.scrollWidth - strip.clientWidth;
-          var scrollable = max > 2;
-          wrap.toggleAttribute('data-more-left', scrollable && strip.scrollLeft > 2);
-          wrap.toggleAttribute('data-more-right', scrollable && strip.scrollLeft < max - 2);
+        function setOpen(group, open) {
+          group.toggleAttribute('data-open', open);
+          group.querySelector('.topnav__trigger').setAttribute('aria-expanded', String(open));
         }
 
-        strip.addEventListener('scroll', update, { passive: true });
-        window.addEventListener('resize', update);
-        if (window.ResizeObserver) new ResizeObserver(update).observe(strip);
+        groups.forEach(function (group) {
+          var trigger = group.querySelector('.topnav__trigger');
+          trigger.addEventListener('click', function () {
+            var open = !group.hasAttribute('data-open');
+            groups.forEach(function (other) {
+              if (other !== group) setOpen(other, false);
+            });
+            setOpen(group, open);
+          });
+          group.addEventListener('focusout', function (e) {
+            if (!group.contains(e.relatedTarget)) setOpen(group, false);
+          });
+          group.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && group.hasAttribute('data-open')) {
+              setOpen(group, false);
+              trigger.focus();
+            }
+          });
+        });
 
-        var current = strip.querySelector('[aria-current="page"]');
-        if (current && strip.scrollWidth > strip.clientWidth) {
-          current.scrollIntoView({ inline: 'center', block: 'nearest' });
-        }
-        update();
+        document.addEventListener('click', function (e) {
+          groups.forEach(function (group) {
+            if (!group.contains(e.target)) setOpen(group, false);
+          });
+        });
       })();
     </script>
   </body>

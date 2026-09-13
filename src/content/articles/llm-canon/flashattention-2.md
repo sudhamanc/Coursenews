@@ -143,5 +143,5 @@ Every serving stack you can name runs on the descendants of this work.
 
 ## Lineage
 
-- **Builds on:** [FlashAttention](/courses/llm-canon/flashattention), whose exact algorithm it keeps unchanged while rebuilding the implementation around the GPU's scheduler.
-- **Leads to:** [PagedAttention (vLLM)](/courses/llm-canon/paged-attention-vllm), which carries the same hardware-first mindset up to memory allocation, and [KV Cache Compression](/courses/llm-canon/kv-cache-compression), which shrinks what those fast kernels must read.
+- **Builds on:** [FlashAttention](/sections/llm-canon/flashattention), whose exact algorithm it keeps unchanged while rebuilding the implementation around the GPU's scheduler.
+- **Leads to:** [PagedAttention (vLLM)](/sections/llm-canon/paged-attention-vllm), which carries the same hardware-first mindset up to memory allocation, and [KV Cache Compression](/sections/llm-canon/kv-cache-compression), which shrinks what those fast kernels must read.
