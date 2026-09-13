@@ -555,10 +555,11 @@ NO RAG. Articles authored directly (no build-time API cost).
   IntroductionToAI), inserted before llm-canon in courses.config.json. Source was a Markdown study-notes
   file, not a PDF, so there is no extract step (Documents/IntroductionToAI does not exist; the extractor
   skips it with a warning).
-- intro-to-ai/week1.md (W1, order 1, ~9.2k words, readingTime 38, 10 concepts, 1 diagram). USER RULE for
-  this desk: strip course code, university, instructor and TA names, syllabus and academic-honesty
-  material. Kept textbook "Week N" cross-references (the desk is organized by week) and Turing's own
-  citation of "Professor Jefferson".
+- intro-to-ai/rational-agent-and-imitation-game.md (lectureId "Foundations", order 1, ~9.2k words,
+  readingTime 38, 10 concepts, 1 diagram; first shipped as week1.md). USER RULE for this desk: it must NOT
+  read like a course article. No course code, university, instructor or TA names, syllabus or
+  academic-honesty material, and NO week references anywhere: body text, acronym-table notes, headings,
+  lectureId, or URL slug. Turing's own citation of "Professor Jefferson" stays.
 - MERMAID IS NOT SUPPORTED by the markdown pipeline (it would render as a code block). The agent-types
   mermaid graph was redrawn as an inline SVG figure (viewBox 600, fonts 14-16).
 - Heading ids follow github-slugger, so a GitHub-style TOC works as-is ("§1 The Imitation Game" ->

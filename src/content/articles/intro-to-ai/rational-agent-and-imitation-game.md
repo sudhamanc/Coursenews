@@ -1,8 +1,8 @@
 ---
 course: intro-to-ai
-lectureId: W1
+lectureId: Foundations
 title: "The Rational Agent and the Imitation Game"
-deck: "Week 1 adopts the textbook's working definition of AI — an agent that acts to maximize its expected performance — and reads it against Turing's 1950 paper, which traded “Can machines think?” for a behavioral test and then spent most of its pages dismantling the objections."
+deck: "The textbook's working definition of AI — an agent that acts to maximize its expected performance — read against Turing's 1950 paper, which traded “Can machines think?” for a behavioral test and then spent most of its pages dismantling the objections."
 order: 1
 readingTime: 38
 tags: ["agents", "rationality", "task-environments", "turing-test", "foundations"]
@@ -45,21 +45,21 @@ works through that framing — agents, rationality, task environments, and the f
 agent architectures — and then reads it against the paper that started the argument,
 Alan Turing's 1950 "Computing Machinery and Intelligence."
 
-**Reading:** AIMA Chapters 1–2; Turing, A. M. (1950), "Computing Machinery and Intelligence," *Mind* 59(236), 433–460
+**Sources:** AIMA Chapters 1–2; Turing, A. M. (1950), "Computing Machinery and Intelligence," *Mind* 59(236), 433–460
 
 **Suggested reading order:** glossary below → Turing §1, §6, §7 (pp. 433–435, 442–447, 454–460) → the rest.
 
 ## Table of contents
 
 - [Part 0 — Acronyms expanded](#part-0--acronyms-expanded)
-- [Part 1 — Week 1 concepts (AIMA Ch. 1–2)](#part-1--week-1-concepts-aima-chapters-1-and-2)
+- [Part 1 — Agents and rationality (AIMA Ch. 1–2)](#part-1--agents-and-rationality-aima-chapters-1-and-2)
   - [1. What "Artificial Intelligence" means](#1-what-artificial-intelligence-means-four-competing-definitions)
   - [2. Agent, sensor, actuator, agent function](#2-agent-sensor-actuator-and-the-agent-function)
   - [3. Rationality](#3-rationality)
   - [4. Task environments — PEAS and seven dimensions](#4-task-environments--peas-and-the-seven-dimensions)
   - [5. Types of agents](#5-types-of-agents)
   - [6. Representation levels](#6-representation-levels)
-  - [7. Problem-solving](#7-problem-solving-the-week-1-framing)
+  - [7. Problem-solving](#7-problem-solving)
 - [Part 2 — Turing (1950)](#part-2--turing-1950-computing-machinery-and-intelligence)
   - [§1 The Imitation Game](#1-the-imitation-game)
   - [§2 Critique of the New Problem](#2-critique-of-the-new-problem)
@@ -76,22 +76,22 @@ Alan Turing's 1950 "Computing Machinery and Intelligence."
 | Acronym | Expansion | Note |
 |---|---|---|
 | **AI** | Artificial Intelligence | — |
-| **AIMA** | *Artificial Intelligence: A Modern Approach* | The Russell & Norvig textbook, 4th edition. Universally abbreviated this way in coursework and papers |
+| **AIMA** | *Artificial Intelligence: A Modern Approach* | The Russell & Norvig textbook, 4th edition. Universally abbreviated this way in textbooks and papers |
 | **PEAS** | **P**erformance measure, **E**nvironment, **A**ctuators, **S**ensors | Checklist for specifying a task before designing an agent |
-| **CSP** | Constraint Satisfaction Problem | Week 6 |
-| **MDP** | Markov Decision Process | Week 7 |
-| **RL** | Reinforcement Learning | Week 8 |
-| **BFS / DFS** | Breadth-First Search / Depth-First Search | Week 2 |
-| **A\*** | "A-star" — not an acronym; the name of an informed search algorithm (Hart, Nilsson, Raphael, 1968) | Week 3 |
-| **IDA\*** | Iterative-Deepening A-star | Week 3 |
-| **GA / GP** | Genetic Algorithm / Genetic Programming | Week 4 |
-| **MCTS** | Monte Carlo Tree Search | Week 5 |
+| **CSP** | Constraint Satisfaction Problem | Search over variable assignments that must satisfy a set of constraints |
+| **MDP** | Markov Decision Process | Sequential decision-making when action outcomes are probabilistic |
+| **RL** | Reinforcement Learning | Learning a policy from reward signals rather than labeled examples |
+| **BFS / DFS** | Breadth-First Search / Depth-First Search | The two basic uninformed search strategies |
+| **A\*** | "A-star" — not an acronym; the name of an informed search algorithm (Hart, Nilsson, Raphael, 1968) | — |
+| **IDA\*** | Iterative-Deepening A-star | A\* run with a rising cost cutoff, trading repeated work for far less memory |
+| **GA / GP** | Genetic Algorithm / Genetic Programming | Population-based search inspired by natural selection |
+| **MCTS** | Monte Carlo Tree Search | Game-tree search guided by randomized playouts |
 | **HMM** | Hidden Markov Model | Referenced in AIMA Ch. 2 as an atomic-representation technique |
 | **ESP** | Extra-Sensory Perception | Turing §6, objection 9 |
-| **LLM** | Large Language Model | Weeks 9 and 11 |
+| **LLM** | Large Language Model | — |
 | **NLP** | Natural Language Processing | One of the capabilities a Turing test requires |
 
-## Part 1 — Week 1 concepts (AIMA Chapters 1 and 2)
+## Part 1 — Agents and rationality (AIMA Chapters 1 and 2)
 
 ### 1. What "Artificial Intelligence" means: four competing definitions
 
@@ -113,7 +113,7 @@ The textbook commits to **acting rationally**. The reasoning:
 
 Passing a full Turing test would require at minimum: Natural Language Processing (understanding and generating human language), **knowledge representation** (storing what the system knows in a form it can reason over), **automated reasoning** (drawing new conclusions from stored knowledge), and **machine learning** (improving from experience and generalizing). The **total Turing test** adds **computer vision** (interpreting images) and **robotics** (manipulating physical objects), so the interrogator can pass objects through a hatch.
 
-**Weakness to flag:** rationality as defined is *unbounded* — it assumes the optimal action can be computed. In practice the optimal action is often uncomputable in the time available. AIMA later shifts toward **bounded optimality**: behaving as well as possible given fixed computational resources. This tension resurfaces in the MDP and RL weeks.
+**Weakness to flag:** rationality as defined is *unbounded* — it assumes the optimal action can be computed. In practice the optimal action is often uncomputable in the time available. AIMA later shifts toward **bounded optimality**: behaving as well as possible given fixed computational resources. This tension resurfaces in Markov decision processes and reinforcement learning.
 
 ### 2. Agent, sensor, actuator, and the agent function
 
@@ -206,8 +206,8 @@ Then classify the environment along seven dimensions. This classification determ
 | Dimension | Definition | Consequence for design |
 |---|---|---|
 | **Fully vs. partially observable** | Do sensors give access to the complete state relevant to the choice of action, at each moment? | Partial observability forces internal state — a **belief state**, the agent's representation of what the world *might* currently be. **Unobservable** is the extreme: no sensors at all |
-| **Single-agent vs. multiagent** | Is another entity present whose performance measure depends on this agent's behavior? | **Competitive** multiagent (chess) → adversarial search, Week 5. **Cooperative** (taxis avoiding collisions) makes communication and randomized behavior rational |
-| **Deterministic vs. nondeterministic** | Is the next state completely determined by the current state and the action? | **Nondeterministic** = multiple possible outcomes, no probabilities. **Stochastic** = outcomes carry explicit probabilities → MDPs, Week 7. An environment can be deterministic in principle but effectively stochastic because the agent cannot observe enough to predict it |
+| **Single-agent vs. multiagent** | Is another entity present whose performance measure depends on this agent's behavior? | **Competitive** multiagent (chess) → adversarial search. **Cooperative** (taxis avoiding collisions) makes communication and randomized behavior rational |
+| **Deterministic vs. nondeterministic** | Is the next state completely determined by the current state and the action? | **Nondeterministic** = multiple possible outcomes, no probabilities. **Stochastic** = outcomes carry explicit probabilities → MDPs. An environment can be deterministic in principle but effectively stochastic because the agent cannot observe enough to predict it |
 | **Episodic vs. sequential** | Is experience divided into independent atomic episodes, or do current actions affect all future decisions? | Episodic (classifying parts on a line) needs no lookahead. **Sequential** (chess, driving) does |
 | **Static vs. dynamic** | Can the environment change while the agent deliberates? | Dynamic imposes real-time deadlines and makes "doing nothing" a decision. **Semidynamic** = environment static but the agent's *score* changes with time (chess with a clock) |
 | **Discrete vs. continuous** | Applies separately to state, time, percepts, and actions | Continuous rules out enumerating states. Driving is continuous in state and time; camera input is technically discrete but treated as continuous |
@@ -270,7 +270,7 @@ Together these constitute the agent's **model of the world**. This is the minimu
 
 Knowing the current state is not enough — at an intersection, the taxi's action depends on where the passenger is going. The agent holds an explicit **goal**: a description of desirable world states. It considers what the world would look like after candidate action sequences and picks one reaching a goal.
 
-This is where **search** (Weeks 2–3) and **planning** enter. Goal-based agents are less efficient than reflex agents but far more **flexible**: change the goal and behavior changes automatically without rewriting rules. A reflex agent's braking rule must be rewritten by hand if the objective changes; a goal-based agent's knowledge is explicit and updatable.
+This is where **search** and **planning** enter. Goal-based agents are less efficient than reflex agents but far more **flexible**: change the goal and behavior changes automatically without rewriting rules. A reflex agent's braking rule must be rewritten by hand if the objective changes; a goal-based agent's knowledge is explicit and updatable.
 
 #### Utility-based agent
 
@@ -278,7 +278,7 @@ Goals are binary — achieved or not. They cannot express *degrees* of desirabil
 
 **Utility function** — a mapping from a state, or sequence of states, to a real number expressing desirability. It is an internalization of the external performance measure. When the two agree, a utility-maximizing agent is rational by the external standard.
 
-Under uncertainty the agent cannot know which state an action produces, so it computes **expected utility**: the sum, over all possible outcomes, of each outcome's probability multiplied by its utility. A rational agent chooses the action with the highest expected utility — the **Maximum Expected Utility** principle. This is the bridge to AIMA Ch. 5.1–5.2 (uncertainty and utilities, Week 4) and Ch. 17 (MDPs, Week 7).
+Under uncertainty the agent cannot know which state an action produces, so it computes **expected utility**: the sum, over all possible outcomes, of each outcome's probability multiplied by its utility. A rational agent chooses the action with the highest expected utility — the **Maximum Expected Utility** principle. This is the bridge to AIMA Ch. 5.1–5.2 (uncertainty and utilities) and Ch. 17 (MDPs).
 
 #### Learning agent
 
@@ -289,7 +289,7 @@ Four components:
 - **Critic** — evaluates behavior against a *fixed external performance standard* and reports how well it is doing. Necessary because the percept stream carries no notion of success: a chess program sees a checkmate percept, and only the standard tells it checkmate is bad.
 - **Problem generator** — suggests exploratory actions, suboptimal in the short run but informative. Without it the agent keeps exploiting what it knows and never discovers better options.
 
-This four-part structure reappears intact in Week 8: the critic becomes the reward signal, the problem generator becomes the exploration policy (e.g. ε-greedy action selection).
+This four-part structure reappears intact in reinforcement learning: the critic becomes the reward signal, the problem generator becomes the exploration policy (e.g. ε-greedy action selection).
 
 ### 6. Representation levels
 
@@ -301,9 +301,9 @@ How states are encoded inside the agent, least to most expressive:
 
 Higher expressiveness gives more compact descriptions of complex worlds, at higher reasoning cost. A related axis is **localist** representation (one variable per concept — readable, sparse) vs. **distributed** representation (a concept spread across many values — noise-robust, what neural networks use).
 
-### 7. Problem-solving (the Week 1 framing)
+### 7. Problem-solving
 
-Week 1 introduces the *stance*; the algorithms arrive Weeks 2–3. The **problem-solving agent** cycle:
+This is the *stance*; the search algorithms that carry it out are a subject of their own. The **problem-solving agent** cycle:
 
 1. **Goal formulation** — adopt a goal. Valuable because it *prunes*: the goal partitions world states into goal and non-goal, and everything not bearing on it can be ignored.
 2. **Problem formulation** — decide the state representation and action granularity. Choosing "drive from city A to city B" over "turn the wheel 3 degrees" is **abstraction**, and it is a design act. This choice is the single largest source of tractability differences between two attacks on the same problem.
