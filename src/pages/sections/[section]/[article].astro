@@ -25,7 +25,11 @@ const prev = idx > 0 ? siblings[idx - 1] : null;
 const next = idx < siblings.length - 1 ? siblings[idx + 1] : null;
 const slugOf = (a: (typeof siblings)[number]) => a.id.split('/').pop();
 
-const idLabel = displayId(entry.data.lectureId);
+// A book's own chapter number is part of the text, not course numbering, so it
+// is shown where `displayId` would suppress an ordering key like `W3` or `L08`.
+const idLabel = entry.data.chapter
+  ? `Chapter ${entry.data.chapter}`
+  : displayId(entry.data.lectureId);
 const dateLine = entry.data.date
   ? entry.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
   : null;
@@ -120,7 +124,9 @@ const byline = [idLabel, dateLine, entry.data.readingTime ? `${entry.data.readin
       {
         prev ? (
           <a class="feature__navlink" href={`/sections/${section.slug}/${slugOf(prev)}`}>
-            <span class="u-muted u-sans">← {displayId(prev.data.lectureId) ?? 'Previous'}</span>
+            <span class="u-muted u-sans">
+              ← {prev.data.chapter ? `Chapter ${prev.data.chapter}` : (displayId(prev.data.lectureId) ?? 'Previous')}
+            </span>
             <span>{prev.data.title}</span>
           </a>
         ) : (
@@ -130,7 +136,9 @@ const byline = [idLabel, dateLine, entry.data.readingTime ? `${entry.data.readin
       {
         next ? (
           <a class="feature__navlink feature__navlink--next" href={`/sections/${section.slug}/${slugOf(next)}`}>
-            <span class="u-muted u-sans">{displayId(next.data.lectureId) ?? 'Next'} →</span>
+            <span class="u-muted u-sans">
+              {next.data.chapter ? `Chapter ${next.data.chapter}` : (displayId(next.data.lectureId) ?? 'Next')} →
+            </span>
             <span>{next.data.title}</span>
           </a>
         ) : (

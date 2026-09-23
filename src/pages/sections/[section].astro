@@ -23,7 +23,31 @@ const articles = (await getCollection('articles'))
 const articlePath = (a: (typeof articles)[number]) =>
   `/sections/${section.slug}/${a.id.split('/').pop()}`;
 
-const [lead, ...rest] = articles;
+/**
+ * Book sections (Bedrock) catalogue books rather than lectures. Their articles
+ * carry a `book` and a `part`, which gives this front a third level:
+ * section → book → chapter, grouped under the book's own divisions. A section
+ * with no `book` on any article renders the usual lede + card grid, unchanged.
+ *
+ * `articles` is already sorted by `order`, so first-appearance order through
+ * these Sets is reading order — no second sort needed.
+ */
+const shelved = articles.filter((a) => a.data.book);
+const unshelved = articles.filter((a) => !a.data.book);
+
+const books = [...new Set(shelved.map((a) => a.data.book!))].map((title) => {
+  const entries = shelved.filter((a) => a.data.book === title);
+  // A book's front matter is the one piece filed without a part.
+  const front = entries.find((a) => !a.data.part) ?? null;
+  const chapters = entries.filter((a) => a !== front);
+  const parts = [...new Set(chapters.map((a) => a.data.part ?? ''))].map((name) => ({
+    name,
+    chapters: chapters.filter((c) => (c.data.part ?? '') === name),
+  }));
+  return { title, front, parts, count: chapters.length };
+});
+
+const [lead, ...rest] = unshelved;
 ---
 
 <Newspaper
@@ -105,6 +129,60 @@ const [lead, ...rest] = articles;
           </div>
         </>
       )
+    }
+
+    {
+      books.map((b) => (
+        <section class="book">
+          <hr class="rule rule--heavy" />
+          <h3 class="headline headline--lg book__title">
+            {b.front ? <a href={articlePath(b.front)}>{b.title}</a> : b.title}
+          </h3>
+          {b.front && (
+            <>
+              <p class="deck">{b.front.data.deck}</p>
+              <p>
+                <a class="readmore" href={articlePath(b.front)}>
+                  Read the overview →
+                </a>
+                <span class="u-muted u-sans book__count">
+                  {' '}· {b.count} {b.count === 1 ? 'chapter' : 'chapters'}
+                </span>
+              </p>
+            </>
+          )}
+          {b.parts.map((p) => (
+            <div class="book__part">
+              {p.name && <span class="flag">{p.name}</span>}
+              <div class="grid grid--3">
+                {p.chapters.map((a) => (
+                  <article class="card">
+                    <div class="byline">
+                      {[
+                        a.data.chapter ? `Chapter ${a.data.chapter}` : null,
+                        a.data.readingTime ? `${a.data.readingTime} min` : null,
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </div>
+                    <h4 class="headline headline--sm">
+                      <a href={articlePath(a)}>{a.data.title}</a>
+                    </h4>
+                    <p class="card__excerpt">{a.data.deck}</p>
+                    {a.data.tags.length > 0 && (
+                      <div class="tag-row">
+                        {a.data.tags.slice(0, 3).map((t) => (
+                          <span class="tag">{t}</span>
+                        ))}
+                      </div>
+                    )}
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))}
+        </section>
+      ))
     }
   </section>
 </Newspaper>

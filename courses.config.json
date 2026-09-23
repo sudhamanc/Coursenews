@@ -75,6 +75,15 @@
       "navShort": "Papers",
       "tagline": "The papers that built the large language model",
       "blurb": "Thirty-seven groundbreaking papers that built the large language model — from attention to the optimizer frontier — read as one connected lineage."
+    },
+    {
+      "slug": "bedrock",
+      "title": "Bedrock: The Foundational Texts",
+      "shortTitle": "Bedrock",
+      "dir": "Bedrock",
+      "navShort": "Books",
+      "tagline": "The standard textbooks, read chapter by chapter",
+      "blurb": "The standard works of the field, read straight through — every chapter of the textbooks that decide what counts as settled knowledge."
     }
   ]
 }

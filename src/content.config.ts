@@ -20,6 +20,24 @@ const articles = defineCollection({
     deck: z.string(),
     /** Ordering within the course front (ascending). */
     order: z.number(),
+    /**
+     * Book title, for sections that catalogue books rather than lectures (e.g.
+     * `bedrock`). Articles sharing a `book` are grouped under it on the section
+     * front, which turns the two-level section → article structure into
+     * section → book → chapter. Omit elsewhere.
+     */
+    book: z.string().optional(),
+    /**
+     * The book's own part/division, e.g. `II · Problem-solving`. Used as a
+     * subhead within a book group. Only meaningful alongside `book`.
+     */
+    part: z.string().optional(),
+    /**
+     * Chapter number within `book`. Shown on the card, because a book's own
+     * chapter numbering is part of the text rather than course numbering —
+     * which is why it bypasses `displayId`.
+     */
+    chapter: z.number().optional(),
     /** Optional publish/lecture date. */
     date: z.coerce.date().optional(),
     /** Estimated reading time in minutes (computed at authoring time). */

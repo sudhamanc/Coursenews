@@ -1406,3 +1406,20 @@ img {
   letter-spacing: 0;
   color: var(--ink-soft);
 }
+
+/* ---- Book section: section → book → part → chapter ----------------------- */
+.book {
+  margin-top: calc(var(--gap) * 1.5);
+}
+.book__title {
+  margin: 0.6rem 0 0.35rem;
+}
+.book__count {
+  font-size: 0.78rem;
+}
+.book__part {
+  margin-top: calc(var(--gap) * 1.25);
+}
+.book__part .flag {
+  margin-bottom: 0.9rem;
+}
