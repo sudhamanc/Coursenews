@@ -2,14 +2,23 @@
 course: ai-foundations
 lectureId: Foundations
 title: "The Rational Agent and the Imitation Game"
-deck: "The textbook's working definition of AI — an agent that acts to maximize its expected performance — read against Turing's 1950 paper, which traded “Can machines think?” for a behavioral test and then spent most of its pages dismantling the objections."
+deck: "The textbook's working definition of AI — an agent that acts to maximize its expected performance — set against the field's founding conjecture, its two winters, and the awkward question of whether human intelligence is even the right target; then read against Turing's 1950 paper, which traded “Can machines think?” for a behavioral test and spent most of its pages dismantling the objections."
 order: 1
-readingTime: 38
-tags: ["agents", "rationality", "task-environments", "turing-test", "foundations"]
+readingTime: 50
+tags: ["agents", "rationality", "task-environments", "turing-test", "history", "foundations"]
 concepts:
+  - id: dartmouth-conjecture
+    term: The Dartmouth Conjecture
+    definition: "The 1955 proposal for the 1956 Dartmouth summer project: every aspect of learning or any other feature of intelligence can in principle be described precisely enough for a machine to simulate it. The field's founding bet, and still unproven."
+  - id: ai-ml-dl
+    term: AI ⊃ ML ⊃ DL
+    definition: "Artificial intelligence is any program that senses, reasons, and acts; machine learning is the subset that improves with data; deep learning is the subset of that using many-layered neural networks. Hand-written rules are AI without being ML."
   - id: rational-agent
     term: Rational Agent
     definition: "One that selects, for each percept sequence, the action expected to maximize its performance measure, given the evidence in that sequence and its built-in knowledge. Rationality is not omniscience and not perfection."
+  - id: vacuum-world
+    term: The Vacuum World
+    definition: "Two squares, a location sensor, a dirt sensor, and four actions. Small enough to write the agent function out as a table, which makes it the standard place to see why a three-line program can stand in for an infinite table — and when it cannot."
   - id: agent-function-program
     term: Agent Function vs. Agent Program
     definition: "The agent function is the abstract mapping from percept sequences to actions — a specification. The agent program is the concrete, finite implementation that runs on an architecture. Agent = architecture + program."
@@ -41,26 +50,35 @@ concepts:
 
 Artificial intelligence has no single agreed definition, and the standard textbook
 settles the matter by choosing one: build agents that *act rationally*. This feature
-works through that framing — agents, rationality, task environments, and the five
-agent architectures — and then reads it against the paper that started the argument,
-Alan Turing's 1950 "Computing Machinery and Intelligence."
+starts where the field did — the 1956 conjecture that intelligence can be described
+precisely enough to simulate, the difficulty of saying what intelligence is, and
+seventy years of boom and bust — then works through the rational-agent framing:
+agents, rationality, task environments, and the five agent architectures. It closes by
+reading all of it against the paper that started the argument, Alan Turing's 1950
+"Computing Machinery and Intelligence."
 
-**Sources:** AIMA Chapters 1–2; Turing, A. M. (1950), "Computing Machinery and Intelligence," *Mind* 59(236), 433–460
+**Sources:** AIMA Chapters 1–2; Turing, A. M. (1950), "Computing Machinery and Intelligence," *Mind* 59(236), 433–460; McCarthy, J., Minsky, M., Rochester, N., & Shannon, C. (1955), "A Proposal for the Dartmouth Summer Research Project on Artificial Intelligence"; Legg, S., & Hutter, M. (2007), "A Collection of Definitions of Intelligence"
 
 **Suggested reading order:** glossary below → Turing §1, §6, §7 (pp. 433–435, 442–447, 454–460) → the rest.
 
 ## Table of contents
 
 - [Part 0 — Acronyms expanded](#part-0--acronyms-expanded)
-- [Part 1 — Agents and rationality (AIMA Ch. 1–2)](#part-1--agents-and-rationality-aima-chapters-1-and-2)
-  - [1. What "Artificial Intelligence" means](#1-what-artificial-intelligence-means-four-competing-definitions)
-  - [2. Agent, sensor, actuator, agent function](#2-agent-sensor-actuator-and-the-agent-function)
-  - [3. Rationality](#3-rationality)
-  - [4. Task environments — PEAS and seven dimensions](#4-task-environments--peas-and-the-seven-dimensions)
-  - [5. Types of agents](#5-types-of-agents)
-  - [6. Representation levels](#6-representation-levels)
-  - [7. Problem-solving](#7-problem-solving)
-- [Part 2 — Turing (1950)](#part-2--turing-1950-computing-machinery-and-intelligence)
+- [Part 1 — What AI is, and how it got here](#part-1--what-ai-is-and-how-it-got-here)
+  - [1. The founding conjecture](#1-the-founding-conjecture)
+  - [2. Whose intelligence?](#2-whose-intelligence-the-case-against-copying-humans)
+  - [3. What "Artificial Intelligence" means](#3-what-artificial-intelligence-means-four-competing-definitions)
+  - [4. A compressed history](#4-a-compressed-history)
+  - [5. What AI can and cannot do](#5-what-ai-can-and-cannot-do)
+  - [6. AI, machine learning, and deep learning](#6-ai-machine-learning-and-deep-learning)
+- [Part 2 — Agents and rationality (AIMA Ch. 1–2)](#part-2--agents-and-rationality-aima-chapters-1-and-2)
+  - [7. Agent, sensor, actuator, agent function](#7-agent-sensor-actuator-and-the-agent-function)
+  - [8. Rationality](#8-rationality)
+  - [9. Task environments — PEAS and seven dimensions](#9-task-environments--peas-and-the-seven-dimensions)
+  - [10. Types of agents](#10-types-of-agents)
+  - [11. Representation levels](#11-representation-levels)
+  - [12. Problem-solving](#12-problem-solving)
+- [Part 3 — Turing (1950)](#part-3--turing-1950-computing-machinery-and-intelligence)
   - [§1 The Imitation Game](#1-the-imitation-game)
   - [§2 Critique of the New Problem](#2-critique-of-the-new-problem)
   - [§3 The Machines Concerned in the Game](#3-the-machines-concerned-in-the-game)
@@ -77,6 +95,11 @@ Alan Turing's 1950 "Computing Machinery and Intelligence."
 |---|---|---|
 | **AI** | Artificial Intelligence | — |
 | **AIMA** | *Artificial Intelligence: A Modern Approach* | The Russell & Norvig textbook, 4th edition. Universally abbreviated this way in textbooks and papers |
+| **ML** | Machine Learning | Algorithms whose performance improves with exposure to data |
+| **DL** | Deep Learning | Machine learning with many-layered neural networks |
+| **GenAI** | Generative AI | Models that produce new text, images, audio, or code |
+| **ATM** | Automated Teller Machine | Used below as an example of a minimal agent |
+| **FEN** | Forsyth–Edwards Notation | Standard text encoding of a chess position — the board *plus* the history-dependent facts the board alone does not show |
 | **PEAS** | **P**erformance measure, **E**nvironment, **A**ctuators, **S**ensors | Checklist for specifying a task before designing an agent |
 | **CSP** | Constraint Satisfaction Problem | Search over variable assignments that must satisfy a set of constraints |
 | **MDP** | Markov Decision Process | Sequential decision-making when action outcomes are probabilistic |
@@ -91,9 +114,78 @@ Alan Turing's 1950 "Computing Machinery and Intelligence."
 | **LLM** | Large Language Model | — |
 | **NLP** | Natural Language Processing | One of the capabilities a Turing test requires |
 
-## Part 1 — Agents and rationality (AIMA Chapters 1 and 2)
+## Part 1 — What AI is, and how it got here
 
-### 1. What "Artificial Intelligence" means: four competing definitions
+### 1. The founding conjecture
+
+The field has a birth certificate. In 1955 John McCarthy, Marvin Minsky, Nathaniel
+Rochester, and Claude Shannon proposed a two-month, ten-person study at Dartmouth
+College for the summer of 1956, and the proposal is where the phrase *artificial
+intelligence* first appears. McCarthy chose it deliberately, partly to separate the
+new work from cybernetics and automata theory.
+
+The proposal rested on a single conjecture: that "every aspect of learning or any
+other feature of intelligence" can in principle be described precisely enough that a
+machine can be made to simulate it. From that premise it listed what it hoped to
+attempt — making machines use language, form abstractions and concepts, solve kinds
+of problems then reserved for humans, and improve themselves.
+
+Three things about the document are worth holding onto.
+
+- **It is a conjecture, not a finding.** Nothing in the seventy years since has proved
+  it or refuted it. Every AI system is a partial test of it for one aspect of
+  intelligence at a time.
+- **The research agenda has barely changed.** Language, abstraction, problem-solving,
+  and self-improvement map onto natural language processing, representation learning,
+  search and planning, and machine learning — still the field's main divisions.
+- **The time estimate was wildly wrong.** The authors expected a significant advance
+  on at least one problem from a carefully chosen group working for one summer. That
+  optimism — progress on a narrow problem read as progress on the general one — is the
+  pattern behind both collapses in §4.
+
+### 2. Whose intelligence? The case against copying humans
+
+The original framing was *replicating human intelligence in a machine* — the version
+popular culture still runs on, with the copied or uploaded human mind as its limiting
+case. It invites an awkward question: is human intelligence actually the thing we want
+to replicate?
+
+Humans are frequently **confidently incorrect**, and not at random.
+
+- **Favorite–longshot bias.** At the racetrack, bettors systematically overbet
+  longshots relative to their true chance of winning and underbet favorites, so the
+  expected return per dollar falls as the odds lengthen. The error persists in markets
+  where bettors have every incentive to fix it.
+- **Inconsistent risk attitudes.** Offered a 50% chance at $100 or a certain $50, a
+  subset of people prefer the gamble. At equal expected value that preference is a risk
+  attitude, not an arithmetic mistake. What *is* a problem is that the attitude flips:
+  people tend to be risk-averse when a choice is framed as a gain and risk-seeking when
+  the same choice is framed as a loss (Kahneman and Tversky's prospect theory). A system
+  that copied that would give different answers to the same question depending on how
+  it was worded.
+
+This is the empirical half of the argument §3 makes on principle: a design target that
+imports human biases as features is a worse target than one that states what "correct"
+means and optimizes for it.
+
+**Defining intelligence is its own problem.** Any definition is arbitrary in a
+specific way. List the features of intelligence — learning, language, knowledge,
+reasoning, understanding — and the list leaves something out; tighten it and it
+excludes things we clearly count. Legg and Hutter (2007) collected around seventy
+published definitions and found them converging on one idea: an agent's ability to
+achieve goals across a wide range of environments. That synthesis is essentially the
+rational-agent definition in §8, reached from the other direction.
+
+A more skeptical reading is that *intelligence* is simply the word for behaviors we
+observe in humans and not in other entities. If so, the target moves: once a machine
+does something, it stops counting. Chess was the paradigm of intelligence until a
+machine won at it. The quip "AI is whatever hasn't been done yet" (usually attributed
+to Larry Tesler) names this — the **AI effect**.
+
+If intelligence cannot be defined, how would anyone recognize artificial intelligence
+on arrival? Turing's answer is a test rather than a definition — see §3 and Part 3.
+
+### 3. What "Artificial Intelligence" means: four competing definitions
 
 AIMA opens by splitting historical definitions along two axes — *thinking vs. acting*, and *human-like vs. rational*.
 
@@ -113,11 +205,198 @@ The textbook commits to **acting rationally**. The reasoning:
 
 Passing a full Turing test would require at minimum: Natural Language Processing (understanding and generating human language), **knowledge representation** (storing what the system knows in a form it can reason over), **automated reasoning** (drawing new conclusions from stored knowledge), and **machine learning** (improving from experience and generalizing). The **total Turing test** adds **computer vision** (interpreting images) and **robotics** (manipulating physical objects), so the interrogator can pass objects through a hatch.
 
+The test has been run for real. The **Loebner Prize** (1991–2019) held an annual
+restricted Turing test, with a bronze medal each year for the most human-like program.
+Its silver and gold prizes — for convincing half the judges, and for a full audiovisual
+version — were never awarded. The winning entries were mostly conversational tricks:
+deflection, feigned personality, and typos, rather than competence. That is the
+behaviorist weakness in Turing's §6(4) and point 2 under *What to interrogate*,
+observed directly.
+
+In practice the field does not define itself by the test at all. **AI is a research
+field covering computational techniques for any aspect of intelligence**: automated
+reasoning, knowledge representation, learning, natural language understanding and
+generation, problem-solving, planning, perception and vision, and action. It draws on
+computer science, mathematics, philosophy, economics, psychology, neuroscience,
+linguistics, and control theory — each of which contributed a question the field
+inherited along with its tools.
+
 **Weakness to flag:** rationality as defined is *unbounded* — it assumes the optimal action can be computed. In practice the optimal action is often uncomputable in the time available. AIMA later shifts toward **bounded optimality**: behaving as well as possible given fixed computational resources. This tension resurfaces in Markov decision processes and reinforcement learning.
 
-### 2. Agent, sensor, actuator, and the agent function
+### 4. A compressed history
+
+The history reads less as steady progress than as a cycle: a burst of early success, a
+collapse when methods fail to scale, a new paradigm, repeat.
+
+<figure>
+<svg viewBox="0 0 860 256" role="img" aria-label="A timeline of AI from 1943 to the 2020s. Events above the line: 1943 McCulloch-Pitts neuron model, 1950 Turing's paper, 1956 Dartmouth workshop, 1965 Robinson's resolution, 1980 to 1988 expert-systems boom, 1990s probability and agents, 2012 onward data, compute, and deep networks, 2020s large language models. Two shaded bands on the line mark the AI winters of the 1970s and of 1988 to 1993.">
+  <line x1="40" y1="130" x2="824" y2="130" stroke="currentColor" stroke-width="1.6"/>
+  <g class="dgm-accent">
+    <rect x="352" y="122" width="55" height="16" class="dgm-soft" stroke="currentColor" stroke-width="1.4"/>
+    <rect x="480" y="122" width="46" height="16" class="dgm-soft" stroke="currentColor" stroke-width="1.4"/>
+    <text x="380" y="154" text-anchor="middle" font-size="10.5" font-weight="700">AI winter</text>
+    <text x="503" y="154" text-anchor="middle" font-size="10.5" font-weight="700">AI winter</text>
+  </g>
+  <line x1="67" y1="68" x2="67" y2="124" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="67" y="46" text-anchor="middle" font-size="11" font-weight="700">1943</text>
+  <text x="67" y="62" text-anchor="middle" font-size="10.5" class="dgm-muted">McCulloch–Pitts</text>
+  <line x1="132" y1="112" x2="132" y2="124" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="132" y="90" text-anchor="middle" font-size="11" font-weight="700">1950</text>
+  <text x="132" y="106" text-anchor="middle" font-size="10.5" class="dgm-muted">Turing</text>
+  <line x1="187" y1="68" x2="187" y2="124" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="187" y="46" text-anchor="middle" font-size="11" font-weight="700">1956</text>
+  <text x="187" y="62" text-anchor="middle" font-size="10.5" class="dgm-muted">Dartmouth</text>
+  <line x1="270" y1="112" x2="270" y2="124" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="270" y="90" text-anchor="middle" font-size="11" font-weight="700">1965</text>
+  <text x="270" y="106" text-anchor="middle" font-size="10.5" class="dgm-muted">resolution</text>
+  <line x1="443" y1="68" x2="443" y2="120" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="443" y="46" text-anchor="middle" font-size="11" font-weight="700">1980–88</text>
+  <text x="443" y="62" text-anchor="middle" font-size="10.5" class="dgm-muted">expert-systems boom</text>
+  <line x1="545" y1="112" x2="545" y2="124" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="545" y="90" text-anchor="middle" font-size="11" font-weight="700">1990s</text>
+  <text x="545" y="106" text-anchor="middle" font-size="10.5" class="dgm-muted">probability, agents</text>
+  <line x1="701" y1="68" x2="701" y2="124" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="701" y="46" text-anchor="middle" font-size="11" font-weight="700">2012–</text>
+  <text x="701" y="62" text-anchor="middle" font-size="10.5" class="dgm-muted">data + compute + deep nets</text>
+  <line x1="800" y1="112" x2="800" y2="124" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="800" y="90" text-anchor="middle" font-size="11" font-weight="700">2020s</text>
+  <text x="800" y="106" text-anchor="middle" font-size="10.5" class="dgm-muted">LLMs</text>
+  <text x="430" y="194" text-anchor="middle" font-size="11">first winter — computational complexity, common sense, and the frame problem stall early methods</text>
+  <text x="430" y="216" text-anchor="middle" font-size="11">second winter — the expert-systems industry booms (1980–88), then busts (1988–93)</text>
+  <text x="430" y="240" text-anchor="middle" font-size="10.5" class="dgm-muted">neural networks return in the 1990s and dominate after 2012</text>
+</svg>
+<figcaption><b>Two winters.</b> Each collapse followed a period in which success on restricted problems was read as progress on the general one.</figcaption>
+</figure>
+
+- **1940s — the preconditions.** McCulloch and Pitts (1943) model the neuron as a
+  Boolean threshold unit, the first formal neural network. Turing (1950) publishes the
+  paper read in Part 3.
+- **1950s–60s — early excitement.** Programs appear before the name does: Samuel's
+  checkers player, which learned to beat its author, and Newell, Simon, and Shaw's
+  **Logic Theorist**, which proved theorems from *Principia Mathematica*. Dartmouth
+  (1956) names the field. Robinson's **resolution** (1965) gives a complete algorithm
+  for logical inference — powerful, and in practice swamped by combinatorial
+  explosion.
+- **1970s — knowledge, then the first winter.** Knowledge-based systems develop from
+  1969 onward, on the lesson that general methods need domain knowledge. The obstacles
+  that ended the first boom were not engineering bugs but conceptual walls:
+  **computational complexity** (methods that worked on toy problems scaled
+  exponentially), **common sense** (the vast, unstated background knowledge people
+  use without noticing), and the **frame problem** (stating what does *not* change when
+  an action happens).
+- **1980s — boom and bust.** Expert systems become an industry from 1980 to 1988, then
+  collapse between 1988 and 1993, when hand-built knowledge bases proved brittle and
+  expensive to maintain — the second winter.
+- **1990s — probability and agents.** Uncertainty is handled with probability rather
+  than with rules and exceptions; the rational agent becomes the unifying frame; neural
+  networks return.
+- **2000s — ambition returns.** Human-level AI comes back onto the research agenda.
+- **2012 onward — scale.** Large datasets, large compute, and deep neural networks
+  drive rapid progress, some subfields partly reunify under shared methods, and AI
+  spreads through most industries.
+
+### 5. What AI can and cannot do
+
+A scorecard is the fastest way to calibrate — with the caution that every row moves,
+and always toward *yes*.
+
+| Task | Verdict | What the verdict hides |
+|---|---|---|
+| Play table tennis | Yes | Robot arms sustain rallies against amateurs: a fast perception–action loop on a narrow task |
+| Drive a car | Yes | In mapped, geofenced service areas. The long tail of rare situations is the unsolved part |
+| Play chess or Go | Yes | Deep Blue (1997), AlphaGo (2016). Fully observable, deterministic, discrete — the easiest row of the table in §9 |
+| Translate text | Almost | Strong for high-resource language pairs; weaker on low-resource languages, idiom, and domain terminology |
+| Hold a conversation | Yes | Large language models. Fluency runs well ahead of reliability |
+| Understand an image | Largely | Multimodal models describe and answer questions about images; fine spatial reasoning and counting still fail |
+| Win at *Jeopardy!* | Yes | IBM Watson, 2011 |
+| Perform surgery | No | Surgical robots are teleoperated by surgeons; autonomous surgery remains experimental |
+| Write a good story | No | See below |
+
+The pattern in the *yes* rows is the pattern of the environment table in §9: the
+earliest and cleanest wins come where the world is observable, deterministic, and
+discrete, and the hardest remaining rows are the ones where it is none of those.
+
+Embodied systems belong on the list too, because they solve perception and action
+together in uncontrolled settings: autonomous delivery robots that carry medications —
+including hazardous drugs — down hospital corridors, camera drones that follow a skier,
+runner, or surfer without a pilot, and legged robots that cross uneven forest ground.
+
+**The story-writing failures are the instructive row.** A well-known set of examples
+comes from TALE-SPIN, a 1970s story generator. In one, a bear told where honey is
+walks to the tree and eats the beehive. In another, a squirrel slips into a river and
+the program reports that *gravity* drowned — gravity had been represented as the
+character that moved him, and nothing in the program knew it could not drown. In a
+third, a crow holding cheese notices the cheese, becomes hungry, and eats it, so the
+fox's fable never happens. Each error is a missing piece of **common sense** — the
+same wall that ended the first boom in §4 — and none is fixable by a better
+story-planning algorithm alone.
+
+### 6. AI, machine learning, and deep learning
+
+The three terms are nested, not synonyms.
+
+<figure>
+<svg viewBox="0 0 840 300" role="img" aria-label="Three nested circles. The outer circle is artificial intelligence, programs that sense, reason, act, and adapt; inside it is machine learning, algorithms that improve with data; inside that is deep learning, many-layered neural networks. Callouts mark hand-written rules as AI without learning in the outer ring, reinforcement learning as spanning machine learning, and generative AI as sitting inside deep learning.">
+  <circle cx="230" cy="150" r="140" fill="none" stroke="currentColor" stroke-width="1.6"/>
+  <circle cx="230" cy="178" r="108" fill="none" stroke="currentColor" stroke-width="1.6"/>
+  <circle cx="230" cy="208" r="72" class="dgm-soft" stroke="currentColor" stroke-width="1.6"/>
+  <text x="230" y="46" text-anchor="middle" font-size="12" font-weight="700">ARTIFICIAL INTELLIGENCE</text>
+  <text x="230" y="62" text-anchor="middle" font-size="10.5" class="dgm-muted">sense, reason, act, adapt</text>
+  <text x="230" y="96" text-anchor="middle" font-size="11.5" font-weight="700">MACHINE LEARNING</text>
+  <text x="230" y="112" text-anchor="middle" font-size="10.5" class="dgm-muted">improves with data</text>
+  <text x="230" y="176" text-anchor="middle" font-size="11.5" font-weight="700">DEEP LEARNING</text>
+  <text x="230" y="192" text-anchor="middle" font-size="10.5" class="dgm-muted">many-layered networks</text>
+  <g class="dgm-accent">
+    <circle cx="260" cy="236" r="4" class="dgm-fill"/>
+  </g>
+  <circle cx="350" cy="110" r="4" class="dgm-fill"/>
+  <line x1="354" y1="110" x2="392" y2="110" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="400" y="106" font-size="11.5" font-weight="700">rules, search, logic, planning</text>
+  <text x="400" y="122" font-size="10.5" class="dgm-muted">AI without learning — the if–then tree lives here</text>
+  <g class="dgm-accent-2">
+    <circle cx="315" cy="165" r="4" class="dgm-fill"/>
+    <line x1="319" y1="165" x2="392" y2="165" stroke="currentColor" stroke-width="1"/>
+    <text x="400" y="161" font-size="11.5" font-weight="700">reinforcement learning</text>
+    <text x="400" y="177" font-size="10.5">spans ML; deep only when the value or policy is a network</text>
+  </g>
+  <g class="dgm-accent">
+    <line x1="264" y1="236" x2="392" y2="236" stroke="currentColor" stroke-width="1"/>
+    <text x="400" y="232" font-size="11.5" font-weight="700">generative AI</text>
+    <text x="400" y="248" font-size="10.5">today almost entirely deep learning</text>
+  </g>
+</svg>
+<figcaption><b>Nested, not synonymous.</b> Every deep-learning system is machine learning and every machine-learning system is AI — but a large share of deployed AI learns nothing at all.</figcaption>
+</figure>
+
+- **Artificial intelligence** — a program that can sense, reason, act, and adapt. The
+  whole of this feature's agent framework lives at this level.
+- **Machine learning** — algorithms whose performance improves as they are exposed to
+  more data. Learning is one way of building an agent program, not the definition of
+  one.
+- **Deep learning** — the subset of machine learning in which many-layered neural
+  networks learn from very large amounts of data.
+
+Two current terms need placing. **Generative AI** sits almost entirely inside deep
+learning today. **Reinforcement learning** is a form of machine learning that is
+deep only when its value function or policy is a neural network — tabular
+reinforcement learning is not deep learning at all.
+
+The outer ring is the one people forget. A widely shared joke unmasks "AI" to reveal
+a nest of if–then–else statements underneath. It lands because it is often true — and
+under the agent definition, a hand-written chain of conditionals is not a fraud but a
+legitimate **simple reflex agent** (§10). It is AI; it is not machine learning. The
+question worth asking of any such system is not whether it deserves the label but
+whether a reflex agent is adequate for its environment.
+
+## Part 2 — Agents and rationality (AIMA Chapters 1 and 2)
+
+### 7. Agent, sensor, actuator, and the agent function
 
 An **agent** is anything that perceives its environment through **sensors** and acts upon that environment through **actuators**.
+
+A slightly stronger working definition adds purpose: an agent is an autonomous entity that observes and acts upon an environment and *directs its activity toward achieving goals*. Humans, robots, and software agents all qualify — and so does an ATM, which senses a card and keypresses, acts by dispensing cash and printing receipts, and pursues a narrow goal. The ATM is a useful reminder that "agent" sets a very low bar. What makes agent design hard is not meeting the definition but meeting it *well* in a difficult environment.
+
+Framing AI as the design of **rational agents** has a practical consequence: the characteristics of the sensors, the actuators, and the environment dictate which techniques for selecting actions are appropriate. The skill is less in knowing techniques than in matching one to the problem.
 
 **Sensor** — any component supplying the agent with information about the state of the world. Camera, microphone, thermometer, keyboard input, a network socket returning an application programming interface response, a software function reading a file.
 
@@ -156,7 +435,51 @@ agent = architecture + program
 
 Keep the function/program distinction straight. A useful check for any described property: does it belong to the function (*what* should be done — a specification) or the program (*how* it is computed — an implementation)?
 
-### 3. Rationality
+#### Worked example: the vacuum world
+
+The smallest environment in which the distinction becomes concrete. Two squares, A and
+B, each clean or dirty. The agent has a **location sensor** and a **dirt sensor**, so a
+percept is a pair such as `[A, Dirty]`. It has four actions: `Left`, `Right`, `Suck`,
+and `NoOp` (do nothing, sometimes written `Wait`).
+
+Part of its agent function, written out as a table:
+
+| Percept sequence | Action |
+|---|---|
+| `[A, Clean]` | `Right` |
+| `[A, Dirty]` | `Suck` |
+| `[B, Clean]` | `Left` |
+| `[B, Dirty]` | `Suck` |
+| `[A, Clean], [A, Clean]` | `Right` |
+| `[A, Clean], [A, Dirty]` | `Suck` |
+| … | … |
+
+Two questions follow.
+
+**What is the function?** A mapping from *every possible percept sequence* to an
+action. The table has an entry for every history, not every percept, so it never
+ends. With four possible percepts, a lifetime of $T$ steps needs
+$\sum_{t=1}^{T} 4^t$ rows — about 1.4 million after only ten steps.
+
+**Can it be implemented as a program?** This one can, in three lines:
+
+```python
+def reflex_vacuum_agent(location, status):
+    if status == "Dirty":
+        return "Suck"
+    return "Right" if location == "A" else "Left"
+```
+
+The program is finite because this particular function **ignores history**: every row
+with the same final percept has the same action. That is the property that makes it
+cheap, and it is also its limitation. Most useful agent functions do depend on
+history, and the central engineering problem of AI is finding a compact program for a
+function whose table is astronomically large.
+
+Whether this agent is *rational* is not a property of the program — it depends on the
+performance measure, which §8 takes up.
+
+### 8. Rationality
 
 Formal definition from AIMA:
 
@@ -183,7 +506,33 @@ Distinctions worth keeping sharp:
 
 **Performance measure design rule:** specify the measure over states of the *environment*, not over the agent's *behavior*. A vacuum agent scored on "amount of dirt collected" learns to dump collected dirt and re-vacuum it. Scored on "floor is clean at each time step," it does not. Same failure mode later called reward hacking or specification gaming.
 
-### 4. Task environments — PEAS and the seven dimensions
+**The same agent under two measures.** Because "intelligence" is ill-defined,
+rationality sidesteps it: *assume* a performance measure — often called a reward
+function — supplied from outside, and ask which actions maximize its expected value
+given the percept sequence. Take the reflex vacuum agent from §7 and two candidate
+measures:
+
+- **+$1 for every square cleaned.** The reflex agent does well. It is also exposed to
+  the gaming problem above — a measure that pays per cleaning event rewards
+  re-dirtying.
+- **+$2 for every square cleaned, −$1 for every move.** Now movement has a price. Once
+  both squares are clean, the rational action is `NoOp`, but the reflex agent keeps
+  shuttling between them forever, losing a dollar a step. It *cannot* do better: with
+  no memory it cannot know the other square is already clean.
+
+Same program, same environment; rational under one measure and irrational under the
+other. And the fix the second measure demands — remember what you have already
+observed — is exactly the step from a simple reflex agent to a model-based one in §10.
+
+**Judge the decision, not the outcome.** Two agents are scored on money won at a
+casino, and each plays one hand of blackjack. Agent A makes the move with the highest
+probability of winning. Agent B makes a riskier move — and wins. A is the rational
+agent. Rationality does not imply **clairvoyance** (seeing how the cards fall) or
+**omniscience** (knowing the actual outcome), so rational does not mean successful.
+The practical corollary: evaluating an agent on a single outcome rewards luck. Its
+rationality is only visible in expectation, across many trials.
+
+### 9. Task environments — PEAS and the seven dimensions
 
 Before designing any agent, specify the **task environment** using **PEAS**:
 
@@ -201,6 +550,66 @@ Worked example, automated taxi:
 | Actuators | Steering, accelerator, brake, turn signal, horn, display screen, speaker |
 | Sensors | Cameras, radar, speedometer, Global Positioning System receiver, engine sensors, accelerometer, microphone, keyboard for passenger input |
 
+A note on the letters: the **A** is sometimes given as *Actions* rather than
+*Actuators*. The two are different things — actuators are the physical means, actions
+are the vocabulary of choices the agent program selects among — but for a pure
+software agent they coincide, and the distinction only matters once hardware is
+involved.
+
+**Worked example: a chess agent.** Built up one slot at a time, which is how PEAS is
+meant to be used.
+
+| PEAS component | Content |
+|---|---|
+| Performance measure | At a terminal state: +1 for a win, 0 for a draw, −1 for a loss |
+| Environment | The board and the opponent |
+| Actions | A pair of coordinates, `(x₁, y₁) → (x₂, y₂)`: the source square and the target square. Castling is expressed as the king's move |
+| Sensors | The board as an 8×8 matrix. Each cell takes one of 13 values: `E` (empty) or a colour–piece pair — `WP`, `WN`, `WB`, `WR`, `WQ`, `WK`, and the same six for black |
+
+The physical environment has many more features than this — the pieces' size and
+material, the opponent's facial expression, whether it is raining. The design
+principle is that **a rational agent needs sensors only for the information
+necessary to maximize its performance measure**. None of those extra features
+changes the game-theoretic value of a position, so none gets a sensor. (Whether the
+opponent's face *should* be ignored depends on the measure: an agent rewarded for
+beating fallible humans rather than for playing correct chess might profit from
+reading tells, as poker players do.)
+
+The specification also hides two subtle gaps, both instructive:
+
+1. **The board is not the whole state.** Whether castling is still legal, whether an
+   en passant capture is available, and how close the game is to a draw by repetition
+   or the fifty-move rule all depend on *history* the 8×8 matrix does not show. From a
+   single board percept, chess is therefore not fully observable — the agent must
+   remember earlier moves, which makes it a model-based agent (§10), not a reflex one.
+   Standard chess notation (FEN) exists precisely to carry those extra facts alongside
+   the board.
+2. **The action encoding is incomplete.** A source-and-target pair cannot say which
+   piece a pawn promotes to. Choosing a knight instead of a queen is occasionally the
+   only winning move, so a real engine adds a promotion field.
+
+Neither gap is visible until you try to write the specification down, which is the
+case for writing it down.
+
+**Worked example: a medical diagnosis system.**
+
+| PEAS component | Content |
+|---|---|
+| Performance measure | Patient health, cost, reputation |
+| Environment | Patients, medical staff, insurers, courts |
+| Actuators | Screen display, email |
+| Sensors | Keyboard and mouse |
+
+Read it critically and most of the design difficulty is already visible. The
+performance measure has **three objectives that conflict** — the cheapest treatment is
+not always the healthiest, and the reputationally safest is not always either — so a
+binary goal will not do; this needs a utility-based agent. The environment contains
+**other agents with their own objectives**, including adversarial ones in the courts.
+The actuators are **advisory only**: the system acts on the world entirely through the
+humans who read its output. And its sensors perceive only what staff choose to type,
+so its view of the patient is **mediated and partial** — it knows what it was told,
+not what is true.
+
 Then classify the environment along seven dimensions. This classification determines which algorithm family applies — the practical payoff of Chapter 2.
 
 | Dimension | Definition | Consequence for design |
@@ -215,7 +624,43 @@ Then classify the environment along seven dimensions. This classification determ
 
 Hardest configuration: partially observable, multiagent, stochastic, sequential, dynamic, continuous, unknown. That is driving in traffic.
 
-### 5. Types of agents
+**Six environments, classified.** Six of the dimensions, applied to a spread of
+environments from a card game to everything:
+
+| | Observable | Deterministic | Sequential | Static | Discrete | Single-agent |
+|---|---|---|---|---|---|---|
+| **Solitaire** | No | Yes | Yes | Yes | Yes | Yes |
+| **Chess** | Yes | Yes | Yes | Yes | Yes | No |
+| **Backgammon** | Yes | No | Yes | Yes | Yes | No |
+| **Taxi driving** | No | No | Yes | No | No | No |
+| **StarCraft** | No | Almost | Yes | No | Yes | No |
+| **Real life** | No | No (?) | Yes | No | No (?) | No |
+
+What the table is showing:
+
+- **Solitaire is the surprise.** It is single-agent and deterministic, yet not
+  observable — the face-down cards are hidden state. Easy-looking problems can fail
+  the observability test.
+- **Chess is "deterministic" by convention.** The opponent's reply is not determined
+  by the board and your move; the table books that uncertainty under *multiagent*
+  rather than *nondeterministic*. Keeping the two columns separate is what lets
+  adversarial search treat the opponent as a reasoner rather than as noise.
+- **Backgammon differs from chess in exactly one cell** — the dice — and that single
+  change moves it from minimax to expectation-based search.
+- **StarCraft** is hidden (fog of war), real-time (the world moves while you think),
+  multiagent, and nearly deterministic.
+- **Real life** fails every column that matters, and the question marks are honest:
+  whether the world is deterministic, or discrete at small enough scales, is a question
+  for physics rather than for AI.
+- **Sequential is Yes in every row.** Every interesting environment makes the agent live
+  with the consequences of its earlier choices.
+
+One definition varies between sources: *discrete* is sometimes stated for the action
+set only — actions can be performed in a small, fixed number of ways — rather than for
+state, time, percepts, and actions separately, as in the table above it. By the
+narrower reading StarCraft is discrete; by the broader one it is closer to continuous.
+
+### 10. Types of agents
 
 Five agent-program structures, in order of increasing generality. Each subsumes the previous.
 
@@ -251,9 +696,81 @@ Five agent-program structures, in order of increasing generality. Each subsumes 
 <figcaption><b>Five agent programs, in order of generality.</b> Each rung adds machinery to the one above it. The learning agent, dashed, is a wrapper rather than a rung: its performance element can be any of the other four.</figcaption>
 </figure>
 
+The model-based reflex agent is also called a **state-based** agent. Some presentations
+count four basic types — reflex, state-based, goal-based, utility-based — and treat
+learning as something any of them can incorporate rather than as a fifth type, which
+is the same position the dashed rung above takes.
+
+The ladder says what each type *adds*. The other way to see the same progression is by
+the questions each architecture is able to ask itself before it acts:
+
+<figure>
+<svg viewBox="0 0 840 300" role="img" aria-label="A matrix of five questions against four agent types. Simple reflex agents ask what the world is like now, from the current percept only, and decide by condition-action rules. Model-based agents add how the world evolves and what their actions do. Goal-based agents add what the world will be like after an action and decide by goals. Utility-based agents add how happy they will be in that state and decide by utility.">
+  <g class="dgm-accent">
+    <rect x="722" y="20" width="96" height="236" class="dgm-soft" stroke="currentColor" stroke-width="1.2"/>
+  </g>
+  <text x="470" y="38" text-anchor="middle" font-size="11" font-weight="700">simple reflex</text>
+  <text x="570" y="38" text-anchor="middle" font-size="11" font-weight="700">model-based</text>
+  <text x="670" y="38" text-anchor="middle" font-size="11" font-weight="700">goal-based</text>
+  <g class="dgm-accent">
+    <text x="770" y="38" text-anchor="middle" font-size="11" font-weight="700">utility-based</text>
+  </g>
+  <line x1="24" y1="50" x2="816" y2="50" stroke="currentColor" stroke-width="1.2"/>
+  <text x="30" y="78" font-size="11.5">What is the world like now?</text>
+  <circle cx="470" cy="74" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  <circle cx="570" cy="74" r="7" class="dgm-fill"/>
+  <circle cx="670" cy="74" r="7" class="dgm-fill"/>
+  <circle cx="770" cy="74" r="7" class="dgm-fill"/>
+  <line x1="24" y1="94" x2="816" y2="94" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="30" y="118" font-size="11.5">How does it evolve? What do my actions do?</text>
+  <text x="470" y="118" text-anchor="middle" font-size="12" class="dgm-muted">—</text>
+  <circle cx="570" cy="114" r="7" class="dgm-fill"/>
+  <circle cx="670" cy="114" r="7" class="dgm-fill"/>
+  <circle cx="770" cy="114" r="7" class="dgm-fill"/>
+  <line x1="24" y1="134" x2="816" y2="134" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="30" y="158" font-size="11.5">What will it be like if I do action A?</text>
+  <text x="470" y="158" text-anchor="middle" font-size="12" class="dgm-muted">—</text>
+  <text x="570" y="158" text-anchor="middle" font-size="12" class="dgm-muted">—</text>
+  <circle cx="670" cy="154" r="7" class="dgm-fill"/>
+  <circle cx="770" cy="154" r="7" class="dgm-fill"/>
+  <line x1="24" y1="174" x2="816" y2="174" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="30" y="198" font-size="11.5">How happy will I be in such a state?</text>
+  <text x="470" y="198" text-anchor="middle" font-size="12" class="dgm-muted">—</text>
+  <text x="570" y="198" text-anchor="middle" font-size="12" class="dgm-muted">—</text>
+  <text x="670" y="198" text-anchor="middle" font-size="12" class="dgm-muted">—</text>
+  <circle cx="770" cy="194" r="7" class="dgm-fill"/>
+  <line x1="24" y1="214" x2="816" y2="214" stroke="currentColor" stroke-width="1" class="dgm-muted"/>
+  <text x="30" y="238" font-size="11.5">What action should I do now? — decided by</text>
+  <text x="470" y="238" text-anchor="middle" font-size="11" font-weight="700">rules</text>
+  <text x="570" y="238" text-anchor="middle" font-size="11" font-weight="700">rules</text>
+  <text x="670" y="238" text-anchor="middle" font-size="11" font-weight="700">goals</text>
+  <g class="dgm-accent">
+    <text x="770" y="238" text-anchor="middle" font-size="11" font-weight="700">utility</text>
+  </g>
+  <text x="420" y="276" text-anchor="middle" font-size="10.5" class="dgm-muted">hollow — from the current percept only, with no memory of earlier ones</text>
+  <text x="420" y="294" text-anchor="middle" font-size="10.5" class="dgm-muted">each column answers every question the one to its left does, plus one more</text>
+</svg>
+<figcaption><b>What each architecture can ask.</b> A reflex agent sees only the present; a model-based agent can reason about what it cannot see; a goal-based agent can simulate the future; a utility-based agent can rank futures against each other.</figcaption>
+</figure>
+
 #### Simple reflex agent
 
 Acts only on the *current* percept, ignoring all history, via **condition-action rules** (also *if-then rules* or *production rules*): `if condition then action`. Example: `if car-in-front-is-braking then initiate-braking`.
+
+The general program is two steps:
+
+```python
+def simple_reflex_agent(percept, rules):
+    state = interpret_input(percept)   # abstract the raw percept into a description
+    rule = rule_match(state, rules)    # first rule whose condition holds
+    return rule.action
+```
+
+Even here there is an abstraction step. Rules do not match raw pixels or voltages;
+`interpret_input` turns the percept into a description such as "car in front is
+braking" that a rule's condition can be tested against. The vacuum agent in §7 is this
+program with the interpretation step folded away. So is the if–then–else chain from
+§6.
 
 Minimal memory, very fast, easy to implement. Fails whenever the correct action depends on history the current percept does not reveal. In partially observable environments it falls into infinite loops — a vacuum agent sensing only its current square, with no location sensor, oscillates forever. **Randomization** (choosing among actions by coin flip) escapes such loops, but it is a patch rather than a fix, and a randomized agent is usually worse than a deliberating one.
 
@@ -265,6 +782,28 @@ Maintains **internal state**: a representation of the parts of the world the sen
 - **Sensor model** — how the state of the world maps onto percepts. ("A bright rectangular region in the camera image means the car ahead is braking.")
 
 Together these constitute the agent's **model of the world**. This is the minimum machinery for handling partial observability. The internal state is a best guess, not certainty.
+
+```python
+class ModelBasedReflexAgent:
+    def __init__(self, model, rules):
+        self.state = None     # current best guess about the world, including unseen parts
+        self.action = None    # most recent action, initially none
+        self.model = model    # how the next state depends on current state and action
+        self.rules = rules    # condition–action rules
+
+    def __call__(self, percept):
+        self.state = update_state(self.state, self.action, percept, self.model)
+        rule = rule_match(self.state, self.rules)
+        self.action = rule.action
+        return self.action
+```
+
+Compare it with the simple reflex program line by line and the only structural change
+is where `state` comes from. `interpret_input` is a function of the current percept
+alone. `update_state` also takes the previous state and the **last action** — the
+agent has to remember what it did, because its own action is evidence about how the
+world changed. This is the memory the vacuum agent lacked under the move-penalty
+measure in §8, and the history the chess board failed to show in §9.
 
 #### Goal-based agent
 
@@ -291,7 +830,7 @@ Four components:
 
 This four-part structure reappears intact in reinforcement learning: the critic becomes the reward signal, the problem generator becomes the exploration policy (e.g. ε-greedy action selection).
 
-### 6. Representation levels
+### 11. Representation levels
 
 How states are encoded inside the agent, least to most expressive:
 
@@ -301,7 +840,7 @@ How states are encoded inside the agent, least to most expressive:
 
 Higher expressiveness gives more compact descriptions of complex worlds, at higher reasoning cost. A related axis is **localist** representation (one variable per concept — readable, sparse) vs. **distributed** representation (a concept spread across many values — noise-robust, what neural networks use).
 
-### 7. Problem-solving
+### 12. Problem-solving
 
 This is the *stance*; the search algorithms that carry it out are a subject of their own. The **problem-solving agent** cycle:
 
@@ -322,7 +861,7 @@ This formulation assumes the environment is **observable, discrete, known, and d
 
 Relax any assumption and the solution must become a **policy** — a mapping from states (or belief states) to actions, so the agent can respond to whatever actually happens. That is **closed-loop** control, and it is exactly what Ch. 17 (MDPs) and Ch. 22 (RL) build.
 
-## Part 2 — Turing (1950), "Computing Machinery and Intelligence"
+## Part 3 — Turing (1950), "Computing Machinery and Intelligence"
 
 *Mind*, New Series, Vol. 59, No. 236, pp. 433–460. *Mind* is a British academic philosophy journal, which is why the paper argues in philosophical rather than engineering register.
 
@@ -563,13 +1102,25 @@ Final sentence: we can see only a short distance ahead, but plenty there needs d
 | **Scientific induction** | Generalizing from observed instances to a general rule; Turing's diagnosis of the "various disabilities" objection |
 | **Atomic pile** | Early term for a nuclear reactor; Turing's analogy for whether a mind is sub-critical or super-critical to injected ideas |
 | **Entscheidungsproblem** | German, "decision problem": Hilbert's challenge for an algorithm deciding mathematical truth. Proved impossible by Church and Turing independently |
+| **Dartmouth conjecture** | The founding premise of the 1956 Dartmouth project: every aspect of intelligence can in principle be described precisely enough for a machine to simulate it |
+| **AI effect** | The tendency to stop counting a capability as intelligence once a machine achieves it |
+| **Favorite–longshot bias** | Bettors' systematic overvaluation of unlikely outcomes and undervaluation of likely ones, leaving longshots with the worst expected return |
+| **Loebner Prize** | Annual restricted Turing test held 1991–2019; its top prizes were never awarded |
+| **AI winter** | A period of collapsed funding and interest after inflated expectations — the 1970s, and 1988–1993 |
+| **Expert system** | A program encoding a specialist's knowledge as hand-written rules; the basis of the 1980s AI industry |
+| **Frame problem** | Stating what does *not* change when an action occurs, without listing every unaffected fact |
+| **Vacuum world** | Two-square environment with location and dirt sensors and actions Left, Right, Suck, NoOp; the standard toy for agent functions |
+| **NoOp** | "No operation" — the action of doing nothing |
+| **State-based agent** | Another name for a model-based reflex agent |
+| **Rule matching** | Selecting the condition–action rule whose condition holds for the current state description |
 
 ## What to interrogate, not just absorb
 
-Five contested points, useful as starting angles rather than answers:
+Six contested points, useful as starting angles rather than answers:
 
 1. **Behaviorism.** The test measures indistinguishability of output, not understanding. Searle's Chinese Room (1980) and Block's lookup-table "Blockhead" argue a system could pass while having no mental states at all. Turing anticipates the shape of this in §6(4) but answers with a dilemma (accept the test or accept solipsism) rather than a positive account of what thinking is.
 2. **The prediction's scorecard.** 10⁹ bits of storage arrived decades ahead of schedule. Five-minute, 70-percent misidentification was arguably achieved by ELIZA-style pattern matching long before anything resembling competence, which suggests the metric partly measures interrogator credulity.
 3. **§6(9), Extra-Sensory Perception.** The strongest evidence in the paper that an operational criterion does not protect a thinker from bad priors about which phenomena exist.
 4. **Imitation game ambiguity.** Gender-imitation vs. human-imitation readings produce measurably different tests.
 5. **Child machine vs. modern machine learning.** The §7 proposal — a mostly blank initial structure, behavior shaped by reward and punishment signals, a random element preferred over systematic search, a teacher ignorant of the internals, and learning that imports fallibility as a side effect — describes gradient-based learning fairly closely at the structural level. Worth asking what Turing got right about the *shape* of the solution while getting the timeline and the specific mechanism wrong.
+6. **The moving scorecard.** Every row of the table in §5 has moved since it was first drawn up, and only toward *yes* — and each time, the achievement has tended to be reclassified as "just engineering." That is the AI effect from §2 in action. Ask whether any row, flipped to *yes*, would change your view of whether machines think. If none would, it is worth asking what the test in §3 is actually measuring.
