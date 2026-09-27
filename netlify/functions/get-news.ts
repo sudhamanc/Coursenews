@@ -18,6 +18,11 @@ export const handler: Handler = async (event) => {
     const feed = await readLatest();
     return json(200, feed ?? { generatedAt: null, items: [] }, {
       'Cache-Control': 'public, max-age=120, stale-while-revalidate=600',
+      // Serve repeat requests from Netlify's shared CDN cache without invoking
+      // this function. `durable` shares the cached copy across edge nodes, so a
+      // flood of reads costs one invocation per window rather than one each.
+      // The wire only changes once a day, so ten minutes of staleness is free.
+      'Netlify-CDN-Cache-Control': 'public, durable, s-maxage=600, stale-while-revalidate=3600',
     });
   } catch (err) {
     console.error('get-news error', err);

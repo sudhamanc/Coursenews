@@ -1,15 +1,19 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import netlify from '@astrojs/netlify';
 import { unified } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import rehypeFigscroll from './scripts/rehype-figscroll.mjs';
 
-// Static newspaper site. The Netlify adapter is included for local Blobs
-// emulation (`netlify dev`) and future flexibility; the site itself builds to
-// static HTML in `dist/`. All dynamic behavior lives in `netlify/functions/`.
+// Static newspaper site: builds to static HTML in `dist/`, and all dynamic
+// behavior lives in `netlify/functions/`.
+//
+// Deliberately NO adapter. `@astrojs/netlify` registers a server function on
+// `/*` (preferStatic), so every URL without a static file — each bot probing
+// for /wp-login.php or /.env — invoked a function and billed compute. A static
+// build needs no server: missing URLs get `404.html` straight from the CDN.
+// `netlify dev` still provides Blobs to the functions on its own.
 //
 // Astro 7 defaults to a new Markdown processor; the remark/rehype math pipeline
 // (KaTeX) is opted into via the `unified()` processor from
@@ -20,7 +24,6 @@ export default defineConfig({
   // domain. The fallback only applies to local builds.
   site: process.env.URL || 'http://localhost:4321',
   output: 'static',
-  adapter: netlify(),
   markdown: {
     processor: unified({
       remarkPlugins: [remarkMath],

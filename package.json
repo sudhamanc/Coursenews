@@ -25,7 +25,6 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.113.0",
     "@astrojs/markdown-remark": "^7.2.1",
-    "@astrojs/netlify": "^8.1.2",
     "@netlify/blobs": "^10.7.9",
     "@netlify/functions": "^5.3.0",
     "astro": "^7.1.3",

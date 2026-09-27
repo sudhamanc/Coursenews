@@ -233,7 +233,7 @@ scrolls away from its figure.
 
 | Area        | Choice                                                            |
 | ----------- | ----------------------------------------------------------------- |
-| Site        | [Astro](https://astro.build) 7 (static output) + `@astrojs/netlify` |
+| Site        | [Astro](https://astro.build) 7 (static output, no adapter)        |
 | Math        | `remark-math` + `rehype-katex` (KaTeX)                            |
 | Serverless  | Netlify Functions (v1 handler API)                                |
 | Storage     | Netlify Blobs                                                     |
@@ -469,7 +469,12 @@ and re-add `identity.netlify.com` to the CSP in `netlify.toml`.
 
 `npm audit` reports issues only in Netlify's build-time tooling and the unused
 image-optimization chain (`esbuild` via `zip-it-and-ship-it`; `sharp`/`ipx`/
-`@netlify/images`). None are reachable at runtime for this static site. The only
-offered fix downgrades `@astrojs/netlify` to a version incompatible with Astro 7,
-so it is intentionally not applied.
+`@netlify/images`). None are reachable at runtime for this static site.
+
+The `@astrojs/netlify` adapter was removed deliberately. It registered a server
+function on `/*`, so every request for a URL without a static file — bot probes
+for `/wp-login.php`, `/.env`, and the like — invoked a function and billed
+compute. The site is fully static and needs no server; missing URLs are now
+served `404.html` from the CDN. Do not re-add an adapter unless a page genuinely
+needs on-demand rendering.
 

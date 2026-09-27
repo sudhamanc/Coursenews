@@ -1,0 +1,26 @@
+---
+/**
+ * Static 404. Astro emits this as `dist/404.html`, which Netlify serves from the
+ * CDN for any URL without a matching file — no function runs, so bots probing
+ * for /wp-login.php or /.env cost nothing but a cached page view.
+ */
+import Newspaper from '../layouts/Newspaper.astro';
+---
+
+<Newspaper
+  title="Page not found — Latent Inference"
+  description="The page you were looking for is not in this edition."
+>
+  <section>
+    <span class="flag">Correction</span>
+    <h2 class="headline headline--xl">Not in This Edition</h2>
+    <p class="deck">
+      The page you were looking for has moved, was never printed, or the link has
+      a typo in it.
+    </p>
+    <hr class="rule rule--thin" />
+    <p>
+      <a class="readmore" href="/">Back to the front page →</a>
+    </p>
+  </section>
+</Newspaper>
