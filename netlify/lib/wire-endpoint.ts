@@ -18,8 +18,10 @@ import { json, error } from './http';
 // Live responses carry a cache tag that every refresh purges (purgeLatest), so
 // new content shows at once instead of after the ten-minute window.
 const LIVE_TAG = 'latest-live';
+// Browsers keep no copy of their own: a purge can't reach a browser's cache,
+// and every reload is served by the CDN anyway, so it costs no invocations.
 export const LIVE = {
-  'Cache-Control': 'public, max-age=120, stale-while-revalidate=600',
+  'Cache-Control': 'public, max-age=0, must-revalidate',
   'Netlify-CDN-Cache-Control': 'public, durable, s-maxage=600, stale-while-revalidate=3600',
   'Netlify-Vary': 'query=date',
   'Netlify-Cache-Tag': LIVE_TAG,
