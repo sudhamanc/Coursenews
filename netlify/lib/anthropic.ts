@@ -8,6 +8,8 @@ import type { ChatMessage } from './blobs';
 
 const CHAT_MODEL = process.env.CHAT_MODEL || 'claude-haiku-4-5';
 export const NEWS_MODEL = process.env.NEWS_MODEL || 'claude-haiku-4-5';
+/** The briefing is synthesis, not ranking, so it gets a stronger model. One call per weekday. */
+export const BRIEFING_MODEL = process.env.BRIEFING_MODEL || 'claude-sonnet-5-5';
 
 let client: Anthropic | null = null;
 export function getClient(): Anthropic {

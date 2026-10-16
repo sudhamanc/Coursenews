@@ -3,9 +3,11 @@
 A static **newspaper** that turns a folder of source PDFs into long-form, in-depth
 feature articles — concepts explained as sections with KaTeX math and hand-drawn
 SVG diagrams. A **"Dig deeper"** assistant (Claude Haiku, via a serverless proxy)
-lets you interrogate any concept, and a daily **"Latest in AI"** page runs two
+lets you interrogate any concept, and a daily **"Latest in AI"** page leads with
+an **Agentic AI Intelligence Briefing** on enterprise adoption, then runs two
 wires: fresh research from arXiv and Hacker News, and an **ecosystem** wire
-tracking model releases, protocol versions, libraries, and design patterns.
+tracking model releases, protocol versions, libraries, and design patterns. The
+last 30 days of editions stay browsable.
 
 It ships with seven sections of AI and machine-learning explainers, but it's built to
 be reused: point it at your own PDFs, edit one config file, and you have your own edition.
@@ -17,6 +19,8 @@ be reused: point it at your own PDFs, edit one config file, and you have your ow
 - [Features](#features)
 - [How it works](#how-it-works)
 - [The two `/latest` wires](#the-two-latest-wires)
+- [The Agentic AI Intelligence Briefing](#the-agentic-ai-intelligence-briefing)
+- [Edition history](#edition-history)
 - [Installable app (PWA) and icons](#installable-app-pwa-and-icons)
 - [Authoring diagrams](#authoring-diagrams)
 - [Tech stack](#tech-stack)
@@ -47,6 +51,10 @@ be reused: point it at your own PDFs, edit one config file, and you have your ow
 - **"Dig deeper" chat** — a Netlify Function proxies to Claude Haiku; the API key
   never reaches the browser. Conversations are saved and can be reopened,
   downloaded, or deleted.
+- **Agentic AI Intelligence Briefing** — each weekday, one Sonnet call reads
+  enterprise vendor newsrooms, trade press, analysts, and targeted Google News
+  searches, and writes a thesis plus the three developments that support it.
+  See [The Agentic AI Intelligence Briefing](#the-agentic-ai-intelligence-briefing).
 - **Latest in AI (research wire)** — a scheduled function pulls fresh work from
   arXiv (RSS) and Hacker News daily, keeps a balanced mix from each source, ranks
   them with one Haiku call, and caches the feed. It carries arXiv forward on days
@@ -57,6 +65,8 @@ be reused: point it at your own PDFs, edit one config file, and you have your ow
   read via GitHub release feeds) alongside a **discovered** lane (trending models
   and repos, launches, community feeds) so brand-new projects can surface too.
   See [The two `/latest` wires](#the-two-latest-wires).
+- **Edition history** — every wire is archived by day for 30 days; `/latest`
+  has a date picker and shareable `?date=YYYY-MM-DD` links.
 - **Incremental content pipeline** — adding a feature or a section is a delta, never
   a full rebuild.
 - **Installable** — a real PWA: web app manifest, maskable Android icons, an
@@ -79,10 +89,12 @@ src/content/articles/<slug>/*.md   ──►  Astro build  ──►  dist/ (sta
                                                             │
 Browser ──/api/chat──────►  netlify/functions/chat.ts  ──►  Claude Haiku
         ──/api/news──────►  netlify/functions/get-news.ts      ◄┐
-        ──/api/ecosystem─►  netlify/functions/get-ecosystem.ts ◄┤
-                                   │                            │
-                             Netlify Blobs          news-refresh (daily cron,
-                    (transcripts + both feeds)       builds both wires)
+        ──/api/ecosystem─►  netlify/functions/get-ecosystem.ts ◄┤  news-refresh (daily
+        ──/api/briefing──►  netlify/functions/get-briefing.ts  ◄┤  cron, both wires)
+        ──/api/editions──►  netlify/functions/get-editions.ts  ◄┤
+                                   │                            │  briefing-refresh
+                             Netlify Blobs                      ┘  (weekday cron)
+               (transcripts, feeds, 30 days of editions)
 ```
 
 The single source of truth for sections is [`courses.config.json`](courses.config.json)
@@ -92,8 +104,9 @@ permanently via [`public/_redirects`](public/_redirects).
 
 ## The two `/latest` wires
 
-`/latest` carries two independent feeds. Both are rebuilt by the same daily
-scheduled function and cached in Blobs, and each costs one Haiku call per run.
+Below the briefing, `/latest` carries two independent feeds. Both are rebuilt by
+the same daily scheduled function and cached in Blobs. The research wire costs
+one Haiku call per run and the ecosystem wire two (one per lane).
 
 | | **Latest in AI** (research) | **The Ecosystem** (releases) |
 | --- | --- | --- |
@@ -164,6 +177,60 @@ releases so a chatty monorepo cannot flood the lane.
   and returns nothing (rather than erroring) if the markup changes.
 - Every source failure degrades to an empty list, and if *all* sources fail the
   previous cached feed is kept rather than publishing an empty one.
+
+## The Agentic AI Intelligence Briefing
+
+The first section on `/latest`. Where the wires list items, the briefing makes
+an argument: a dateline, **Today's headline** (a one-sentence thesis about how
+the enterprise is changing), and the three developments that support it, each
+with a label, a takeaway, what it means for a technology leader, and its sources.
+
+| | |
+| --- | --- |
+| Schedule | `briefing-refresh`, weekdays at 13:30 UTC (Monday's covers the weekend) |
+| Window | Everything since the previous briefing (at least 24 h, at most 96 h) |
+| Model | One call to `BRIEFING_MODEL` (default `claude-sonnet-5-5`), structured JSON output |
+| Endpoint | `/api/briefing[?date=YYYY-MM-DD]` |
+| Code | [`netlify/lib/briefing.ts`](netlify/lib/briefing.ts) |
+
+**Sources** (the `BRIEFING_SOURCES` constant):
+
+- **Vendor newsrooms:** Salesforce, SAP, Microsoft, Google Cloud, AWS,
+  Databricks, Snowflake, OpenAI, Anthropic (via a community mirror, since it
+  publishes no feed).
+- **Trade press:** TechCrunch AI, SiliconANGLE, The Register, CIO Dive.
+- **Analysts:** Latent Space, Import AI, Interconnects.
+- **Google News searches:** six queries, for example enterprise AI agents and
+  agentic commerce. These reach companies with no feed, such as Workday,
+  ServiceNow, Shopify and JPMorgan.
+- **Hacker News**, filtered to stories with enterprise terms.
+
+ServiceNow, Workday, and IBM newsrooms and VentureBeat refuse feed readers, and
+paywalled outlets can't be read, so they are not sources.
+
+**How it stays honest.**
+- The model only ever cites items by number. Every link is mapped back
+  server-side from the fetched list, so it can't invent a URL.
+- Items the previous briefing already cited are excluded.
+- A quiet day (fewer than 8 candidates), a refusal, or ungrounded output
+  publishes nothing, and the previous briefing stays current.
+
+To rebuild it on demand: `/api/refresh-news?key=<secret>&wire=briefing`.
+
+## Edition history
+
+Each refresh also writes a dated snapshot beside the live keys in the `news`
+Blobs store, as `editions/<research|ecosystem|briefing>/<YYYY-MM-DD>.json` (UTC
+day). Snapshots older than 30 days are pruned on every refresh.
+
+- `/api/editions` lists the archived days.
+- `/api/news`, `/api/ecosystem`, and `/api/briefing` take `?date=YYYY-MM-DD`.
+  A weekend date returns the most recent weekday briefing.
+- `/latest?date=YYYY-MM-DD` renders that edition, with Older/Newer links and a
+  date picker.
+
+The page itself stays static. Past days are immutable, so their responses are
+CDN-cached for a week, and the cache key varies only on `date`.
 
 ## Installable app (PWA) and icons
 
@@ -311,12 +378,18 @@ src/
   components/ConceptChat.astro    # the "Dig deeper" chat island
   pages/  index.astro · latest.astro · sections/[section].astro · sections/[section]/[article].astro
   lib/courses.ts           # reads courses.config.json
+  lib/edition.ts           # /latest edition-date helpers (client side)
   styles/newspaper.css
 netlify/
-  functions/  chat.ts · threads.ts · get-news.ts · get-ecosystem.ts · news-refresh.ts · refresh-news.ts
+  functions/  chat.ts · threads.ts · get-news.ts · get-ecosystem.ts · get-briefing.ts · get-editions.ts
+              news-refresh.ts · briefing-refresh.ts · refresh-news.ts
   lib/        identity.ts · validate.ts · blobs.ts · anthropic.ts · ratelimit.ts · http.ts
+              feeds.ts      # shared RSS/Atom reader and fetch helpers
               news.ts       # research wire (arXiv + Hacker News)
               ecosystem.ts  # ecosystem wire (WATCHLIST lives here)
+              briefing.ts   # enterprise briefing (BRIEFING_SOURCES lives here)
+              editions.ts   # 30-day dated archive
+              wire-endpoint.ts  # shared cached GET handler for the /latest endpoints
 ```
 
 ## Adding content (a delta operation)
@@ -370,9 +443,10 @@ Environment variables (see [`.env.example`](.env.example)):
 | `ANTHROPIC_API_KEY`    | yes      | —                  | Chat + news ranking. **Functions-only.**   |
 | `CHAT_MODEL`           | no       | `claude-haiku-4-5` | Chat model id.                             |
 | `NEWS_MODEL`           | no       | `claude-haiku-4-5` | News-ranking model id.                     |
+| `BRIEFING_MODEL`       | no       | `claude-sonnet-5-5` | Briefing synthesis model id (one call per weekday). |
 | `CHAT_DAILY_CAP`       | no       | `100`              | Max chat messages per client IP per day.   |
 | `CHAT_MAX_INPUT_CHARS` | no       | `4000`             | Max characters per chat message.           |
-| `NEWS_REFRESH_KEY`     | no       | — (disabled)       | Secret enabling on-demand `GET /api/refresh-news?key=…&wire=research\|ecosystem\|both`. |
+| `NEWS_REFRESH_KEY`     | no       | — (disabled)       | Secret enabling on-demand `GET /api/refresh-news?key=…&wire=research\|ecosystem\|both\|briefing`. |
 
 Locally these come from `.env`. In production they're set in the Netlify UI.
 
@@ -388,16 +462,17 @@ publish dir, functions dir, redirects, security headers). Deploy either way:
    Build command and publish directory are detected from `netlify.toml` — accept
    the defaults.
 3. **Site configuration → Environment variables** → add `ANTHROPIC_API_KEY`
-   (scope: **Functions**). Optionally add `CHAT_MODEL`, `NEWS_MODEL`,
+   (scope: **Functions**). Optionally add `CHAT_MODEL`, `NEWS_MODEL`, `BRIEFING_MODEL`,
    `CHAT_DAILY_CAP`, `CHAT_MAX_INPUT_CHARS`, `NEWS_REFRESH_KEY`.
 4. **Blobs** — no setup needed; it's provisioned automatically for the site.
 5. **Scheduled function** — `news-refresh` self-registers to run daily at
-   **13:00 UTC** and rebuilds *both* `/latest` wires (one Haiku call each). Until
+   **13:00 UTC** and rebuilds *both* `/latest` wires (three Haiku calls), and
+   `briefing-refresh` runs on weekdays at **13:30 UTC** (one Sonnet call). Until
    it first runs, `/latest` shows empty states. To populate immediately, set
    `NEWS_REFRESH_KEY` (a long random string) and call
    `https://<your-site>/api/refresh-news?key=<secret>` once. Add
    `&wire=ecosystem` (or `research`) to rebuild just one wire without spending a
-   call on the other.
+   call on the other, or `&wire=briefing` for the briefing.
 6. Deploy. Every push to the production branch redeploys.
 
 ### Option B — CLI

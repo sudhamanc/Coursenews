@@ -1,31 +1,16 @@
 /**
- * GET /api/ecosystem  ->  /.netlify/functions/get-ecosystem
+ * GET /api/ecosystem[?date=YYYY-MM-DD]  ->  /.netlify/functions/get-ecosystem
  *
- * Returns the cached "Ecosystem" wire produced by the scheduled `news-refresh`
- * function. Public and cacheable — like get-news it only exposes already-public
- * headlines and never touches the Anthropic key.
+ * The "Ecosystem" wire produced by the scheduled `news-refresh` function:
+ * today's by default, or an archived day's.
  */
-import type { Handler } from '@netlify/functions';
-import { connectLambda } from '@netlify/blobs';
-import { readEcosystem } from '../lib/ecosystem';
-import { json, error } from '../lib/http';
+import { readEcosystem, type EcoFeed } from '../lib/ecosystem';
+import { readEdition } from '../lib/editions';
+import { wireEndpoint } from '../lib/wire-endpoint';
 
-export const handler: Handler = async (event) => {
-  if (event.httpMethod !== 'GET') return error(405, 'Method not allowed.');
-  connectLambda(event as any);
-
-  try {
-    const feed = await readEcosystem();
-    return json(200, feed ?? { generatedAt: null, items: [] }, {
-      'Cache-Control': 'public, max-age=120, stale-while-revalidate=600',
-      // Serve repeat requests from Netlify's shared CDN cache without invoking
-      // this function. `durable` shares the cached copy across edge nodes, so a
-      // flood of reads costs one invocation per window rather than one each.
-      // The wire only changes once a day, so ten minutes of staleness is free.
-      'Netlify-CDN-Cache-Control': 'public, durable, s-maxage=600, stale-while-revalidate=3600',
-    });
-  } catch (err) {
-    console.error('get-ecosystem error', err);
-    return json(200, { generatedAt: null, items: [] }, { 'Cache-Control': 'public, max-age=60' });
-  }
-};
+export const handler = wireEndpoint<EcoFeed>({
+  name: 'get-ecosystem',
+  readLive: readEcosystem,
+  readDated: (date) => readEdition<EcoFeed>('ecosystem', date),
+  empty: { generatedAt: null, items: [] },
+});

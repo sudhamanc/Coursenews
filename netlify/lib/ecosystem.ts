@@ -28,8 +28,8 @@
  * a watchlist this size would intermittently 403. The Atom feeds have no such cap.
  */
 import { getStore, type Store } from '@netlify/blobs';
-import { XMLParser } from 'fast-xml-parser';
 import { getClient, NEWS_MODEL } from './anthropic';
+import { getText, pool, clean, atomLink, asArray, parser, readFeed } from './feeds';
 
 export type EcoBucket = 'Models' | 'Standards' | 'Libraries' | 'Patterns';
 export type EcoLane = 'tracked' | 'discovered';
@@ -124,12 +124,6 @@ const VENDOR_PER_SOURCE = 4;
 const LAUNCH_TITLE =
   /\b(introduc\w*|announc\w*|launch\w*|releas\w*|unveil\w*|now available|generally available|apis?|sdks?)\b/i;
 
-/**
- * Reddit rejects unfamiliar user agents on its feed endpoints, so identify the
- * client honestly but with the conventional Mozilla-compatible prefix.
- */
-const UA = 'Mozilla/5.0 (compatible; LatentInferenceBot/1.0; +https://github.com/sudhamanc/Coursenews)';
-
 const TRACKED_WINDOW_MS = 21 * 24 * 60 * 60 * 1000; // releases are sparse; look back 3 weeks
 const DISCOVER_WINDOW_MS = 5 * 24 * 60 * 60 * 1000;
 
@@ -177,64 +171,6 @@ export async function readEcosystem(): Promise<EcoFeed | null> {
 
 export async function writeEcosystem(feed: EcoFeed): Promise<void> {
   await ecoStore().setJSON('ecosystem.json', feed);
-}
-
-const withTimeout = (ms: number) => {
-  const c = new AbortController();
-  const t = setTimeout(() => c.abort(), ms);
-  return { signal: c.signal, done: () => clearTimeout(t) };
-};
-
-async function getText(url: string, ms = 8000): Promise<string | null> {
-  const to = withTimeout(ms);
-  try {
-    const res = await fetch(url, { signal: to.signal, headers: { 'User-Agent': UA } });
-    return res.ok ? await res.text() : null;
-  } catch {
-    return null;
-  } finally {
-    to.done();
-  }
-}
-
-/** Run `jobs` with bounded concurrency so a 17-repo watchlist can't stall the function. */
-async function pool<T>(jobs: Array<() => Promise<T>>, limit = 6): Promise<T[]> {
-  const out: T[] = [];
-  let cursor = 0;
-  const workers = Array.from({ length: Math.min(limit, jobs.length) }, async () => {
-    while (cursor < jobs.length) {
-      const job = jobs[cursor++];
-      try {
-        out.push(await job());
-      } catch {
-        /* one dead source must not take the wire down */
-      }
-    }
-  });
-  await Promise.all(workers);
-  return out;
-}
-
-const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@_' });
-const asArray = <T,>(v: T | T[] | undefined): T[] => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
-const clean = (s: unknown, max = 400): string =>
-  String(s ?? '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&[a-z]+;/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, max);
-
-/** Pull the alternate link href out of an Atom entry (string or array form). */
-function atomLink(entry: any): string {
-  const links = asArray(entry?.link);
-  for (const l of links) {
-    const href = typeof l === 'string' ? l : l?.['@_href'];
-    const rel = typeof l === 'string' ? 'alternate' : l?.['@_rel'] ?? 'alternate';
-    if (href && rel === 'alternate') return String(href);
-  }
-  const first = links[0];
-  return String((typeof first === 'string' ? first : first?.['@_href']) ?? '');
 }
 
 /* ------------------------------------------------------------------ tracked */
@@ -369,46 +305,17 @@ export async function fetchLaunches(): Promise<EcoItem[]> {
   return out;
 }
 
-/**
- * Generic Atom/RSS reader used for subreddits and commentary feeds.
- *
- * Reddit throttles unpredictably and answers a rejected request with an HTML
- * page rather than an error status, so one retry is worth the second or two —
- * r/LocalLLaMA is the highest-signal discovery feed on the list.
- */
+/** Subreddits, commentary, and vendor feeds, mapped into the discovery lane. */
 export async function fetchFeed(url: string, source: string): Promise<EcoItem[]> {
-  let xml = await getText(url, 9000);
-  if (!xml || !/<(entry|item)[\s>]/.test(xml)) {
-    await new Promise((r) => setTimeout(r, 800));
-    xml = await getText(url, 9000);
-  }
-  if (!xml) return [];
-  const doc = parser.parse(xml);
-  // Atom (<feed><entry>) and RSS (<rss><channel><item>) both appear here.
-  const entries = asArray(doc?.feed?.entry);
-  const items = asArray(doc?.rss?.channel?.item);
-  // Newest first before truncating: document order is not always recency
-  // (OpenAI's feed lists 1,000+ posts, slightly out of order).
-  const stamp = (e: any): number =>
-    new Date(String(e?.updated ?? e?.published ?? e?.pubDate ?? '')).getTime() || 0;
-  const rows = (entries.length ? entries : items).sort((a, b) => stamp(b) - stamp(a));
-  const out: EcoItem[] = [];
-  for (const e of rows.slice(0, 20)) {
-    const title = clean(e?.title, 200);
-    const link = entries.length ? atomLink(e) : String(e?.link ?? '');
-    if (!title || !link) continue;
-    const when = e?.updated ?? e?.published ?? e?.pubDate;
-    out.push({
-      id: `feed:${source}:${link}`,
-      title,
-      url: link,
-      source,
-      lane: 'discovered',
-      published: when ? new Date(String(when)).toISOString() : new Date().toISOString(),
-      summary: clean(e?.summary?.['#text'] ?? e?.summary ?? e?.description ?? e?.content, 400),
-    });
-  }
-  return out;
+  return (await readFeed(url)).map((e) => ({
+    id: `feed:${source}:${e.url}`,
+    title: e.title,
+    url: e.url,
+    source,
+    lane: 'discovered' as const,
+    published: e.published,
+    summary: e.summary,
+  }));
 }
 
 /**

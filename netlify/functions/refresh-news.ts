@@ -6,7 +6,7 @@
  * secret so it can't be hit anonymously to burn Anthropic budget:
  *
  *   Netlify env var:  NEWS_REFRESH_KEY = <some long random string>
- *   Call:  https://<site>/api/refresh-news?key=<secret>[&wire=research|ecosystem|both]
+ *   Call:  https://<site>/api/refresh-news?key=<secret>[&wire=research|ecosystem|both|briefing]
  *          (or send header  X-Refresh-Key: <secret>)
  *
  * If NEWS_REFRESH_KEY is not set, the endpoint is disabled (503).
@@ -16,6 +16,8 @@ import { connectLambda } from '@netlify/blobs';
 import { timingSafeEqual } from 'node:crypto';
 import { buildFeed, writeLatest } from '../lib/news';
 import { buildEcosystemFeed, writeEcosystem } from '../lib/ecosystem';
+import { buildBriefing, writeBriefing } from '../lib/briefing';
+import { archiveEdition, pruneEditions } from '../lib/editions';
 import { json, error } from '../lib/http';
 
 function keyMatches(provided: string | undefined): boolean {
@@ -39,25 +41,40 @@ export const handler: Handler = async (event) => {
 
   connectLambda(event as any);
 
-  // ?wire=research | ecosystem | both (default). Lets you re-rank one wire
-  // without spending a second Anthropic call on the other.
+  // ?wire=research | ecosystem | both (default) | briefing. Lets you re-rank one
+  // wire without spending Anthropic calls on the others. `both` means the two
+  // wires; the briefing is only rebuilt when asked for by name.
   const wire = (event.queryStringParameters?.wire ?? 'both').toLowerCase();
-  if (!['research', 'ecosystem', 'both'].includes(wire)) {
-    return error(400, 'wire must be research, ecosystem, or both.');
+  if (!['research', 'ecosystem', 'both', 'briefing'].includes(wire)) {
+    return error(400, 'wire must be research, ecosystem, both, or briefing.');
   }
 
   const out: Record<string, unknown> = { ok: true };
   try {
+    if (wire === 'briefing') {
+      const b = await buildBriefing();
+      if (b) {
+        await writeBriefing(b);
+        await archiveEdition('briefing', b);
+      }
+      out.briefing = b
+        ? { developments: b.developments.length, candidates: b.candidates, generatedAt: b.generatedAt }
+        : { published: false };
+      return json(200, out);
+    }
     if (wire !== 'ecosystem') {
       const feed = await buildFeed();
       await writeLatest(feed);
+      await archiveEdition('research', feed);
       out.research = { items: feed.items.length, generatedAt: feed.generatedAt };
     }
     if (wire !== 'research') {
       const feed = await buildEcosystemFeed();
       await writeEcosystem(feed);
+      await archiveEdition('ecosystem', feed);
       out.ecosystem = { items: feed.items.length, generatedAt: feed.generatedAt };
     }
+    await pruneEditions();
     return json(200, out);
   } catch (err) {
     console.error('manual refresh failed', err);

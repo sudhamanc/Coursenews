@@ -3,13 +3,17 @@
  * at 13:00 UTC.
  * (Also invocable on demand from the Netlify UI for verification.)
  *
- * This is the only place besides chat that spends Anthropic budget — one ranking
- * call per wire, so two per run.
+ * Ranking spends Anthropic budget: one Haiku call for the research wire and two
+ * for the ecosystem wire (one per lane), so three per run. The briefing has its
+ * own scheduled function (briefing-refresh).
+ *
+ * Each wire is also archived under its date for the 30-day edition history.
  */
 import { schedule } from '@netlify/functions';
 import { connectLambda } from '@netlify/blobs';
 import { buildFeed, writeLatest } from '../lib/news';
 import { buildEcosystemFeed, writeEcosystem } from '../lib/ecosystem';
+import { archiveEdition, pruneEditions } from '../lib/editions';
 
 export const handler = schedule('0 13 * * *', async (event) => {
   connectLambda(event as any);
@@ -18,11 +22,13 @@ export const handler = schedule('0 13 * * *', async (event) => {
     (async () => {
       const feed = await buildFeed();
       await writeLatest(feed);
+      await archiveEdition('research', feed);
       return feed.items.length;
     })(),
     (async () => {
       const feed = await buildEcosystemFeed();
       await writeEcosystem(feed);
+      await archiveEdition('ecosystem', feed);
       return feed.items.length;
     })(),
   ]);
@@ -32,5 +38,7 @@ export const handler = schedule('0 13 * * *', async (event) => {
 
   if (ecosystem.status === 'fulfilled') console.log(`news-refresh: ecosystem wire cached ${ecosystem.value} items`);
   else console.error('news-refresh: ecosystem wire failed', ecosystem.reason);
+
+  await pruneEditions().catch((err) => console.error('news-refresh: prune failed', err));
   return { statusCode: 200 };
 });

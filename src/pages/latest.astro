@@ -5,9 +5,50 @@ import Newspaper from '../layouts/Newspaper.astro';
 <Newspaper
   section="latest"
   title="Latest in AI — Latent Inference"
-  description="A daily, ranked digest of AI research from arXiv and Hacker News, plus an ecosystem wire tracking model releases, protocol versions, libraries, and architectural patterns."
+  description="An Agentic AI Intelligence Briefing on enterprise adoption, a daily ranked digest of AI research from arXiv and Hacker News, and an ecosystem wire tracking model releases, protocol versions, libraries, and architectural patterns. Thirty days of past editions."
 >
+  <nav class="edition-bar" id="edition-bar" aria-label="Edition" hidden>
+    <a class="edition-bar__step" id="ed-older" rel="prev">‹ Older</a>
+    <label class="edition-bar__pick">
+      <span>Edition</span>
+      <select id="ed-select"></select>
+    </label>
+    <a class="edition-bar__step" id="ed-newer" rel="next">Newer ›</a>
+    <a class="edition-bar__today" id="ed-today" href="?" hidden>Today’s edition</a>
+  </nav>
+  <p class="edition-note" id="ed-note" hidden></p>
+
   <section>
+    <span class="flag">The Briefing</span>
+    <h2 class="headline headline--xl">Agentic AI Intelligence Briefing</h2>
+    <p class="brief__standfirst">How enterprises are putting AI agents to work — and how their software, infrastructure, and commerce are changing around them.</p>
+
+    <hr class="rule rule--heavy" />
+
+    <p id="brief-loading" class="u-muted">Loading the briefing…</p>
+    <p id="brief-empty" class="u-muted" hidden>
+      No briefing has been published yet. Briefings appear on weekday mornings
+      (US time).
+    </p>
+
+    <div class="brief" id="brief" hidden>
+      <p class="brief__dateline">
+        <span id="brief-date"></span>
+        <span class="brief__sep" aria-hidden="true">|</span>
+        <span id="brief-since"></span>
+      </p>
+      <p class="brief__note" id="brief-note" hidden></p>
+      <p class="brief__headline"><span class="brief__kicker" id="brief-kicker">Today’s headline:</span> <span id="brief-headline"></span></p>
+      <p class="brief__lede" id="brief-lede"></p>
+      <ol class="brief__devs" id="brief-devs"></ol>
+      <div class="brief__also" id="brief-also-wrap" hidden>
+        <h3 class="eco-group__title">Also on the radar</h3>
+        <ul class="brief__also-list" id="brief-also"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="u-mt">
     <span class="flag">The Wire</span>
     <h2 class="headline headline--xl">Latest in AI</h2>
 
@@ -42,6 +83,199 @@ import Newspaper from '../layouts/Newspaper.astro';
 </Newspaper>
 
 <script>
+  import { editionDate, formatDay } from '../lib/edition';
+
+  // The edition picker. Each choice is a plain navigation to ?date=…, so every
+  // edition has a shareable URL and the page itself stays static.
+  const bar = document.getElementById('edition-bar')!;
+  const select = document.getElementById('ed-select') as HTMLSelectElement;
+  const older = document.getElementById('ed-older') as HTMLAnchorElement;
+  const newer = document.getElementById('ed-newer') as HTMLAnchorElement;
+  const today = document.getElementById('ed-today') as HTMLAnchorElement;
+  const note = document.getElementById('ed-note')!;
+
+  const hrefFor = (date: string | null) => (date ? `?date=${date}` : window.location.pathname);
+
+  function step(link: HTMLAnchorElement, date: string | null | undefined, isLatest = false) {
+    if (date === undefined) {
+      link.removeAttribute('href');
+      link.setAttribute('aria-disabled', 'true');
+    } else {
+      link.href = hrefFor(isLatest ? null : date);
+      link.removeAttribute('aria-disabled');
+    }
+  }
+
+  async function loadEditions() {
+    try {
+      const res = await fetch('/api/editions');
+      if (!res.ok) return;
+      const dates: string[] = ((await res.json()).editions ?? []).map((e: { date: string }) => e.date);
+      if (dates.length === 0) return;
+
+      const latest = dates[0];
+      const asked = editionDate();
+      const current = asked && dates.includes(asked) ? asked : asked ?? latest;
+      const i = dates.indexOf(current);
+
+      for (const d of dates) {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d === latest ? `${formatDay(d, 'short')} (latest)` : formatDay(d, 'short');
+        opt.selected = d === current;
+        select.appendChild(opt);
+      }
+      select.addEventListener('change', () => {
+        window.location.href = hrefFor(select.value === latest ? null : select.value);
+      });
+
+      // Newest first: "older" is the next index, "newer" the previous one.
+      step(older, i >= 0 ? dates[i + 1] : undefined);
+      step(newer, i > 0 ? dates[i - 1] : undefined, i === 1);
+
+      if (asked && asked !== latest) {
+        today.hidden = false;
+        today.href = window.location.pathname;
+        note.hidden = false;
+        note.textContent =
+          i >= 0
+            ? `You are reading the archived edition for ${formatDay(asked)}.`
+            : `There is no archived edition for ${formatDay(asked)}. Editions are kept for 30 days.`;
+      }
+      bar.hidden = false;
+    } catch {
+      /* the picker is optional; today's edition still renders */
+    }
+  }
+
+  loadEditions();
+</script>
+
+<script>
+  import { editionDate, editionQuery, formatDay, safeHref, todayUtc } from '../lib/edition';
+
+  interface Source {
+    title: string;
+    url: string;
+    outlet: string;
+  }
+  interface Briefing {
+    date: string;
+    since: string;
+    headline: string;
+    developments: Array<{ label: string; takeaway: string; implication?: string; sources: Source[] }>;
+    alsoNoted: Array<Source & { note: string }>;
+  }
+
+  const $ = (id: string) => document.getElementById(id)!;
+  const COUNT = ['No', 'One', 'Two', 'Three'];
+
+  function sourceLinks(sources: Source[]): HTMLParagraphElement {
+    const p = document.createElement('p');
+    p.className = 'brief__src';
+    sources.forEach((s, i) => {
+      const href = safeHref(s.url);
+      if (!href) return;
+      if (p.childNodes.length) p.appendChild(document.createTextNode(' · '));
+      const a = document.createElement('a');
+      a.href = href;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      a.textContent = s.outlet || `Source ${i + 1}`;
+      a.title = s.title;
+      p.appendChild(a);
+    });
+    return p;
+  }
+
+  async function loadBriefing() {
+    try {
+      const res = await fetch(`/api/briefing${editionQuery()}`);
+      if (!res.ok) throw new Error(String(res.status));
+      const b: Briefing | null = await res.json();
+      $('brief-loading').hidden = true;
+      if (!b || !b.headline || !Array.isArray(b.developments)) {
+        $('brief-empty').hidden = false;
+        return;
+      }
+
+      $('brief-date').textContent = formatDay(b.date);
+      const since = b.since
+        ? new Date(b.since).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' })
+        : '';
+      $('brief-since').textContent = since
+        ? `Developments since the previous briefing (${since})`
+        : 'Developments since the previous briefing';
+
+      const asked = editionDate();
+      if (asked && asked !== b.date) {
+        const n = $('brief-note');
+        n.hidden = false;
+        n.textContent = `No briefing was published on ${formatDay(asked)}; this is the most recent one before it.`;
+      }
+      if (b.date !== todayUtc()) $('brief-kicker').textContent = 'The headline:';
+      $('brief-headline').textContent = b.headline;
+
+      const devs = b.developments;
+      $('brief-lede').textContent = `${COUNT[devs.length] ?? devs.length} development${devs.length === 1 ? '' : 's'} ${devs.length === 1 ? 'deserves' : 'deserve'} particular attention:`;
+
+      const ol = $('brief-devs');
+      for (const d of devs) {
+        const li = document.createElement('li');
+        li.className = 'brief__dev';
+        const p = document.createElement('p');
+        p.className = 'brief__take';
+        const strong = document.createElement('strong');
+        strong.textContent = `${d.label}:`;
+        p.appendChild(strong);
+        p.appendChild(document.createTextNode(` ${d.takeaway}`));
+        li.appendChild(p);
+        if (d.implication) {
+          const impl = document.createElement('p');
+          impl.className = 'brief__impl';
+          impl.textContent = d.implication;
+          li.appendChild(impl);
+        }
+        li.appendChild(sourceLinks(d.sources ?? []));
+        ol.appendChild(li);
+      }
+
+      const also = (b.alsoNoted ?? []).filter((a) => safeHref(a.url));
+      if (also.length) {
+        const ul = $('brief-also');
+        for (const a of also) {
+          const li = document.createElement('li');
+          const link = document.createElement('a');
+          link.href = safeHref(a.url)!;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.textContent = a.title;
+          const meta = document.createElement('span');
+          meta.className = 'brief__also-outlet';
+          meta.textContent = ` — ${a.outlet}`;
+          const why = document.createElement('p');
+          why.className = 'news__why';
+          why.textContent = a.note;
+          li.append(link, meta, why);
+          ul.appendChild(li);
+        }
+        $('brief-also-wrap').hidden = false;
+      }
+      $('brief').hidden = false;
+    } catch {
+      $('brief-loading').hidden = true;
+      const e = $('brief-empty');
+      e.hidden = false;
+      e.textContent = 'The briefing is unavailable right now. Please try again later.';
+    }
+  }
+
+  loadBriefing();
+</script>
+
+<script>
+  import { editionQuery } from '../lib/edition';
+
   interface NewsItem {
     id: string;
     title: string;
@@ -138,7 +372,7 @@ import Newspaper from '../layouts/Newspaper.astro';
 
   async function load() {
     try {
-      const res = await fetch('/api/news');
+      const res = await fetch(`/api/news${editionQuery()}`);
       if (!res.ok) throw new Error(String(res.status));
       const feed = await res.json();
       const items: NewsItem[] = Array.isArray(feed.items) ? feed.items : [];
@@ -177,6 +411,8 @@ import Newspaper from '../layouts/Newspaper.astro';
 </script>
 
 <script>
+  import { editionQuery } from '../lib/edition';
+
   interface EcoItem {
     id: string;
     title: string;
@@ -287,7 +523,7 @@ import Newspaper from '../layouts/Newspaper.astro';
 
   async function loadEcosystem() {
     try {
-      const res = await fetch('/api/ecosystem');
+      const res = await fetch(`/api/ecosystem${editionQuery()}`);
       if (!res.ok) throw new Error(String(res.status));
       const feed = await res.json();
       const items: EcoItem[] = Array.isArray(feed.items) ? feed.items : [];
