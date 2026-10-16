@@ -53,6 +53,8 @@ export interface Briefing {
   generatedAt: string;
   /** Start of the window this briefing covers (the previous briefing's run). */
   since: string;
+  /** Date of the briefing before this one; absent on the first briefing. */
+  previous?: string;
   headline: string;
   developments: Development[];
   alsoNoted: Array<BriefingSource & { note: string }>;
@@ -380,6 +382,7 @@ export async function buildBriefing(): Promise<Briefing | null> {
     date: utcDate(generatedAt),
     generatedAt,
     since: new Date(sinceMs).toISOString(),
+    previous: prev?.date,
     ...body,
     candidates: list.length,
   };

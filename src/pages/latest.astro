@@ -164,6 +164,7 @@ import Newspaper from '../layouts/Newspaper.astro';
   interface Briefing {
     date: string;
     since: string;
+    previous?: string;
     headline: string;
     developments: Array<{ label: string; takeaway: string; implication?: string; sources: Source[] }>;
     alsoNoted: Array<Source & { note: string }>;
@@ -205,9 +206,13 @@ import Newspaper from '../layouts/Newspaper.astro';
       const since = b.since
         ? new Date(b.since).toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', day: 'numeric' })
         : '';
-      $('brief-since').textContent = since
-        ? `Developments since the previous briefing (${since})`
-        : 'Developments since the previous briefing';
+      // Only name "the previous briefing" when there was one; the first
+      // briefing just looked back a fixed window.
+      $('brief-since').textContent = !since
+        ? 'Developments since the previous briefing'
+        : b.previous
+          ? `Developments since the previous briefing (${since})`
+          : `Developments since ${since}`;
 
       const asked = editionDate();
       if (asked && asked !== b.date) {
