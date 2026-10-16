@@ -6,7 +6,7 @@
  *   GET /api/<wire>                    today's edition (the live blob)
  *   GET /api/<wire>?date=YYYY-MM-DD    an archived edition (30-day history)
  */
-import type { Handler } from '@netlify/functions';
+import { purgeCache, type Handler } from '@netlify/functions';
 import { connectLambda } from '@netlify/blobs';
 import { isEditionDate, utcDate } from './editions';
 import { json, error } from './http';
@@ -15,10 +15,14 @@ import { json, error } from './http';
 // function. `durable` shares the cached copy across edge nodes, so a flood of
 // reads costs one invocation per window rather than one each. Only `date`
 // varies the cache key, so bots appending random query strings can't bust it.
-const LIVE = {
+// Live responses carry a cache tag that every refresh purges (purgeLatest), so
+// new content shows at once instead of after the ten-minute window.
+const LIVE_TAG = 'latest-live';
+export const LIVE = {
   'Cache-Control': 'public, max-age=120, stale-while-revalidate=600',
   'Netlify-CDN-Cache-Control': 'public, durable, s-maxage=600, stale-while-revalidate=3600',
   'Netlify-Vary': 'query=date',
+  'Netlify-Cache-Tag': LIVE_TAG,
 };
 // A past day's edition never changes again.
 const SETTLED = {
@@ -26,6 +30,18 @@ const SETTLED = {
   'Netlify-CDN-Cache-Control': 'public, durable, s-maxage=604800',
   'Netlify-Vary': 'query=date',
 };
+
+/**
+ * Drop the CDN's cached copies of today's /latest responses after a refresh.
+ * Best-effort: a failed purge only means the old copy lives out its window.
+ */
+export async function purgeLatest(): Promise<void> {
+  try {
+    await purgeCache({ tags: [LIVE_TAG] });
+  } catch (err) {
+    console.error('purgeLatest failed', err);
+  }
+}
 
 export function wireEndpoint<T>(opts: {
   name: string;

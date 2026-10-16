@@ -11,6 +11,7 @@ import { schedule } from '@netlify/functions';
 import { connectLambda } from '@netlify/blobs';
 import { buildBriefing, writeBriefing } from '../lib/briefing';
 import { archiveEdition, pruneEditions } from '../lib/editions';
+import { purgeLatest } from '../lib/wire-endpoint';
 
 export const handler = schedule('30 13 * * 1-5', async (event) => {
   connectLambda(event as any);
@@ -25,6 +26,7 @@ export const handler = schedule('30 13 * * 1-5', async (event) => {
       console.log(`briefing-refresh: published ${briefing.developments.length} developments in ${Date.now() - t0} ms`);
     }
     await pruneEditions();
+    await purgeLatest();
   } catch (err) {
     console.error('briefing-refresh failed', err);
   }

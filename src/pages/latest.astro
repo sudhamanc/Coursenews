@@ -111,10 +111,12 @@ import Newspaper from '../layouts/Newspaper.astro';
       const res = await fetch('/api/editions');
       if (!res.ok) return;
       const dates: string[] = ((await res.json()).editions ?? []).map((e: { date: string }) => e.date);
-      if (dates.length === 0) return;
+      const asked = editionDate();
+      // Nothing to pick between until a second day is archived. A dated link
+      // still gets the bar, so its "Today's edition" link can lead back.
+      if (dates.length === 0 || (dates.length === 1 && !asked)) return;
 
       const latest = dates[0];
-      const asked = editionDate();
       const current = asked && dates.includes(asked) ? asked : asked ?? latest;
       const i = dates.indexOf(current);
 

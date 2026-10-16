@@ -1420,6 +1420,10 @@ img {
   font-family: var(--sans);
   font-size: 0.78rem;
 }
+/* `display: flex` above would otherwise override the hidden attribute. */
+.edition-bar[hidden] {
+  display: none;
+}
 .edition-bar__pick {
   display: inline-flex;
   align-items: center;

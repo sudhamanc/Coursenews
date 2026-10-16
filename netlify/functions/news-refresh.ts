@@ -14,6 +14,7 @@ import { connectLambda } from '@netlify/blobs';
 import { buildFeed, writeLatest } from '../lib/news';
 import { buildEcosystemFeed, writeEcosystem } from '../lib/ecosystem';
 import { archiveEdition, pruneEditions } from '../lib/editions';
+import { purgeLatest } from '../lib/wire-endpoint';
 
 export const handler = schedule('0 13 * * *', async (event) => {
   connectLambda(event as any);
@@ -40,5 +41,6 @@ export const handler = schedule('0 13 * * *', async (event) => {
   else console.error('news-refresh: ecosystem wire failed', ecosystem.reason);
 
   await pruneEditions().catch((err) => console.error('news-refresh: prune failed', err));
+  await purgeLatest();
   return { statusCode: 200 };
 });

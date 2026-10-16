@@ -19,6 +19,7 @@ import { buildEcosystemFeed, writeEcosystem } from '../lib/ecosystem';
 import { buildBriefing, writeBriefing } from '../lib/briefing';
 import { archiveEdition, pruneEditions } from '../lib/editions';
 import { json, error } from '../lib/http';
+import { purgeLatest } from '../lib/wire-endpoint';
 
 function keyMatches(provided: string | undefined): boolean {
   const secret = process.env.NEWS_REFRESH_KEY;
@@ -60,6 +61,7 @@ export const handler: Handler = async (event) => {
       out.briefing = b
         ? { developments: b.developments.length, candidates: b.candidates, generatedAt: b.generatedAt }
         : { published: false };
+      await purgeLatest();
       return json(200, out);
     }
     if (wire !== 'ecosystem') {
@@ -75,6 +77,7 @@ export const handler: Handler = async (event) => {
       out.ecosystem = { items: feed.items.length, generatedAt: feed.generatedAt };
     }
     await pruneEditions();
+    await purgeLatest();
     return json(200, out);
   } catch (err) {
     console.error('manual refresh failed', err);
