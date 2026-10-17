@@ -1,7 +1,7 @@
 /**
- * GET /api/briefing[?date=YYYY-MM-DD]  ->  /.netlify/functions/get-briefing
+ * GET /api/briefing[?date=YYYY-MM-DD]
  *
- * The "Agentic AI Intelligence Briefing" produced by `briefing-refresh`.
+ * The "Agentic AI Intelligence Briefing" produced by the weekday briefing job (server/lib/jobs.ts).
  * Briefings publish on weekdays only, so a dated request returns the newest
  * briefing on or before that day; the page labels it with its own date.
  */

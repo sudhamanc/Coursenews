@@ -8,8 +8,7 @@
  * `X-Visitor-Id`). This is not a security boundary — with login disabled,
  * history is simply namespaced per browser.
  */
-import type { Handler } from '@netlify/functions';
-import { connectLambda } from '@netlify/blobs';
+import type { Handler } from '../lib/types';
 import { getVisitorId } from '../lib/identity';
 import { isValidThreadId } from '../lib/validate';
 import {
@@ -48,11 +47,10 @@ function transcriptToText(t: Thread): string {
 }
 
 export const handler: Handler = async (event) => {
-  connectLambda(event as any);
   const visitorId = getVisitorId(event);
   const id = extractThreadId(event.path, event.queryStringParameters);
 
-  // Storage is best-effort: if Blobs is unavailable, degrade gracefully rather
+  // Storage is best-effort: if storage is unavailable, degrade gracefully rather
   // than 500 (list -> empty, item -> not found).
   let store: ReturnType<typeof threadsStore>;
   try {

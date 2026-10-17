@@ -1,7 +1,7 @@
 ---
 /**
- * Static 404. Astro emits this as `dist/404.html`, which Netlify serves from the
- * CDN for any URL without a matching file — no function runs, so bots probing
+ * Static 404. Astro emits this as `dist/404.html`, which CloudFront serves for
+ * any URL without a matching file — no function runs, so bots probing
  * for /wp-login.php or /.env cost nothing but a cached page view.
  */
 import Newspaper from '../layouts/Newspaper.astro';

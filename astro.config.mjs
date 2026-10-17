@@ -6,24 +6,26 @@ import rehypeKatex from 'rehype-katex';
 import rehypeRaw from 'rehype-raw';
 import rehypeFigscroll from './scripts/rehype-figscroll.mjs';
 
-// Static newspaper site: builds to static HTML in `dist/`, and all dynamic
-// behavior lives in `netlify/functions/`.
+// Static newspaper site: builds to static HTML in `dist/` (served from S3 via
+// CloudFront), and all dynamic behavior lives in `server/` (one Lambda behind
+// /api/*).
 //
-// Deliberately NO adapter. `@astrojs/netlify` registers a server function on
-// `/*` (preferStatic), so every URL without a static file — each bot probing
-// for /wp-login.php or /.env — invoked a function and billed compute. A static
-// build needs no server: missing URLs get `404.html` straight from the CDN.
-// `netlify dev` still provides Blobs to the functions on its own.
+// Deliberately NO adapter. A server adapter registers a function on `/*`, so
+// every URL without a static file — each bot probing for /wp-login.php or
+// /.env — would invoke a function and bill compute. A static build needs no
+// server: missing URLs get `404.html` straight from the CDN.
 //
 // Astro 7 defaults to a new Markdown processor; the remark/rehype math pipeline
 // (KaTeX) is opted into via the `unified()` processor from
 // `@astrojs/markdown-remark`.
 export default defineConfig({
-  // Netlify injects URL (the site's primary address) at build time, so the
-  // canonical/OG absolute URLs are correct on every deploy without hardcoding a
-  // domain. The fallback only applies to local builds.
-  site: process.env.URL || 'http://localhost:4321',
+  // The deploy script sets SITE_URL (the CloudFront address, or a custom domain
+  // later) so canonical/OG absolute URLs are correct. The fallback only applies
+  // to local builds.
+  site: process.env.SITE_URL || 'http://localhost:4321',
   output: 'static',
+  // In dev, /api/* goes to the local API server (server/dev.ts).
+  vite: { server: { proxy: { '/api': `http://localhost:${process.env.API_PORT || 8787}` } } },
   markdown: {
     processor: unified({
       remarkPlugins: [remarkMath],

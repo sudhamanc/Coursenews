@@ -1,7 +1,7 @@
 /**
  * Icon generation — rasterises assets/icons/*.svg into the PNG set in public/.
  *
- * Run on demand (`npm run icons`), NEVER during the Netlify build: the outputs
+ * Run on demand (`npm run icons`), NEVER during the deploy build: the outputs
  * are committed, so a deploy never has to execute a native image binary.
  *
  * sharp is already resolved in node_modules as an optionalDependency of astro

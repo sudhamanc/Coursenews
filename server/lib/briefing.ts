@@ -26,7 +26,7 @@
  * Every link in the output comes from the candidate list by index; the model
  * never writes a URL, so it cannot invent one.
  */
-import { getStore, type Store } from '@netlify/blobs';
+import { getStore, type Store } from './store';
 import { getClient, BRIEFING_MODEL } from './anthropic';
 import { getText, pool, clean, readFeed } from './feeds';
 import { utcDate } from './editions';
@@ -307,11 +307,11 @@ async function synthesize(list: Candidate[], prev: Briefing | null): Promise<Raw
       model: BRIEFING_MODEL,
       max_tokens: 4000,
       system: SYSTEM,
-      // Low effort keeps the call well inside a scheduled function's 30 s limit.
+      // Low effort keeps the call quick (about 10 s); the jobs Lambda allows 120 s.
       output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA as any } },
       messages: [{ role: 'user', content: user }],
     },
-    { timeout: 22_000, maxRetries: 0 },
+    { timeout: 60_000, maxRetries: 0 },
   );
   if (res.stop_reason === 'refusal' || res.stop_reason === 'max_tokens') {
     console.error(`briefing: model stopped with ${res.stop_reason}`);

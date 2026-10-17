@@ -1,13 +1,12 @@
 /**
- * POST /api/chat  ->  /.netlify/functions/chat
+ * POST /api/chat
  *
  * Public chat proxy to Claude Haiku. Validates input, enforces a per-IP daily
  * cap (cost guardrail), calls the model with an injection-resistant system
- * prompt, and persists the transcript to Netlify Blobs under an anonymous
+ * prompt, and persists the transcript to the JSON store under an anonymous
  * per-browser visitor id. The Anthropic API key never leaves this function.
  */
-import type { Handler } from '@netlify/functions';
-import { connectLambda } from '@netlify/blobs';
+import type { Handler } from '../lib/types';
 import { getVisitorId, getClientIp } from '../lib/identity';
 import { validateChatBody } from '../lib/validate';
 import { consumeDailyQuota } from '../lib/ratelimit';
@@ -29,9 +28,6 @@ const MAX_STORED_MESSAGES = 40; // keep transcripts bounded
 export const handler: Handler = async (event) => {
   if (event.httpMethod !== 'POST') return error(405, 'Method not allowed.');
 
-  // Wire the Netlify Blobs context for this Lambda-compat (v1) function.
-  // Without this, getStore() throws MissingBlobsEnvironmentError and nothing persists.
-  connectLambda(event as any);
 
   const visitorId = getVisitorId(event);
 
@@ -50,7 +46,7 @@ export const handler: Handler = async (event) => {
   const quota = await consumeDailyQuota(getClientIp(event));
   if (!quota.allowed) return error(429, 'Rate limit reached. Please try again later.');
 
-  // Thread storage is best-effort: if Blobs is unavailable, chat still works,
+  // Thread storage is best-effort: if storage is unavailable, chat still works,
   // just without persistence.
   let store: ReturnType<typeof threadsStore> | null = null;
   let thread: Thread | null = null;

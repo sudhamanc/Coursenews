@@ -1,7 +1,7 @@
 /**
- * GET /api/news[?date=YYYY-MM-DD]  ->  /.netlify/functions/get-news
+ * GET /api/news[?date=YYYY-MM-DD]
  *
- * The research wire produced by the scheduled `news-refresh` function: today's
+ * The research wire produced by the scheduled news job (server/lib/jobs.ts): today's
  * by default, or an archived day's.
  */
 import { readLatest, type NewsFeed } from '../lib/news';

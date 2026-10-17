@@ -1,5 +1,5 @@
 /**
- * Netlify Blobs persistence for chat threads.
+ * Persistence for chat threads, in the JSON store (S3 in production).
  *
  * Storage layout (all keys are namespaced by the authenticated user id, so one
  * user can never address another user's data):
@@ -8,7 +8,7 @@
  *
  * Titles are stored in the index for fast listing (no need to read every blob).
  */
-import { getStore, type Store } from '@netlify/blobs';
+import { getStore, type Store } from './store';
 
 export interface ChatMessage {
   role: 'user' | 'assistant';

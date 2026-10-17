@@ -1,8 +1,8 @@
 /**
- * Shared HTTP helpers for Netlify Functions (v1 handler API).
+ * Shared HTTP helpers for the server handlers.
  * Centralizes JSON responses and per-response security headers.
  */
-import type { HandlerResponse } from '@netlify/functions';
+import type { HandlerResponse } from './types';
 
 /** Baseline security headers applied to every function response. */
 export const SECURITY_HEADERS: Record<string, string> = {

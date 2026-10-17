@@ -17,7 +17,7 @@ const {
 } = Astro.props;
 
 /** Absolute URL for this page — canonical + Open Graph. `Astro.site` comes from
- *  astro.config.mjs, which reads Netlify's build-time URL env var. */
+ *  astro.config.mjs, which reads the SITE_URL the deploy script sets. */
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL('/og.png', Astro.site);
 

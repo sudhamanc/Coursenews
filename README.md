@@ -31,7 +31,7 @@ be reused: point it at your own PDFs, edit one config file, and you have your ow
 - [Adding content (a delta operation)](#adding-content-a-delta-operation)
 - [Local development](#local-development)
 - [Configuration](#configuration)
-- [Deploy to Netlify](#deploy-to-netlify)
+- [Deploy to AWS](#deploy-to-aws)
 - [Security & cost controls](#security--cost-controls)
 - [Authentication (disabled)](#authentication-disabled)
 - [Troubleshooting](#troubleshooting)
@@ -48,7 +48,7 @@ be reused: point it at your own PDFs, edit one config file, and you have your ow
 - **Reader themes** — a light default styled after the *Financial Times* (salmon
   paper, claret flags, Oxford-blue links) with a one-click light/dark toggle,
   remembered per browser.
-- **"Dig deeper" chat** — a Netlify Function proxies to Claude Haiku; the API key
+- **"Dig deeper" chat** — a Lambda function proxies to Claude Haiku; the API key
   never reaches the browser. Conversations are saved and can be reopened,
   downloaded, or deleted.
 - **Agentic AI Intelligence Briefing** — each weekday, one Sonnet call reads
@@ -87,14 +87,16 @@ content/_extracted/<slug>/*.txt  +  manifest.json      (gitignored, regenerable)
         ▼
 src/content/articles/<slug>/*.md   ──►  Astro build  ──►  dist/ (static HTML)
                                                             │
-Browser ──/api/chat──────►  netlify/functions/chat.ts  ──►  Claude Haiku
-        ──/api/news──────►  netlify/functions/get-news.ts      ◄┐
-        ──/api/ecosystem─►  netlify/functions/get-ecosystem.ts ◄┤  news-refresh (daily
-        ──/api/briefing──►  netlify/functions/get-briefing.ts  ◄┤  cron, both wires)
-        ──/api/editions──►  netlify/functions/get-editions.ts  ◄┤
-                                   │                            │  briefing-refresh
-                             Netlify Blobs                      ┘  (weekday cron)
-               (transcripts, feeds, 30 days of editions)
+Browser ─► CloudFront ─┬─ pages ──► S3 (dist/)
+                       └─ /api/* ─► Lambda "api" (server/router.ts)
+                                      ├─ chat · threads ──────────► Claude Haiku
+                                      └─ news · ecosystem · briefing · editions ◄┐
+                                                   │                             │  EventBridge Scheduler
+                                                   │                             │  → Lambda "jobs"
+                                                   │                             │  (13:00 UTC wires,
+                                                   ▼                             │   13:30 UTC briefing)
+                                         S3 "data" bucket  ──────────────────────┘
+                              (transcripts, feeds, 30 days of editions)
 ```
 
 The single source of truth for sections is [`courses.config.json`](courses.config.json)
@@ -105,7 +107,7 @@ permanently via [`public/_redirects`](public/_redirects).
 ## The two `/latest` wires
 
 Below the briefing, `/latest` carries two independent feeds. Both are rebuilt by
-the same daily scheduled function and cached in Blobs. The research wire costs
+the same daily scheduled job and cached in the data store. The research wire costs
 one Haiku call per run and the ecosystem wire two (one per lane).
 
 | | **Latest in AI** (research) | **The Ecosystem** (releases) |
@@ -114,7 +116,7 @@ one Haiku call per run and the ecosystem wire two (one per lane).
 | Sources | arXiv RSS, Hacker News | GitHub release feeds, GitHub Trending, Hugging Face, Show HN, subreddit + commentary RSS, AI vendor announcement RSS |
 | Grouping | Ranked list, free-form category | Four fixed buckets: Models · Standards · Libraries · Patterns |
 | Endpoint | `/api/news` | `/api/ecosystem` |
-| Code | [`netlify/lib/news.ts`](netlify/lib/news.ts) | [`netlify/lib/ecosystem.ts`](netlify/lib/ecosystem.ts) |
+| Code | [`server/lib/news.ts`](server/lib/news.ts) | [`server/lib/ecosystem.ts`](server/lib/ecosystem.ts) |
 
 ### Two lanes, because they fail in opposite ways
 
@@ -131,7 +133,7 @@ releases' summaries. Per-lane calls plus a title echo check fixed both.
 
 ### Changing what is tracked
 
-Edit the `WATCHLIST` constant in [`netlify/lib/ecosystem.ts`](netlify/lib/ecosystem.ts) —
+Edit the `WATCHLIST` constant in [`server/lib/ecosystem.ts`](server/lib/ecosystem.ts) —
 it is the single source of truth for that lane:
 
 ```ts
@@ -149,7 +151,7 @@ releases so a chatty monorepo cannot flood the lane.
 ### Source notes and limitations
 
 - **GitHub Atom feeds, not the REST API.** Unauthenticated REST allows only
-  60 requests/hour *per IP* and Netlify Functions share egress addresses, so a
+  60 requests/hour *per IP* and Lambda functions share egress addresses, so a
   watchlist of this size would intermittently `403`. The Atom feeds have no cap
   and need no token.
 - **X/Twitter is deliberately absent.** Its API returns `401` unauthenticated and
@@ -191,7 +193,7 @@ with a label, a takeaway, what it means for a technology leader, and its sources
 | Window | Everything since the previous briefing (at least 24 h, at most 96 h) |
 | Model | One call to `BRIEFING_MODEL` (default `claude-sonnet-5-5`), structured JSON output |
 | Endpoint | `/api/briefing[?date=YYYY-MM-DD]` |
-| Code | [`netlify/lib/briefing.ts`](netlify/lib/briefing.ts) |
+| Code | [`server/lib/briefing.ts`](server/lib/briefing.ts) |
 
 **Sources** (the `BRIEFING_SOURCES` constant):
 
@@ -220,7 +222,7 @@ To rebuild it on demand: `/api/refresh-news?key=<secret>&wire=briefing`.
 ## Edition history
 
 Each refresh also writes a dated snapshot beside the live keys in the `news`
-Blobs store, as `editions/<research|ecosystem|briefing>/<YYYY-MM-DD>.json` (UTC
+store, as `editions/<research|ecosystem|briefing>/<YYYY-MM-DD>.json` (UTC
 day). Snapshots older than 30 days are pruned on every refresh.
 
 - `/api/editions` lists the archived days.
@@ -242,7 +244,7 @@ signature double rule, in the same tokens as the stylesheet (`#fff1e5` paper,
 reads at 16px in a browser tab.
 
 Sources live in `assets/icons/` and are **not** published; `public/` gets the
-rasterised output, which is committed so a Netlify build never has to run a
+rasterised output, which is committed so a deploy build never has to run a
 native image binary. Regenerate after editing a source:
 
 ```bash
@@ -302,8 +304,9 @@ scrolls away from its figure.
 | ----------- | ----------------------------------------------------------------- |
 | Site        | [Astro](https://astro.build) 7 (static output, no adapter)        |
 | Math        | `remark-math` + `rehype-katex` (KaTeX)                            |
-| Serverless  | Netlify Functions (v1 handler API)                                |
-| Storage     | Netlify Blobs                                                     |
+| Hosting     | AWS: CloudFront + S3 (pages), Lambda (API + jobs), EventBridge Scheduler |
+| Storage     | S3 JSON documents (`server/lib/store.ts`)                         |
+| Infra       | AWS CDK (TypeScript, `infra/`), deployed by GitHub Actions        |
 | LLM         | Anthropic Claude Haiku (`@anthropic-ai/sdk`)                      |
 | PDF text    | `unpdf`                                                           |
 | News        | arXiv RSS + Hacker News (Algolia) via `fast-xml-parser`           |
@@ -314,7 +317,7 @@ scrolls away from its figure.
 
 - **Node.js ≥ 22.12** (required by Astro 7) and npm.
 - An **Anthropic API key** (for chat + news ranking) — [console.anthropic.com](https://console.anthropic.com).
-- A **Netlify account** (for deploy). The Netlify CLI is installed as a dev
+- An **AWS account** and the AWS CLI v2 (for deploy). CDK is installed as a dev
   dependency, so no global install is needed.
 
 ## Quick start
@@ -325,13 +328,13 @@ npm run setup      # installs deps, creates .env, extracts PDF text
 
 npm run dev        # pages only          -> http://localhost:4321
 # or
-npm start          # full stack (chat + news via Functions/Blobs) -> http://localhost:8888
+npm start          # full stack (pages + /api, local file store) -> http://localhost:4321
 ```
 
 > `npm run setup` runs `npm install`, copies `.env.example` → `.env` (if missing),
-> and runs `npm run extract`. Chat needs a real `ANTHROPIC_API_KEY` in `.env`, and
-> Blobs-backed history/news only work once the site is linked/deployed (see
-> [Troubleshooting](#troubleshooting)).
+> and runs `npm run extract`. Chat and the news refresh need a real
+> `ANTHROPIC_API_KEY` in `.env`. Locally, chat history and the feeds are stored as
+> JSON files under `.data/` (gitignored).
 
 ## Scripts
 
@@ -339,24 +342,25 @@ npm start          # full stack (chat + news via Functions/Blobs) -> http://loca
 | ---------------------- | -------------------------------------------------------------------- |
 | `npm run setup`        | Install deps, create `.env`, extract PDF text.                       |
 | `npm run dev`          | Astro dev server (pages only) on **:4321**.                          |
-| `npm start`            | Full stack via Netlify Dev on **:8888** (Functions + Blobs + redirects). |
-| `npm stop`             | Stop the full-stack server and free ports 4321/4322/8888.            |
+| `npm start`            | Full stack on **:4321**: Astro plus the local API server (`server/dev.ts`, :8787). |
+| `npm stop`             | Stop both servers and free ports 4321/8787.                          |
 | `npm run restart`      | `stop` then `start`.                                                 |
 | `npm run status`       | Report whether the server is running and which ports are busy.       |
 | `npm run build`        | Production build into `dist/`.                                       |
 | `npm run preview`      | Preview the built site.                                              |
 | `npm run extract`      | Extract PDF text (incremental). See below for per-section usage.     |
 | `npm run icons`        | Regenerate the PWA/favicon PNGs from `assets/icons/*.svg`.            |
-| `npm run deploy`       | Deploy a **draft** preview to Netlify.                               |
-| `npm run deploy:prod`  | Deploy to **production**.                                            |
+| `npm run api`          | Only the local API server (:8787).                                   |
+| `npm run synth`        | Synthesize the CDK stack (bundles the Lambdas; no AWS calls).        |
+| `npm run deploy`       | Deploy to AWS: infrastructure, build, upload, invalidate.           |
 
 ## Project structure
 
 ```text
 courses.config.json        # SINGLE SOURCE OF TRUTH for sections and nav groups
 courses.schema.json        # JSON schema for the above (editor validation)
-netlify.toml               # build, functions dir, redirects, security headers/CSP
-astro.config.mjs           # Astro config (KaTeX pipeline, Netlify adapter)
+cdk.json                   # CDK app entry (infra/bin/app.ts)
+astro.config.mjs           # Astro config (KaTeX pipeline, dev /api proxy)
 .copilot/memory/           # assistant repo memory (version-controlled project notes)
 Documents/<Section>/*.pdf   # source PDFs (input)
 content/_extracted/        # extracted text + manifest.json (gitignored, regenerable)
@@ -370,7 +374,7 @@ scripts/
   extract-pdfs.mjs         # PDF -> text (incremental)
   make-icons.mjs           # SVG -> the PNG icon set (run on demand, outputs committed)
   rehype-figscroll.mjs     # wraps wide figures/tables in a scroll container at build time
-  setup.sh · serve.sh · deploy.sh
+  setup.sh · serve.sh · deploy.sh · migrate-blobs.sh (one-off Netlify → S3 copy)
 src/
   content.config.ts        # `articles` collection schema (zod)
   content/articles/<slug>/*.md   # the authored feature articles
@@ -380,16 +384,25 @@ src/
   lib/courses.ts           # reads courses.config.json
   lib/edition.ts           # /latest edition-date helpers (client side)
   styles/newspaper.css
-netlify/
-  functions/  chat.ts · threads.ts · get-news.ts · get-ecosystem.ts · get-briefing.ts · get-editions.ts
-              news-refresh.ts · briefing-refresh.ts · refresh-news.ts
-  lib/        identity.ts · validate.ts · blobs.ts · anthropic.ts · ratelimit.ts · http.ts
+server/
+  router.ts   # /api/* routes, shared by the Lambda and the dev server
+  dev.ts      # local API server (npm start)
+  aws/        api.ts (Function URL entry) · jobs.ts (scheduled refreshes)
+  handlers/   chat.ts · threads.ts · get-news.ts · get-ecosystem.ts · get-briefing.ts · get-editions.ts · refresh-news.ts
+  lib/        identity.ts · validate.ts · blobs.ts · anthropic.ts · ratelimit.ts · http.ts · types.ts
+              store.ts      # JSON store: S3 in production, files in .data/ locally
+              config.ts     # loads secrets from SSM Parameter Store
+              jobs.ts       # the /latest refresh jobs
               feeds.ts      # shared RSS/Atom reader and fetch helpers
               news.ts       # research wire (arXiv + Hacker News)
               ecosystem.ts  # ecosystem wire (WATCHLIST lives here)
               briefing.ts   # enterprise briefing (BRIEFING_SOURCES lives here)
               editions.ts   # 30-day dated archive
               wire-endpoint.ts  # shared cached GET handler for the /latest endpoints
+infra/
+  bin/app.ts · lib/site-stack.ts   # the whole AWS stack
+  lib/redirects.ts                 # public/_redirects → CloudFront Function
+.github/workflows/deploy.yml       # deploy on push to main
 ```
 
 ## Adding content (a delta operation)
@@ -424,15 +437,18 @@ The new desk, its section front, and its feature pages appear on the next build.
 
 ## Local development
 
-Two servers, depending on what you're working on:
+Two ways to run it, depending on what you're working on:
 
-- **`npm run dev` (:4321)** — fast Astro dev server with HMR. Best for editing
-  pages, articles, styles, and diagrams. Functions are **not** served here.
-- **`npm start` (:8888)** — full Netlify stack (pages + Functions + Blobs +
-  `/api/*` redirects). Use this to exercise chat and news. Stop with `npm stop`.
+- **`npm run dev` (:4321)** — Astro alone, with HMR. Best for editing pages,
+  articles, styles, and diagrams. `/api` calls fail here.
+- **`npm start` (:4321)** — Astro plus the local API server
+  ([`server/dev.ts`](server/dev.ts), :8787), which runs the same router as the
+  Lambda against JSON files in `.data/`. Astro proxies `/api` to it. Use this to
+  exercise chat and the news wires. Stop with `npm stop`.
 
-`npm start`/`npm stop` clear stale ports automatically, which matters because
-Astro 7 and Netlify Dev both bind ports.
+To fill the wires locally, set `NEWS_REFRESH_KEY` in `.env` and call
+`http://localhost:4321/api/refresh-news?wire=both` (or `wire=briefing`) with the
+header `X-Refresh-Key: <key>`.
 
 ## Configuration
 
@@ -440,72 +456,90 @@ Environment variables (see [`.env.example`](.env.example)):
 
 | Variable               | Required | Default            | Purpose                                    |
 | ---------------------- | -------- | ------------------ | ------------------------------------------ |
-| `ANTHROPIC_API_KEY`    | yes      | —                  | Chat + news ranking. **Functions-only.**   |
+| `ANTHROPIC_API_KEY`    | yes      | —                  | Chat + news ranking. **Server-only.**      |
 | `CHAT_MODEL`           | no       | `claude-haiku-4-5` | Chat model id.                             |
 | `NEWS_MODEL`           | no       | `claude-haiku-4-5` | News-ranking model id.                     |
 | `BRIEFING_MODEL`       | no       | `claude-sonnet-5-5` | Briefing synthesis model id (one call per weekday). |
 | `CHAT_DAILY_CAP`       | no       | `100`              | Max chat messages per client IP per day.   |
+| `CHAT_GLOBAL_DAILY_CAP`| no       | `300`              | Max chat messages per day, site-wide.      |
 | `CHAT_MAX_INPUT_CHARS` | no       | `4000`             | Max characters per chat message.           |
 | `NEWS_REFRESH_KEY`     | no       | — (disabled)       | Secret enabling on-demand `GET /api/refresh-news?key=…&wire=research\|ecosystem\|both\|briefing`. |
 
-Locally these come from `.env`. In production they're set in the Netlify UI.
+Locally these come from `.env`. In production the two secrets
+(`ANTHROPIC_API_KEY`, `NEWS_REFRESH_KEY`) are SSM Parameter Store SecureStrings
+under `/latent-inference/`, read by the Lambdas at cold start. The models and caps
+are plain Lambda environment variables set in
+[`infra/lib/site-stack.ts`](infra/lib/site-stack.ts).
 
-## Deploy to Netlify
+## Deploy to AWS
 
-The build is fully described by [`netlify.toml`](netlify.toml) (build command,
-publish dir, functions dir, redirects, security headers). Deploy either way:
+Everything is defined in [`infra/lib/site-stack.ts`](infra/lib/site-stack.ts)
+(AWS CDK, `us-east-1`):
 
-### Option A — Git-based (recommended)
+- **CloudFront** serves the pages from a private S3 bucket, and `/api/*` from the
+  `api` Lambda's Function URL.
+  - A CloudFront Function applies the legacy 301s from
+    [`public/_redirects`](public/_redirects) and maps `/dir/` URLs to
+    `index.html`.
+  - A response-headers policy sets the CSP and security headers.
+- **EventBridge Scheduler** runs the `jobs` Lambda for the news wires daily at
+  13:00 UTC and the briefing on weekdays at 13:30 UTC.
+- **An S3 data bucket** holds the feeds, the edition archive, and chat threads.
+- **A monthly AWS Budget** sends email alerts (set `BUDGET_EMAIL`).
 
-1. Push the repo to GitHub/GitLab/Bitbucket.
-2. In Netlify: **Add new site → Import an existing project**, pick the repo.
-   Build command and publish directory are detected from `netlify.toml` — accept
-   the defaults.
-3. **Site configuration → Environment variables** → add `ANTHROPIC_API_KEY`
-   (scope: **Functions**). Optionally add `CHAT_MODEL`, `NEWS_MODEL`, `BRIEFING_MODEL`,
-   `CHAT_DAILY_CAP`, `CHAT_MAX_INPUT_CHARS`, `NEWS_REFRESH_KEY`.
-4. **Blobs** — no setup needed; it's provisioned automatically for the site.
-5. **Scheduled function** — `news-refresh` self-registers to run daily at
-   **13:00 UTC** and rebuilds *both* `/latest` wires (three Haiku calls), and
-   `briefing-refresh` runs on weekdays at **13:30 UTC** (one Sonnet call). Until
-   it first runs, `/latest` shows empty states. To populate immediately, set
-   `NEWS_REFRESH_KEY` (a long random string) and call
-   `https://<your-site>/api/refresh-news?key=<secret>` once. Add
-   `&wire=ecosystem` (or `research`) to rebuild just one wire without spending a
-   call on the other, or `&wire=briefing` for the briefing.
-6. Deploy. Every push to the production branch redeploys.
+**Cost:** at this site's traffic, everything stays inside AWS's always-free
+tiers (CloudFront 1 TB / 10M requests, Lambda 1M requests / 400K GB-s, and so
+on). Expect about $0–1 a month, plus Anthropic usage.
 
-### Option B — CLI
+### First deploy (once, from a laptop)
 
 ```bash
-npx netlify login
-npx netlify init          # create & link a new site (or: npx netlify link)
-npx netlify env:set ANTHROPIC_API_KEY "sk-ant-..."   # Functions scope by default
-npm run deploy:prod       # build + deploy to production
+aws login                                   # your AWS account
+npx cdk bootstrap aws://<account-id>/us-east-1
+aws ssm put-parameter --region us-east-1 --type SecureString \
+  --name /latent-inference/ANTHROPIC_API_KEY --value "sk-ant-..."
+aws ssm put-parameter --region us-east-1 --type SecureString \
+  --name /latent-inference/NEWS_REFRESH_KEY --value "$(openssl rand -hex 24)"
+BUDGET_EMAIL=you@example.com npm run deploy
 ```
 
-`npm run deploy` (no suffix) publishes a **draft** preview URL for testing before
-going live.
+The deploy prints the site URL (`https://<id>.cloudfront.net`). Then in the
+GitHub repo, under **Settings → Secrets and variables → Actions → Variables**, add:
 
-### Custom domain (optional)
+- `AWS_DEPLOY_ROLE_ARN`: the stack's `DeployRoleArn` output.
+- `BUDGET_EMAIL` (optional).
 
-**Site configuration → Domain management → Add a domain**, then follow Netlify's
-DNS instructions. HTTPS (including the HSTS header in `netlify.toml`) is automatic.
+### After that
+
+Every push to `main` deploys through
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). It signs in with
+GitHub's OIDC token, so no AWS keys are stored in GitHub.
+
+### Custom domain (later)
+
+Request an ACM certificate in `us-east-1`, then add `domainNames` and
+`certificate` to the distribution in the stack. Point the domain's DNS at the
+CloudFront address and set `SITE_URL` to match.
 
 ## Security & cost controls
 
-- **API key isolation** — `ANTHROPIC_API_KEY` is read only inside Functions; the
-  build output in `dist/` contains no secret.
+- **API key isolation** — `ANTHROPIC_API_KEY` lives in SSM and is read only
+  inside the Lambdas; the build output in `dist/` contains no secret.
+- **Origin lock** — CloudFront adds a secret header (the stack's UUID) to every
+  `/api` request, and the Lambda refuses anything without it. The Function URL
+  can't be called around the CDN.
 - **Cost guardrail** — chat is rate-limited per client IP (`CHAT_DAILY_CAP`/day →
-  `429`). Also set a **budget/spend limit in the Anthropic console** as a backstop.
+  `429`) and site-wide (`CHAT_GLOBAL_DAILY_CAP`). AWS has no hard spend cap, so
+  the stack adds a budget alert. Also set a **spend limit in the Anthropic
+  console** as a backstop.
 - **Input validation** — message length and section slug are validated server-side;
   the system prompt is written to resist prompt injection.
 - **Output safety** — assistant and wire text render via `textContent` (no HTML
   injection); every external link on both wires is protocol-validated
   (`http`/`https` only). Feed content is treated strictly as data — nothing
   fetched from a third-party source is executed or rendered as markup.
-- **Headers** — a Content Security Policy and standard security headers are set in
-  `netlify.toml`. The CSP allows Astro's own inlined first-party scripts and the
+- **Headers** — a Content Security Policy and standard security headers are set by
+  a CloudFront response-headers policy. The CSP allows Astro's own inlined first-party scripts and the
   inline styles KaTeX/Shiki need, while still blocking external script origins,
   framing, and objects.
 
@@ -515,41 +549,28 @@ Login is currently **off** — chat is open to anyone who can reach the site, ga
 only by the per-IP cap above. History is namespaced by an anonymous per-browser id
 (`X-Visitor-Id`), which is convenience scoping, not a security boundary.
 
-To re-enable Netlify Identity later: restore the Identity widget + sign-in control
-in [`src/layouts/Newspaper.astro`](src/layouts/Newspaper.astro), swap the
-`getVisitorId` calls back to the `getUser` check (kept in
-[`netlify/lib/identity.ts`](netlify/lib/identity.ts)) in `chat.ts`/`threads.ts`,
-and re-add `identity.netlify.com` to the CSP in `netlify.toml`.
+Re-enabling login would mean adding an identity provider (for example Amazon
+Cognito) and checking its token in `server/handlers/chat.ts` and `threads.ts`
+in place of `getVisitorId`.
 
 ## Troubleshooting
 
-- **Port already in use / server won't start** → `npm stop` (clears 4321/4322/8888),
+- **Port already in use / server won't start** → `npm stop` (clears 4321/8787),
   then `npm start`. `npm run status` shows what's bound.
-- **`netlify dev` exits immediately** → Astro 7 auto-backgrounds its dev server in
-  agent/CI shells, which makes Netlify Dev quit. The `start` script sets
-  `ASTRO_DEV_BACKGROUND=1` to keep Astro in the foreground; run via `npm start`
-  rather than calling `netlify dev` directly.
-- **`MissingBlobsEnvironmentError` locally** → Netlify Blobs needs a linked site.
-  Chat still replies (persistence is best-effort) and news shows an empty state;
-  run `npx netlify link` (or deploy) to enable Blobs-backed history and the cached
-  feed.
-- **Chat returns 502 locally** → `ANTHROPIC_API_KEY` isn't set in `.env` (or is a
-  placeholder). Add a real key and restart.
-- **Interactive pages look inert on :8888** → Netlify Dev applies the production
-  CSP, and Astro's dev HMR uses blob-worker scripts it doesn't allow. Use
-  `npm run dev` (:4321) for UI work. In production the CSP permits Astro's inlined
-  first-party scripts, so `/latest` and the chat panel work normally.
+- **Astro exits immediately under `npm start`** → Astro 7 auto-backgrounds its dev
+  server in agent/CI shells. The `start` script sets `ASTRO_DEV_BACKGROUND=1` to
+  keep it in the foreground; run via `npm start`.
+- **Chat returns 502** → `ANTHROPIC_API_KEY` isn't set (in `.env` locally, or the
+  SSM parameter in AWS). Check the `api` function's CloudWatch logs.
+- **A new briefing doesn't show** → the refresh invalidates the live `/api` paths
+  in CloudFront; invalidations take a few seconds to a minute.
+- **`cdk deploy` fails with "not bootstrapped"** → run `npx cdk bootstrap` once
+  for the account and `us-east-1`.
 
 ## Dependency audit note
 
-`npm audit` reports issues only in Netlify's build-time tooling and the unused
-image-optimization chain (`esbuild` via `zip-it-and-ship-it`; `sharp`/`ipx`/
-`@netlify/images`). None are reachable at runtime for this static site.
-
-The `@astrojs/netlify` adapter was removed deliberately. It registered a server
-function on `/*`, so every request for a URL without a static file — bot probes
-for `/wp-login.php`, `/.env`, and the like — invoked a function and billed
-compute. The site is fully static and needs no server; missing URLs are now
-served `404.html` from the CDN. Do not re-add an adapter unless a page genuinely
-needs on-demand rendering.
-
+No server adapter is used, deliberately. An adapter registers a server function
+on `/*`, so every request for a URL without a static file — bot probes for
+`/wp-login.php`, `/.env`, and the like — would invoke a function and bill
+compute. The site is fully static; missing URLs get `404.html` from CloudFront.
+Do not add an adapter unless a page genuinely needs on-demand rendering.

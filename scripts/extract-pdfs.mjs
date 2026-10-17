@@ -20,7 +20,7 @@
  *   npm run extract -- <slug> --force  re-extract just that course
  *
  * Courses come from `courses.config.json` (the single source of truth shared
- * with the site and the Netlify Functions).
+ * with the site and the server).
  */
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -35,7 +35,7 @@ const OUT_DIR = path.join(ROOT, 'content', '_extracted');
 const CONFIG_PATH = path.join(ROOT, 'courses.config.json');
 const MANIFEST_PATH = path.join(OUT_DIR, 'manifest.json');
 
-// Single source of truth for courses (shared with the site + Netlify Functions).
+// Single source of truth for courses (shared with the site + the server).
 const COURSES = JSON.parse(await readFile(CONFIG_PATH, 'utf8')).courses;
 
 const ARGS = process.argv.slice(2);

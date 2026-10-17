@@ -29,3 +29,7 @@ Documents/
 .DS_Store
 *.log
 npm-debug.log*
+
+# Local API store (server/dev.ts) and CDK output
+.data/
+cdk.out/

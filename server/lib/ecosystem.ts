@@ -24,10 +24,10 @@
  *
  * Everything here uses public feeds with no API keys. GitHub's *Atom* feeds are
  * used rather than its REST API on purpose: the unauthenticated REST API allows
- * only 60 requests/hour per IP, and Netlify functions share egress addresses, so
+ * only 60 requests/hour per IP, and Lambda functions share egress addresses, so
  * a watchlist this size would intermittently 403. The Atom feeds have no such cap.
  */
-import { getStore, type Store } from '@netlify/blobs';
+import { getStore, type Store } from './store';
 import { getClient, NEWS_MODEL } from './anthropic';
 import { getText, pool, clean, atomLink, asArray, parser, readFeed } from './feeds';
 
@@ -320,7 +320,7 @@ export async function fetchFeed(url: string, source: string): Promise<EcoItem[]>
 
 /**
  * Subreddit feeds, fetched IN SERIES on purpose. Reddit throttles concurrent
- * requests from one address, and Netlify functions egress from shared IPs — run
+ * requests from one address, and Lambda functions egress from shared IPs — run
  * these in the general pool and the second subreddit reliably comes back empty.
  */
 async function fetchSubreddits(): Promise<EcoItem[]> {

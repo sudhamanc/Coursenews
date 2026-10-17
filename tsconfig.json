@@ -1,9 +1,9 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "node_modules", ".netlify"],
+  "exclude": ["dist", "node_modules", ".netlify", "cdk.out", ".data"],
   "compilerOptions": {
-    "types": ["@netlify/functions"],
+    "types": ["node", "aws-lambda"],
     "allowJs": true,
     "checkJs": false
   }

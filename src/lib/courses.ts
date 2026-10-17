@@ -1,12 +1,12 @@
 /**
  * Canonical section registry. Sections live in `courses.config.json` at the
  * repo root (under the historical `courses` key) — the SINGLE SOURCE OF TRUTH
- * shared by the site, the PDF extraction script, and the Netlify Functions. To
+ * shared by the site, the PDF extraction script, and the server (server/). To
  * add a section, add an entry there (no code changes needed here).
  *
  * The `dir` values map to the source PDF folders under `Documents/`. Slugs are
  * the URL-safe identifiers used in `/sections/<slug>` and validated server-side
- * in Netlify Functions (never trust client input — see `netlify/lib/validate.ts`).
+ * on the server (never trust client input — see `server/lib/validate.ts`).
  */
 import coursesConfig from '../../courses.config.json';
 

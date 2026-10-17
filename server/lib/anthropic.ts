@@ -1,5 +1,5 @@
 /**
- * Anthropic (Claude Haiku) access — used ONLY inside Netlify Functions.
+ * Anthropic access — used ONLY server-side (the api and jobs Lambdas).
  * The API key is read from the function environment and never reaches the client.
  */
 import Anthropic from '@anthropic-ai/sdk';

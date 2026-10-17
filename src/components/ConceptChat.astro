@@ -3,9 +3,9 @@
  * ConceptChat — the "Dig deeper" chat island.
  *
  * Renders a slide-in panel plus a thread-history drawer. It does NOT talk to
- * Anthropic directly; it POSTs to the Netlify Function proxy at `/api/chat`
- * (and `/api/threads`), attaching the Netlify Identity JWT. The API key lives
- * only in the function environment.
+ * Anthropic directly; it POSTs to the server proxy at `/api/chat` (and
+ * `/api/threads`), attaching an anonymous per-browser visitor id. The API key
+ * lives only on the server.
  *
  * Lecture context is passed via data-* attributes and read by the client script.
  * "Dig deeper" trigger buttons live in the page and carry `data-concept-*`;

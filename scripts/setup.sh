@@ -24,9 +24,8 @@ cat <<'EOF'
 
 Setup complete. Common commands:
   npm run dev        Pages-only dev server   -> http://localhost:4321
-  npm start          Full stack (Functions)  -> http://localhost:8888
-  npm stop           Stop the full-stack server and free ports
+  npm start          Full stack (pages + /api) -> http://localhost:4321
+  npm stop           Stop the full-stack servers and free ports
   npm run build      Production build into dist/
-  npm run deploy     Deploy a draft to Netlify (needs `netlify link` first)
-  npm run deploy:prod  Deploy to production
+  npm run deploy     Deploy to AWS (needs `aws login` first; see README)
 EOF

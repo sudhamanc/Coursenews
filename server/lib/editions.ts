@@ -9,7 +9,7 @@
  *
  * A re-run on the same day overwrites that day's snapshot.
  */
-import { getStore, type Store } from '@netlify/blobs';
+import { getStore, type Store } from './store';
 
 export type EditionKind = 'research' | 'ecosystem' | 'briefing';
 export const EDITION_KINDS: EditionKind[] = ['research', 'ecosystem', 'briefing'];

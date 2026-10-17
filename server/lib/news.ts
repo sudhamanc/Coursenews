@@ -7,9 +7,9 @@
  *
  * Pipeline: fetch -> normalize -> dedupe + 48h window + heuristic prefilter ->
  * a single Haiku call ranks the top candidates and writes a category and a
- * one-to-two sentence "why it matters" note. Results are cached in Blobs.
+ * one-to-two sentence "why it matters" note. Results are cached in the JSON store.
  */
-import { getStore, type Store } from '@netlify/blobs';
+import { getStore, type Store } from './store';
 import { XMLParser } from 'fast-xml-parser';
 import { getClient, NEWS_MODEL } from './anthropic';
 

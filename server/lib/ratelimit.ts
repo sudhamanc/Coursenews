@@ -1,5 +1,5 @@
 /**
- * Daily message caps, backed by Netlify Blobs.
+ * Daily message caps, backed by the JSON store (S3 in production).
  *
  * Two counters keyed by UTC date, checked in order:
  *
@@ -10,18 +10,19 @@
  *      this is the limit that actually bounds the daily bill.
  *
  * Not a strict distributed limiter, but sufficient as a cost guardrail. Uses
- * optimistic concurrency (ETag) so parallel requests don't clobber a count.
+ * optimistic concurrency (ETag conditional writes) so parallel requests don't
+ * clobber a count. An S3 lifecycle rule expires old counters.
  *
  * Fails CLOSED in production: if a counter cannot be read or settled, the call
- * is refused rather than let through uncounted. Under `netlify dev` (no linked
- * Blobs) it fails open so local development still works.
+ * is refused rather than let through uncounted. In local dev (LOCAL_DEV=true)
+ * it fails open so development still works.
  */
-import { getStore, type Store } from '@netlify/blobs';
+import { getStore, type Store } from './store';
 
 const DAILY_CAP = Number(process.env.CHAT_DAILY_CAP || 100);
 const GLOBAL_DAILY_CAP = Number(process.env.CHAT_GLOBAL_DAILY_CAP || 300);
 
-const IS_LOCAL_DEV = process.env.NETLIFY_DEV === 'true';
+const IS_LOCAL_DEV = process.env.LOCAL_DEV === 'true';
 
 function rateStore(): Store {
   return getStore('rate-limits');
@@ -83,8 +84,8 @@ export async function consumeDailyQuota(identifier: string): Promise<RateResult>
 
     return { allowed: true, remaining: DAILY_CAP - visitor.count, cap: DAILY_CAP };
   } catch (err) {
-    // Blobs unavailable. Locally that just means `netlify dev` without a linked
-    // site; in production it means we cannot count, so we must not spend.
+    // Storage unavailable. In production that means we cannot count, so we
+    // must not spend.
     if (IS_LOCAL_DEV) return { allowed: true, remaining: DAILY_CAP, cap: DAILY_CAP };
     console.error('chat: rate-limit store unavailable, refusing', err);
     return refused;
