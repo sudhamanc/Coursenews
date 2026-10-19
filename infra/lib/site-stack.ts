@@ -7,6 +7,11 @@
  *
  * Everything here sits inside AWS's always-free tiers at this site's traffic.
  * AWS has no hard spend cap, so a monthly budget alert is the backstop.
+ *
+ * Deploys run from a laptop (scripts/deploy.sh). There is no CI deploy role:
+ * this account's managed IAM experience denies iam:CreateOpenIDConnectProvider,
+ * so GitHub OIDC federation is unavailable without activating advanced
+ * features, and a long-lived access key in GitHub is not worth the trade.
  */
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -37,8 +42,6 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 export interface SiteStackProps extends StackProps {
   /** SSM path holding the secrets (SecureStrings created by hand; see README). */
   ssmPrefix: string;
-  /** GitHub repo allowed to deploy from its main branch, e.g. "owner/name". */
-  githubRepo: string;
   /** Where the budget alert goes. No budget is created without one. */
   budgetEmail?: string;
   monthlyBudgetUsd: number;
@@ -256,41 +259,6 @@ export class SiteStack extends Stack {
     schedule('NewsDaily', 'cron(0 13 * * ? *)', 'news');
     schedule('BriefingWeekdays', 'cron(30 13 ? * MON-FRI *)', 'briefing');
 
-    /* ------------------------------------------------- GitHub deploys */
-
-    const github = new iam.OpenIdConnectProvider(this, 'GitHubOidc', {
-      url: 'https://token.actions.githubusercontent.com',
-      clientIds: ['sts.amazonaws.com'],
-    });
-    const deployRole = new iam.Role(this, 'GitHubDeployRole', {
-      roleName: 'latent-inference-github-deploy',
-      assumedBy: new iam.WebIdentityPrincipal(github.openIdConnectProviderArn, {
-        StringEquals: {
-          'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
-          'token.actions.githubusercontent.com:sub': `repo:${props.githubRepo}:ref:refs/heads/main`,
-        },
-      }),
-      maxSessionDuration: Duration.hours(1),
-    });
-    // `cdk deploy` works by assuming the bootstrap roles.
-    deployRole.addToPolicy(
-      new iam.PolicyStatement({
-        actions: ['sts:AssumeRole'],
-        resources: [`arn:aws:iam::${this.account}:role/cdk-*`],
-      }),
-    );
-    deployRole.addToPolicy(
-      new iam.PolicyStatement({ actions: ['cloudformation:DescribeStacks'], resources: [this.stackId] }),
-    );
-    siteBucket.grantReadWrite(deployRole);
-    siteBucket.grantDelete(deployRole);
-    deployRole.addToPolicy(
-      new iam.PolicyStatement({
-        actions: ['cloudfront:CreateInvalidation'],
-        resources: [`arn:aws:cloudfront::${this.account}:distribution/${distribution.distributionId}`],
-      }),
-    );
-
     /* ---------------------------------------------------------- budget */
 
     if (props.budgetEmail) {
@@ -314,6 +282,5 @@ export class SiteStack extends Stack {
     new CfnOutput(this, 'DistributionId', { value: distribution.distributionId });
     new CfnOutput(this, 'SiteBucketName', { value: siteBucket.bucketName });
     new CfnOutput(this, 'DataBucketName', { value: dataBucket.bucketName });
-    new CfnOutput(this, 'DeployRoleArn', { value: deployRole.roleArn });
   }
 }

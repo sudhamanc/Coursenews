@@ -507,17 +507,20 @@ aws ssm put-parameter --region us-east-2 --type SecureString \
 BUDGET_EMAIL=you@example.com npm run deploy
 ```
 
-The deploy prints the site URL (`https://<id>.cloudfront.net`). Then in the
-GitHub repo, under **Settings → Secrets and variables → Actions → Variables**, add:
-
-- `AWS_DEPLOY_ROLE_ARN`: the stack's `DeployRoleArn` output.
-- `BUDGET_EMAIL` (optional).
+The deploy prints the site URL (`https://<id>.cloudfront.net`).
 
 ### After that
 
-Every push to `main` deploys through
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). It signs in with
-GitHub's OIDC token, so no AWS keys are stored in GitHub.
+Every release is `npm run deploy` from a laptop signed in with `aws login`. It
+re-runs the CDK stack, rebuilds the site, syncs it to S3, and invalidates
+CloudFront, so it is safe to re-run and cheap when nothing changed.
+
+There is no deploy from CI. GitHub Actions would need an OIDC identity
+provider, and this account's managed IAM experience denies
+`iam:CreateOpenIDConnectProvider` through a service control policy; the only
+ways around that are activating advanced AWS features (irreversible, and it
+removes the account's spend limit) or storing a long-lived access key in
+GitHub. Neither is worth it for a site one person deploys.
 
 ### Custom domain (later)
 

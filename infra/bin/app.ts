@@ -17,7 +17,6 @@ new SiteStack(app, 'LatentInference', {
   // that must live in us-east-1, and it needs its own stack there.
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'us-east-2' },
   ssmPrefix: '/latent-inference',
-  githubRepo: 'sudhamanc/Coursenews',
   budgetEmail: app.node.tryGetContext('budgetEmail') || process.env.BUDGET_EMAIL || undefined,
   monthlyBudgetUsd: Number(app.node.tryGetContext('monthlyBudgetUsd') ?? 5),
 });
