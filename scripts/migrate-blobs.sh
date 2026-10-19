@@ -11,7 +11,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-BUCKET="$(aws cloudformation describe-stacks --region us-east-1 --stack-name LatentInference \
+BUCKET="$(aws cloudformation describe-stacks --region us-east-2 --stack-name LatentInference \
   --query "Stacks[0].Outputs[?OutputKey=='DataBucketName'].OutputValue" --output text)"
 WORK="$(mktemp -d)"
 NETLIFY=(npx -y netlify-cli@26)

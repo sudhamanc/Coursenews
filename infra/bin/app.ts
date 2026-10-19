@@ -11,8 +11,11 @@ import { SiteStack } from '../lib/site-stack';
 const app = new App();
 
 new SiteStack(app, 'LatentInference', {
-  // CloudFront, and any future custom-domain certificate, live in us-east-1.
-  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'us-east-1' },
+  // us-east-2 is this project's only Region: a service control policy denies
+  // regional service actions anywhere else. CloudFront is global, so the CDN
+  // is created from here; a future custom-domain certificate is the one piece
+  // that must live in us-east-1, and it needs its own stack there.
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: 'us-east-2' },
   ssmPrefix: '/latent-inference',
   githubRepo: 'sudhamanc/Coursenews',
   budgetEmail: app.node.tryGetContext('budgetEmail') || process.env.BUDGET_EMAIL || undefined,

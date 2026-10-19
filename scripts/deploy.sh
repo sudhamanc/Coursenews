@@ -12,7 +12,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 STACK=LatentInference
-REGION=us-east-1
+REGION=us-east-2
 export AWS_REGION=$REGION
 
 CDK_ARGS=(--require-approval never)

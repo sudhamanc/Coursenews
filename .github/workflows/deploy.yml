@@ -34,7 +34,7 @@ jobs:
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
-          aws-region: us-east-1
+          aws-region: us-east-2
       - run: bash scripts/deploy.sh
         env:
           BUDGET_EMAIL: ${{ vars.BUDGET_EMAIL }}

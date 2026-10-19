@@ -474,7 +474,10 @@ are plain Lambda environment variables set in
 ## Deploy to AWS
 
 Everything is defined in [`infra/lib/site-stack.ts`](infra/lib/site-stack.ts)
-(AWS CDK, `us-east-1`):
+(AWS CDK, `us-east-2`). The account is on the new AWS experience, where a
+service control policy allows regional services in one Region only, so the
+Lambdas, S3 buckets, SSM parameters and schedules all live in `us-east-2`.
+CloudFront, IAM and Budgets are global and are created from the same stack:
 
 - **CloudFront** serves the pages from a private S3 bucket, and `/api/*` from the
   `api` Lambda's Function URL.
@@ -495,10 +498,11 @@ on). Expect about $0–1 a month, plus Anthropic usage.
 
 ```bash
 aws login                                   # your AWS account
-npx cdk bootstrap aws://<account-id>/us-east-1
-aws ssm put-parameter --region us-east-1 --type SecureString \
-  --name /latent-inference/ANTHROPIC_API_KEY --value "sk-ant-..."
-aws ssm put-parameter --region us-east-1 --type SecureString \
+npx cdk bootstrap aws://<account-id>/us-east-2
+read -rs ANTHROPIC_KEY                      # paste the key; keeps it out of history
+aws ssm put-parameter --region us-east-2 --type SecureString \
+  --name /latent-inference/ANTHROPIC_API_KEY --value "$ANTHROPIC_KEY"
+aws ssm put-parameter --region us-east-2 --type SecureString \
   --name /latent-inference/NEWS_REFRESH_KEY --value "$(openssl rand -hex 24)"
 BUDGET_EMAIL=you@example.com npm run deploy
 ```
@@ -517,9 +521,12 @@ GitHub's OIDC token, so no AWS keys are stored in GitHub.
 
 ### Custom domain (later)
 
-Request an ACM certificate in `us-east-1`, then add `domainNames` and
-`certificate` to the distribution in the stack. Point the domain's DNS at the
-CloudFront address and set `SITE_URL` to match.
+A CloudFront certificate must be in `us-east-1`, which is the one exception to
+the single-Region rule above. Request the ACM certificate there in its own
+small `us-east-1` stack, reference it from the distribution with
+`crossRegionReferences: true`, then add `domainNames` and `certificate` to the
+distribution. Point the domain's DNS at the CloudFront address and set
+`SITE_URL` to match.
 
 ## Security & cost controls
 
@@ -565,7 +572,10 @@ in place of `getVisitorId`.
 - **A new briefing doesn't show** → the refresh invalidates the live `/api` paths
   in CloudFront; invalidations take a few seconds to a minute.
 - **`cdk deploy` fails with "not bootstrapped"** → run `npx cdk bootstrap` once
-  for the account and `us-east-1`.
+  for the account and `us-east-2`.
+- **Any AWS call fails with "explicit deny in a service control policy"** →
+  it is almost always the wrong Region. Regional services are permitted in
+  `us-east-2` only; check `--region` and `AWS_REGION`.
 
 ## Dependency audit note
 
