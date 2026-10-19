@@ -18,6 +18,7 @@ be reused: point it at your own PDFs, edit one config file, and you have your ow
 
 - [Features](#features)
 - [How it works](#how-it-works)
+- [Why this architecture](#why-this-architecture)
 - [The two `/latest` wires](#the-two-latest-wires)
 - [The Agentic AI Intelligence Briefing](#the-agentic-ai-intelligence-briefing)
 - [Edition history](#edition-history)
@@ -78,31 +79,104 @@ be reused: point it at your own PDFs, edit one config file, and you have your ow
 
 ## How it works
 
-```text
-Documents/<Section>/*.pdf
-        │  npm run extract  (incremental)
-        ▼
-content/_extracted/<slug>/*.txt  +  manifest.json      (gitignored, regenerable)
-        │  authored into
-        ▼
-src/content/articles/<slug>/*.md   ──►  Astro build  ──►  dist/ (static HTML)
-                                                            │
-Browser ─► CloudFront ─┬─ pages ──► S3 (dist/)
-                       └─ /api/* ─► Lambda "api" (server/router.ts)
-                                      ├─ chat · threads ──────────► Claude Haiku
-                                      └─ news · ecosystem · briefing · editions ◄┐
-                                                   │                             │  EventBridge Scheduler
-                                                   │                             │  → Lambda "jobs"
-                                                   │                             │  (13:00 UTC wires,
-                                                   ▼                             │   13:30 UTC briefing)
-                                         S3 "data" bucket  ──────────────────────┘
-                              (transcripts, feeds, 30 days of editions)
+Authoring is an offline pipeline; serving is a static site with a thin API
+behind it.
+
+```mermaid
+flowchart TD
+    PDF["Section PDFs in Documents/"] -->|npm run extract| EX["Extracted text + manifest<br/>gitignored, regenerable"]
+    EX -->|authored into| MD["Markdown articles<br/>src/content/articles/"]
+    MD -->|astro build| DIST["dist/ static HTML"]
+    DIST -->|npm run deploy| S3SITE["S3 site bucket"]
 ```
+
+At request time nothing is rendered on demand: CloudFront serves pages straight
+from S3, and only `/api/*` reaches a Lambda.
+
+```mermaid
+flowchart LR
+    Browser --> CF[CloudFront]
+    CF -->|pages| S3SITE["S3 site bucket<br/>private, OAC"]
+    CF -->|"/api/*"| API["Lambda api<br/>server/router.ts"]
+
+    API -->|chat, threads| CLAUDE[Claude Haiku]
+    API -->|"news, ecosystem,<br/>briefing, editions"| DATA[("S3 data bucket<br/>transcripts, feeds, editions")]
+
+    SCHED["EventBridge Scheduler<br/>13:00 UTC wires<br/>13:30 UTC briefing"] --> JOBS["Lambda jobs"]
+    JOBS --> CLAUDE
+    JOBS -->|writes feeds| DATA
+    JOBS -->|invalidates| CF
+
+    SSM["SSM Parameter Store<br/>SecureStrings"] -.->|read at cold start| API
+    SSM -.->|read at cold start| JOBS
+```
+
+The `api` Lambda only ever *reads* the feeds. Everything that costs model
+tokens happens on the schedule, in the `jobs` Lambda, so a traffic spike cannot
+turn into an Anthropic bill.
 
 The single source of truth for sections is [`courses.config.json`](courses.config.json)
 (the file keeps its original name), shared by the site, the extraction script, and the
 Functions. Pages live at `/sections/<slug>/<article>`; old `/courses/...` URLs redirect
 permanently via [`public/_redirects`](public/_redirects).
+
+## Why this architecture
+
+The site ran on Netlify first. The move to AWS was not about Netlify being
+slow or unreliable — it was about which resource the hosting bill is
+denominated in.
+
+**The shape of the problem.** This is a static site with two small dynamic
+surfaces: a chat proxy, and four read-only JSON feeds. The feeds are rewritten
+twice a day by a scheduled job; between those runs they are immutable. So the
+ideal hosting is one that charges for *bytes served from cache* and almost
+nothing else, and that never runs compute on a page view.
+
+**What changed structurally.**
+
+| | Netlify | AWS |
+| --- | --- | --- |
+| Pages | Edge CDN, 100 GB/mo free | CloudFront, 1 TB + 10M requests/mo always-free |
+| Dynamic | Functions, 125k invocations/mo free | Lambda, 1M requests + 400k GB-s/mo always-free |
+| Deploys | Build minutes on every push (300/mo free) | `npm run deploy` from a laptop — no metered build |
+| Storage | Netlify Blobs | S3 (5 GB free for 12 months, then ~$0.023/GB-mo) |
+| Schedule | Scheduled functions | EventBridge Scheduler, 14M invocations/mo free |
+| Secrets | Env vars in the UI | SSM SecureStrings, read at cold start |
+
+The headline difference is the free-tier *ceiling*: CloudFront's always-free
+allowance is an order of magnitude above Netlify's, and it does not expire
+after twelve months the way most AWS introductory tiers do. At this site's
+traffic both are free; the AWS one stays free much further up the curve.
+
+The second difference is deploys. Netlify spends build minutes on every push to
+`main` whether or not the content changed. Here the build runs locally and
+`aws s3 sync` uploads only what differs — a typo fix is a few kilobytes and one
+CloudFront invalidation, not a metered rebuild of the whole site.
+
+**What actually costs money.** Neither CDN bill is the real number. Anthropic
+tokens are, and the architecture is shaped around that: the `api` Lambda only
+reads pre-generated feeds from S3, so no amount of traffic can trigger a model
+call. Only the scheduled `jobs` Lambda spends tokens, twice a day, and chat is
+capped per-IP and globally (`CHAT_DAILY_CAP`, `CHAT_GLOBAL_DAILY_CAP`). A front
+page that goes viral costs bandwidth, not inference.
+
+**Honest trade-offs.** This is not free of downsides:
+
+- **AWS has no hard spend cap.** Netlify's free tier simply stops serving when
+  you exhaust it; AWS keeps going and bills you. The mitigations here are a
+  monthly budget alert (`BUDGET_EMAIL`) and the per-IP chat caps — alerts, not
+  limits. This is a real regression in blast-radius protection.
+- **More moving parts.** One Netlify project became CloudFront, two S3 buckets,
+  two Lambdas, two schedules, SSM parameters and a CDK stack. That is more to
+  understand and more to break, justified only because CDK keeps it in version
+  control.
+- **No push-to-deploy.** See [After that](#after-that) — the account's managed
+  IAM experience blocks the OIDC provider GitHub Actions would need, so
+  releases are manual.
+
+For a one-person site that publishes on a schedule, those trade-offs are worth
+the ceiling. For a team shipping many times a day, the lost CI deploy would
+probably not be.
 
 ## The two `/latest` wires
 
@@ -306,7 +380,7 @@ scrolls away from its figure.
 | Math        | `remark-math` + `rehype-katex` (KaTeX)                            |
 | Hosting     | AWS: CloudFront + S3 (pages), Lambda (API + jobs), EventBridge Scheduler |
 | Storage     | S3 JSON documents (`server/lib/store.ts`)                         |
-| Infra       | AWS CDK (TypeScript, `infra/`), deployed by GitHub Actions        |
+| Infra       | AWS CDK (TypeScript, `infra/`), deployed from a laptop            |
 | LLM         | Anthropic Claude Haiku (`@anthropic-ai/sdk`)                      |
 | PDF text    | `unpdf`                                                           |
 | News        | arXiv RSS + Hacker News (Algolia) via `fast-xml-parser`           |
@@ -374,7 +448,7 @@ scripts/
   extract-pdfs.mjs         # PDF -> text (incremental)
   make-icons.mjs           # SVG -> the PNG icon set (run on demand, outputs committed)
   rehype-figscroll.mjs     # wraps wide figures/tables in a scroll container at build time
-  setup.sh · serve.sh · deploy.sh · migrate-blobs.sh (one-off Netlify → S3 copy)
+  setup.sh · serve.sh · deploy.sh
 src/
   content.config.ts        # `articles` collection schema (zod)
   content/articles/<slug>/*.md   # the authored feature articles
@@ -493,6 +567,15 @@ CloudFront, IAM and Budgets are global and are created from the same stack:
 **Cost:** at this site's traffic, everything stays inside AWS's always-free
 tiers (CloudFront 1 TB / 10M requests, Lambda 1M requests / 400K GB-s, and so
 on). Expect about $0–1 a month, plus Anthropic usage.
+
+```mermaid
+flowchart LR
+    DEV["Laptop, signed in with aws login"] -->|1 cdk deploy| CFN["CloudFormation<br/>us-east-2"]
+    CFN --> STACK["CloudFront, 2 S3 buckets,<br/>2 Lambdas, 2 schedules,<br/>SSM, Budget"]
+    DEV -->|2 astro build| DISTD["dist/"]
+    DISTD -->|3 aws s3 sync| S3SITE["S3 site bucket"]
+    DEV -->|4 create-invalidation| CDN[CloudFront]
+```
 
 ### First deploy (once, from a laptop)
 
