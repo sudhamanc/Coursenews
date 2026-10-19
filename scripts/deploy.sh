@@ -6,7 +6,8 @@
 #   npm run deploy                 from a laptop signed in with `aws login`
 #   (GitHub Actions runs the same script on every push to main)
 #
-# Optional: BUDGET_EMAIL=you@example.com to create/update the budget alert.
+# Optional: BUDGET_EMAIL=you@example.com creates the monthly budget. It tracks
+# spend in the console but cannot send mail (see infra/lib/site-stack.ts).
 #
 set -euo pipefail
 cd "$(dirname "$0")/.."

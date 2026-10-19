@@ -6,7 +6,10 @@
  *   EventBridge Scheduler   → Lambda "jobs" (the /latest refreshes)
  *
  * Everything here sits inside AWS's always-free tiers at this site's traffic.
- * AWS has no hard spend cap, so a monthly budget alert is the backstop.
+ * A monthly budget tracks spend, but it CANNOT notify on this account: email
+ * recipients need AWS User Notifications verification, which a service control
+ * policy denies, and the SNS alternative needs a topic in us-east-1, which the
+ * Region policy denies. Treat the budget as a dashboard to check, not an alert.
  *
  * Deploys run from a laptop (scripts/deploy.sh). There is no CI deploy role:
  * this account's managed IAM experience denies iam:CreateOpenIDConnectProvider,
@@ -42,7 +45,11 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 export interface SiteStackProps extends StackProps {
   /** SSM path holding the secrets (SecureStrings created by hand; see README). */
   ssmPrefix: string;
-  /** Where the budget alert goes. No budget is created without one. */
+  /**
+   * Recipient recorded on the budget. No budget is created without one.
+   * Note: this address cannot be verified under the account's service control
+   * policies, so no mail is ever delivered — see the note at the top.
+   */
   budgetEmail?: string;
   monthlyBudgetUsd: number;
 }

@@ -163,9 +163,12 @@ page that goes viral costs bandwidth, not inference.
 **Honest trade-offs.** This is not free of downsides:
 
 - **AWS has no hard spend cap.** Netlify's free tier simply stops serving when
-  you exhaust it; AWS keeps going and bills you. The mitigations here are a
-  monthly budget alert (`BUDGET_EMAIL`) and the per-IP chat caps — alerts, not
-  limits. This is a real regression in blast-radius protection.
+  you exhaust it; AWS keeps going and bills you. The mitigation that actually
+  binds is the account plan: on the Free plan, spend is bounded by credits. The
+  monthly budget is a dashboard, not an alarm — it cannot send mail on this
+  account (see [Security & cost controls](#security--cost-controls)), and the
+  per-IP chat caps limit inference, not infrastructure. This is a real
+  regression in blast-radius protection.
 - **More moving parts.** One Netlify project became CloudFront, two S3 buckets,
   two Lambdas, two schedules, SSM parameters and a CDK stack. That is more to
   understand and more to break, justified only because CDK keeps it in version
@@ -562,7 +565,8 @@ CloudFront, IAM and Budgets are global and are created from the same stack:
 - **EventBridge Scheduler** runs the `jobs` Lambda for the news wires daily at
   13:00 UTC and the briefing on weekdays at 13:30 UTC.
 - **An S3 data bucket** holds the feeds, the edition archive, and chat threads.
-- **A monthly AWS Budget** sends email alerts (set `BUDGET_EMAIL`).
+- **A monthly AWS Budget** tracks spend in the Billing console (set
+  `BUDGET_EMAIL`). It does **not** email — see below.
 
 **Cost:** at this site's traffic, everything stays inside AWS's always-free
 tiers (CloudFront 1 TB / 10M requests, Lambda 1M requests / 400K GB-s, and so
@@ -622,9 +626,16 @@ distribution. Point the domain's DNS at the CloudFront address and set
   `/api` request, and the Lambda refuses anything without it. The Function URL
   can't be called around the CDN.
 - **Cost guardrail** — chat is rate-limited per client IP (`CHAT_DAILY_CAP`/day →
-  `429`) and site-wide (`CHAT_GLOBAL_DAILY_CAP`). AWS has no hard spend cap, so
-  the stack adds a budget alert. Also set a **spend limit in the Anthropic
-  console** as a backstop.
+  `429`) and site-wide (`CHAT_GLOBAL_DAILY_CAP`). Set a **spend limit in the
+  Anthropic console** as well: that is the only hard stop on inference spend.
+- **The AWS budget does not alert.** The stack creates a $5 monthly budget, and
+  it tracks spend correctly in the Billing console, but no notification can
+  reach you. Budget email recipients must be verified through AWS User
+  Notifications, which a service control policy denies
+  (`notifications-contacts:SendActivationCode`), and the documented alternative
+  — an SNS topic — must live in `us-east-1`, which the Region policy also
+  denies. So check the budget; do not wait to be told. On the Free plan the
+  account's credit balance is the real cap.
 - **Input validation** — message length and section slug are validated server-side;
   the system prompt is written to resist prompt injection.
 - **Output safety** — assistant and wire text render via `textContent` (no HTML
