@@ -19,7 +19,7 @@
       "shortTitle": "AI Foundations",
       "dir": "IntroductionToAI",
       "group": "ai",
-      "tagline": "Rational agents, problem-solving, and Turing's test",
+      "tagline": "Rational agents, search, games, and Turing's test",
       "blurb": "Rational agents, search, games, uncertainty, and learning — the classical foundations of artificial intelligence, from Turing's question onward."
     },
     {

@@ -4,7 +4,7 @@ lectureId: W3
 title: "Knowing Which Way Is Warmer: Heuristics and A*"
 deck: "Uniform-cost search is optimal and blind. Give it an estimate of the distance remaining and it becomes A* — still optimal, far faster, and dependent on two properties of that estimate that are easy to state, easy to violate, and decide whether the answer is right."
 order: 3
-readingTime: 14
+readingTime: 15
 tags: ["search", "heuristics", "a-star", "admissibility", "consistency", "greedy-search"]
 concepts:
   - id: heuristic
@@ -174,6 +174,36 @@ $S$, putting $A$ ($f = 4$) and $B$ ($f = 3$) on the queue. It expands $B$, which
 on the queue at cost 5. Stopping there would return 5. Continuing, A* expands $A$
 ($f = 4$), which puts $G$ on the queue again at cost 4, and that is the copy that comes
 off first. The optimal path is only guaranteed once a goal is the *cheapest thing left*.
+
+### Worked exercise: Arad to Bucharest by cost alone
+
+The same rule governs uniform-cost search, which is A* with $h = 0$. On the Romania
+road map, from Arad to Bucharest, the priority queue evolves like this (each entry is a
+city and its path cost $g$; the cheapest is removed next):
+
+| Removed | Queue afterwards |
+|---|---|
+| Arad (0) | Zerind 75, Timisoara 118, Sibiu 140 |
+| Zerind (75) | Timisoara 118, Sibiu 140, Oradea 146 |
+| Timisoara (118) | Sibiu 140, Oradea 146, Lugoj 229 |
+| Sibiu (140) | Oradea 146, Rimnicu Vilcea 220, Lugoj 229, Fagaras 239 |
+| Oradea (146) | *(its other neighbour, Sibiu, is already closed)* Rimnicu Vilcea 220, Lugoj 229, Fagaras 239 |
+| Rimnicu Vilcea (220) | Lugoj 229, Fagaras 239, Pitesti 317, Craiova 366 |
+| Lugoj (229) | Fagaras 239, Mehadia 299, Pitesti 317, Craiova 366 |
+| Fagaras (239) | Mehadia 299, Pitesti 317, Craiova 366, **Bucharest 450** |
+| Mehadia (299) | Pitesti 317, Craiova 366, Drobeta 374, Bucharest 450 |
+| Pitesti (317) | Craiova 366, Drobeta 374, **Bucharest 418** *(replaces 450)* |
+| Craiova (366) | Drobeta 374, Bucharest 418 *(its neighbours are closed or already cheaper)* |
+| Drobeta (374) | Bucharest 418 |
+| **Bucharest (418)** | — goal removed: done |
+
+Bucharest joins the queue at 450 via Fagaras, but four more cities are expanded before it
+comes off — by then at 418, via Pitesti. Stopping at the first sight of the goal would
+have returned the 450 route. The answer is **Arad → Sibiu → Rimnicu Vilcea → Pitesti →
+Bucharest**: four legs, one more than the Arad → Sibiu → Fagaras → Bucharest route.
+Uniform-cost search, greedy search and A* minimize **path cost**, not the number of
+moves; breadth-first search, depth-first search and iterative deepening count moves and
+ignore cost.
 
 ## 5. Is A* optimal? Admissibility
 
