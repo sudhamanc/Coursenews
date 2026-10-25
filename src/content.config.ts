@@ -53,6 +53,22 @@ const articles = defineCollection({
       )
       .default([]),
     tags: z.array(z.string()).default([]),
+    /**
+     * The public work a feature summarizes, for articles written from an
+     * outside source rather than the section's own material. Renders a
+     * "Read the original" link under the byline and an attribution card at the
+     * end, with the license when the source asks for one (e.g. CC BY-SA).
+     * URLs must be https so a typo can never ship a `javascript:` link.
+     */
+    source: z
+      .object({
+        title: z.string(),
+        author: z.string(),
+        url: z.string().url().startsWith('https://'),
+        license: z.string().optional(),
+        licenseUrl: z.string().url().startsWith('https://').optional(),
+      })
+      .optional(),
   }),
 });
 

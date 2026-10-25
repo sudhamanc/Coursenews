@@ -36,6 +36,7 @@ const dateLine = entry.data.date
 const byline = [idLabel, dateLine, entry.data.readingTime ? `${entry.data.readingTime} min read` : null]
   .filter(Boolean)
   .join(' · ');
+const source = entry.data.source;
 ---
 
 <Newspaper
@@ -63,6 +64,17 @@ const byline = [idLabel, dateLine, entry.data.readingTime ? `${entry.data.readin
       <div class="byline article__byline">{byline}</div>
 
       {
+        source && (
+          <p class="source-line u-sans">
+            Summarized from <cite>{source.title}</cite> by {source.author} ·{' '}
+            <a href={source.url} target="_blank" rel="noopener noreferrer">
+              Read the original ↗
+            </a>
+          </p>
+        )
+      }
+
+      {
         entry.data.tags.length > 0 && (
           <div class="tag-row article__tags">
             {entry.data.tags.map((t) => (
@@ -77,6 +89,41 @@ const byline = [idLabel, dateLine, entry.data.readingTime ? `${entry.data.readin
       <div class="feature__grid">
         <div class="article__body">
           <Content />
+
+          {
+            source && (
+              <aside class="source-card" aria-labelledby="source-card-title">
+                <span class="flag" id="source-card-title">The Original</span>
+                <p class="source-card__title">
+                  <a href={source.url} target="_blank" rel="noopener noreferrer">
+                    {source.title}
+                  </a>
+                </p>
+                <p class="source-card__meta u-sans">
+                  {source.author}
+                  {source.license &&
+                    (source.licenseUrl ? (
+                      <>
+                        {' · '}
+                        <a href={source.licenseUrl} target="_blank" rel="noopener noreferrer">
+                          {source.license}
+                        </a>
+                      </>
+                    ) : (
+                      ` · ${source.license}`
+                    ))}
+                </p>
+                <p class="source-card__note">
+                  This feature summarizes the original in our own words, and its code sketches
+                  are illustrations rather than excerpts. The full text, with its own examples
+                  and diagrams, is at the source.
+                </p>
+                <a class="readmore" href={source.url} target="_blank" rel="noopener noreferrer">
+                  Read the original ↗
+                </a>
+              </aside>
+            )
+          }
 
           <hr class="rule" />
           <div class="feature__cta">

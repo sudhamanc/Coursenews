@@ -731,6 +731,40 @@ img {
 .article__tags {
   margin-bottom: 0.5rem;
 }
+/* Features summarized from an outside work (frontmatter `source`): a credit
+   line under the byline, and an attribution card closing the body. */
+.source-line {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin: 0 0 0.5rem;
+}
+.source-line cite {
+  font-style: italic;
+}
+.source-card {
+  margin: 2.2rem 0 0;
+  padding: 1rem 1.15rem;
+  background: var(--paper-2);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+}
+.article__body .source-card p {
+  margin: 0 0 0.5rem;
+}
+.source-card__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.source-card__meta {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.article__body .source-card .source-card__note {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  margin-bottom: 0.75rem;
+}
 
 /* The feature page uses a wider shell than the narrow default article measure. */
 .feature {
