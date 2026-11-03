@@ -20,12 +20,14 @@
     "deploy": "bash scripts/deploy.sh",
     "icons": "node scripts/make-icons.mjs",
     "api": "tsx server/dev.ts",
+    "news:why": "tsx scripts/news-why.ts",
     "synth": "cdk synth --quiet"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.113.0",
     "@astrojs/markdown-remark": "^7.2.1",
     "@aws-sdk/client-cloudfront": "^3.1152.0",
+    "@aws-sdk/client-lambda": "^3.1152.0",
     "@aws-sdk/client-s3": "^3.1152.0",
     "@aws-sdk/client-ssm": "^3.1152.0",
     "astro": "^7.1.3",

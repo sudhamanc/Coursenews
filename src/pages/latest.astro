@@ -5,7 +5,7 @@ import Newspaper from '../layouts/Newspaper.astro';
 <Newspaper
   section="latest"
   title="Latest in AI — Latent Inference"
-  description="An Agentic AI Intelligence Briefing on enterprise adoption, a daily ranked digest of AI research from arXiv and Hacker News, and an ecosystem wire tracking model releases, protocol versions, libraries, and architectural patterns. Thirty days of past editions."
+  description="An Agentic AI Intelligence Briefing on enterprise adoption, a daily ranked digest of AI research from arXiv, Hacker News, and the links curator newsletters agree on, and an ecosystem wire tracking model releases, protocol versions, libraries, and architectural patterns. Thirty days of past editions."
 >
   <nav class="edition-bar" id="edition-bar" aria-label="Edition" hidden>
     <a class="edition-bar__step" id="ed-older" rel="prev">‹ Older</a>
@@ -291,6 +291,7 @@ import Newspaper from '../layouts/Newspaper.astro';
     published: string;
     points?: number;
     authors?: string;
+    cites?: string[];
     category?: string;
     why?: string;
   }
@@ -341,6 +342,14 @@ import Newspaper from '../layouts/Newspaper.astro';
       pts.className = 'u-muted';
       pts.textContent = `${item.points} points`;
       meta.appendChild(pts);
+    }
+    // Only worth saying when someone besides the item's own source pointed at it.
+    const others = (item.cites ?? []).filter((c) => c !== item.source);
+    if (others.length) {
+      const cited = document.createElement('span');
+      cited.className = 'u-muted';
+      cited.textContent = `Cited by ${others.join(', ')}`;
+      meta.appendChild(cited);
     }
 
     const h = document.createElement('h3');

@@ -5,7 +5,8 @@ feature articles — concepts explained as sections with KaTeX math and hand-dra
 SVG diagrams. A **"Dig deeper"** assistant (Claude Haiku, via a serverless proxy)
 lets you interrogate any concept, and a daily **"Latest in AI"** page leads with
 an **Agentic AI Intelligence Briefing** on enterprise adoption, then runs two
-wires: fresh research from arXiv and Hacker News, and an **ecosystem** wire
+wires: fresh research from arXiv, Hacker News, and what curator newsletters
+link to, and an **ecosystem** wire
 tracking model releases, protocol versions, libraries, and design patterns. The
 last 30 days of editions stay browsable.
 
@@ -57,10 +58,11 @@ be reused: point it at your own PDFs, edit one config file, and you have your ow
   searches, and writes a thesis plus the three developments that support it.
   See [The Agentic AI Intelligence Briefing](#the-agentic-ai-intelligence-briefing).
 - **Latest in AI (research wire)** — a scheduled function pulls fresh work from
-  arXiv (RSS) and Hacker News daily, keeps a balanced mix from each source, ranks
-  them with one Haiku call, and caches the feed. It carries arXiv forward on days
-  that feed is empty (arXiv announces only Sun–Thu), so the wire never collapses
-  to one source.
+  arXiv (RSS), Hacker News, and the links that curator newsletters and aggregators
+  agree on, keeps a balanced mix from each source, ranks them with one Haiku call,
+  and caches the feed. It carries arXiv forward on days that feed is empty (arXiv
+  announces only Sun–Thu), so the wire never collapses to one source. See
+  [Finding what the field is pointing at](#finding-what-the-field-is-pointing-at).
 - **The Ecosystem (releases wire)** — what *shipped*, in four buckets: Models,
   Standards, Libraries, Patterns. Runs a **tracked** lane (a watchlist of repos
   read via GitHub release feeds) alongside a **discovered** lane (trending models
@@ -190,7 +192,7 @@ one Haiku call per run and the ecosystem wire two (one per lane).
 | | **Latest in AI** (research) | **The Ecosystem** (releases) |
 | --- | --- | --- |
 | Question | What is being *discovered*? | What is being *used*? |
-| Sources | arXiv RSS, Hacker News | GitHub release feeds, GitHub Trending, Hugging Face, Show HN, subreddit + commentary RSS, AI vendor announcement RSS |
+| Sources | arXiv RSS, Hacker News, curator citations | GitHub release feeds, GitHub Trending, Hugging Face, Show HN, subreddit + commentary RSS, AI vendor announcement RSS |
 | Grouping | Ranked list, free-form category | Four fixed buckets: Models · Standards · Libraries · Patterns |
 | Endpoint | `/api/news` | `/api/ecosystem` |
 | Code | [`server/lib/news.ts`](server/lib/news.ts) | [`server/lib/ecosystem.ts`](server/lib/ecosystem.ts) |
@@ -245,8 +247,9 @@ releases so a chatty monorepo cannot flood the lane.
   titles are taken — at most 4 per vendor and 8 in all, with unused slots going
   back to the other discovery sources. Anthropic and Meta publish no feed and
   surface through Hacker News.
-- **Keyword gates match whole words.** Both wires drop Hacker News stories whose
-  title misses a topical term list, so plurals and stems must be spelled out
+- **Keyword gates match whole words.** The ecosystem wire drops Hacker News
+  stories whose title misses a topical term list (in the research wire the list is
+  only a hint; see below), so plurals and stems must be spelled out
   (`agents?`, `quantiz\w*`) — a bare `agent` is why the Agents API launch never
   reached the ranker. Company names (OpenAI, Anthropic, Google, Microsoft,
   Mistral, Amazon/AWS) count in the research wire only alongside a shipping word
@@ -256,6 +259,61 @@ releases so a chatty monorepo cannot flood the lane.
   and returns nothing (rather than erroring) if the markup changes.
 - Every source failure degrades to an empty list, and if *all* sources fail the
   previous cached feed is kept rather than publishing an empty one.
+
+### Finding what the field is pointing at
+
+The research wire used to find a story only if it was posted to arXiv or Hacker
+News and its HN title contained a word from a fixed list. In autumn 2026 that
+missed two pieces everyone was reading:
+
+- *Sparks of Weight-Space Programming* was #1 on Hacker News (2,900 points) as
+  "Astra can read and write weights to improve Qwen". That title contains no word
+  from the list, so the story never reached the ranker. Latent Space, Simon
+  Willison, and Lobsters all linked to it.
+- Goodfire's *Neural Networks Are Already Clean* got 849 points. Goodfire has no
+  feed, and the old fetch took one snapshot of the front page at 13:00 UTC, by
+  which time the story had dropped off.
+
+So the wire now asks what independent sources are pointing at, instead of
+keeping a list of every site worth watching:
+
+- **Citations.** [`server/lib/citations.ts`](server/lib/citations.ts) reads
+  `CURATOR_FEEDS` (Latent Space, Import AI, Interconnects, Simon Willison, the
+  Alignment Forum, The Decoder, the HF Blog, and Lobsters' `ai` tag) and indexes
+  every outbound link in their item bodies, along with Hacker News. A link cited by
+  two independent sources, or once by an aggregator, becomes a candidate. The
+  links come from the feed bodies the job downloads anyway; a link that arrives
+  without anchor text costs one fetch for its title (at most 10 a run). To add a
+  curator, add one line to `CURATOR_FEEDS`.
+- **One Hacker News query over a time window.** The fetch asks for the
+  top-scoring stories of the last 36 hours, not a snapshot of the front page.
+- **The keyword list is a hint, not a gate.** A story that misses the list
+  still goes to the ranker if it has at least 150 points or two citations, in
+  its own quota so a busy news day can't crowd out on-topic stories. The ranker
+  marks such stories `off_topic` or keeps them. It is told what the site's
+  courses cover, so "relevant" means relevant to them.
+- **Each candidate is described.** A bare title reads as thin to the ranker:
+  Goodfire's essay ranked last of 14 until the ranker could see the page's own
+  description. Each headline-only candidate's page description is now fetched
+  (at most 60 per run, in parallel).
+- **Cited items rank first within their source.** The arXiv quota used to take
+  the first 18 papers in feed order; a paper someone links to now jumps the
+  queue.
+
+The page shows **"Cited by …"** on an item when anyone besides its own source
+linked to it.
+
+**Answering "why wasn't X on it?"** Each run writes
+`audit/research-<YYYY-MM-DD>.json` to the `news` store. It has a row for every
+item that was dropped, saying at which stage (`window`, `gate`, `quota`, or
+`ranker-drop`) and why, and a `kept` row for every item that made the feed. It
+is pruned with the editions after 30 days. To trace a URL:
+
+```bash
+npm run news:why -- https://example.com/post            # today's sources, no model call
+npm run news:why -- https://example.com/post --rank     # ...and through the ranker
+npm run news:why -- https://example.com/post --audit research-2026-11-03.json
+```
 
 ## The Agentic AI Intelligence Briefing
 
@@ -425,6 +483,7 @@ npm start          # full stack (pages + /api, local file store) -> http://local
 | `npm run status`       | Report whether the server is running and which ports are busy.       |
 | `npm run build`        | Production build into `dist/`.                                       |
 | `npm run preview`      | Preview the built site.                                              |
+| `npm run news:why -- <url>` | Trace a URL through the research wire's sources and filters; `--rank` adds the ranker. |
 | `npm run extract`      | Extract PDF text (incremental). See below for per-section usage.     |
 | `npm run icons`        | Regenerate the PWA/favicon PNGs from `assets/icons/*.svg`.            |
 | `npm run api`          | Only the local API server (:8787).                                   |
@@ -471,7 +530,8 @@ server/
               config.ts     # loads secrets from SSM Parameter Store
               jobs.ts       # the /latest refresh jobs
               feeds.ts      # shared RSS/Atom reader and fetch helpers
-              news.ts       # research wire (arXiv + Hacker News)
+              news.ts       # research wire (arXiv + Hacker News + citations)
+              citations.ts  # who links to what, across curator feeds
               ecosystem.ts  # ecosystem wire (WATCHLIST lives here)
               briefing.ts   # enterprise briefing (BRIEFING_SOURCES lives here)
               editions.ts   # 30-day dated archive
@@ -525,7 +585,10 @@ Two ways to run it, depending on what you're working on:
 
 To fill the wires locally, set `NEWS_REFRESH_KEY` in `.env` and call
 `http://localhost:4321/api/refresh-news?wire=both` (or `wire=briefing`) with the
-header `X-Refresh-Key: <key>`.
+header `X-Refresh-Key: <key>`. Locally the call runs the refresh and answers with
+the result; on AWS it hands the job to the jobs function and answers `202` at
+once (a research refresh takes 40–60 s, past the API function's 30 s), so read
+the outcome in the jobs function's logs.
 
 ## Configuration
 

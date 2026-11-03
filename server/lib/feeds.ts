@@ -77,6 +77,86 @@ export interface FeedEntry {
   summary: string;
   /** The publishing outlet when the feed names one per item (Google News does). */
   outlet?: string;
+  /** Outbound links in the item body, when asked for with `{ links: true }`. */
+  links?: FeedLink[];
+}
+
+export interface FeedLink {
+  url: string; // normalised
+  text: string; // anchor text, cleaned
+}
+
+/**
+ * One canonical form per resource, so the same post cited by three newsletters
+ * counts once: https, no `www.`, no tracking parameters, fragment, or trailing
+ * slash, and arXiv PDFs and versions folded into the abstract page.
+ */
+export function normalizeUrl(raw: string): string | null {
+  let u: URL;
+  try {
+    u = new URL(raw.trim());
+  } catch {
+    return null;
+  }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+  u.protocol = 'https:';
+  u.hostname = u.hostname.toLowerCase().replace(/^www\./, '');
+  u.hash = '';
+  for (const k of [...u.searchParams.keys()]) {
+    if (/^(utm_\w+|ref|ref_src|triedRedirect|publication_id|post_id|isFreemail)$/i.test(k)) u.searchParams.delete(k);
+  }
+  if (u.hostname === 'arxiv.org' || u.hostname === 'export.arxiv.org') {
+    u.hostname = 'arxiv.org';
+    const id = /^\/(?:abs|pdf|html)\/([^/?#]+?)(?:v\d+)?(?:\.pdf)?\/?$/.exec(u.pathname)?.[1];
+    if (id) u.pathname = `/abs/${id}`;
+  }
+  const path = u.pathname.replace(/\/+$/, '');
+  return `https://${u.host}${path}${u.search}`;
+}
+
+/**
+ * Links that say nothing about what a newsletter is pointing at: its own pages,
+ * subscribe and share buttons, social profiles, and images.
+ */
+const BOILERPLATE_HOST =
+  /(^|\.)(substack\.com|substackcdn\.com|x\.com|twitter\.com|t\.co|linkedin\.com|facebook\.com|instagram\.com|threads\.net|bsky\.app|mastodon\.social|buttondown\.email|beehiiv\.com|mailchi\.mp|list-manage\.com|feedburner\.com|gravatar\.com|apple\.com|spotify\.com|open\.spotify\.com|podcasts\.google\.com|patreon\.com|ko-fi\.com|buymeacoffee\.com|discord\.gg|discord\.com|wikipedia\.org|google\.com)$/i;
+const BOILERPLATE_PATH = /\/(subscribe|unsubscribe|share|signup|sign-up|login|account|about|tag|tags|category|author|feed|rss)(\/|$)|\.(png|jpe?g|gif|webp|svg|mp3|mp4)$/i;
+
+export function isBoilerplateLink(url: string, feedHost: string): boolean {
+  let host: string;
+  let path: string;
+  try {
+    const u = new URL(url);
+    host = u.hostname;
+    path = u.pathname;
+  } catch {
+    return true;
+  }
+  const own = feedHost.replace(/^www\./, '');
+  if (host === own || host.endsWith(`.${own}`)) return true;
+  if (BOILERPLATE_HOST.test(host)) return true;
+  if (path === '' || path === '/') return true; // a home page is a mention, not a citation
+  return BOILERPLATE_PATH.test(path);
+}
+
+const decodeEntities = (s: string): string =>
+  s
+    .replace(/&amp;/g, '&')
+    .replace(/&#x2F;/gi, '/')
+    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+    .replace(/&quot;/g, '"');
+
+/** Every outbound `<a href>` in an item body, normalised and de-boilerplated. */
+export function extractLinks(html: string, feedHost: string): FeedLink[] {
+  const out = new Map<string, FeedLink>();
+  for (const m of html.matchAll(/<a\b[^>]*?href\s*=\s*["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)) {
+    const url = normalizeUrl(decodeEntities(m[1]));
+    if (!url || isBoilerplateLink(url, feedHost)) continue;
+    const text = clean(m[2], 160);
+    const prev = out.get(url);
+    if (!prev || text.length > prev.text.length) out.set(url, { url, text });
+  }
+  return [...out.values()];
 }
 
 /**
@@ -85,7 +165,12 @@ export interface FeedEntry {
  * Reddit throttles unpredictably and answers a rejected request with an HTML
  * page rather than an error status, so one retry is worth the second or two.
  */
-export async function readFeed(url: string, limit = 20, ms = 9000): Promise<FeedEntry[]> {
+export async function readFeed(
+  url: string,
+  limit = 20,
+  ms = 9000,
+  opts: { links?: boolean } = {},
+): Promise<FeedEntry[]> {
   let xml = await getText(url, ms);
   if (!xml || !/<(entry|item)[\s>]/.test(xml)) {
     await new Promise((r) => setTimeout(r, 800));
@@ -113,13 +198,42 @@ export async function readFeed(url: string, limit = 20, ms = 9000): Promise<Feed
     if (!title || !link) continue;
     const when = e?.updated ?? e?.published ?? e?.pubDate;
     const outlet = clean(e?.source?.['#text'] ?? (typeof e?.source === 'string' ? e.source : ''), 80);
+    let links: FeedLink[] | undefined;
+    if (opts.links) {
+      const body = [e?.['content:encoded'], e?.content?.['#text'] ?? e?.content, e?.description, e?.summary?.['#text'] ?? e?.summary]
+        .filter((v) => typeof v === 'string')
+        .join(' ');
+      links = extractLinks(body, new URL(url).hostname);
+    }
     out.push({
       title,
       url: link,
       published: when && !isNaN(Date.parse(String(when))) ? new Date(String(when)).toISOString() : new Date().toISOString(),
       summary: clean(e?.summary?.['#text'] ?? e?.summary ?? e?.description ?? e?.content?.['#text'] ?? e?.content, 400),
       outlet: outlet || undefined,
+      links,
     });
   }
   return out;
 }
+
+const unescape = (s: string): string =>
+  s.replace(/&amp;/g, '&').replace(/&#0?39;|&apos;|&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+
+/**
+ * A page's own title and description (Open Graph first, then the plain tags),
+ * for links that arrive with only a headline. One GET, never throws.
+ */
+export async function pageMeta(url: string, ms = 7000): Promise<{ title: string; description: string }> {
+  const html = await getText(url, ms);
+  if (!html) return { title: '', description: '' };
+  const head = html.slice(0, 200_000);
+  const meta = (name: string) =>
+    new RegExp(`<meta[^>]+(?:property|name)=["']${name}["'][^>]+content=["']([^"']*)["']`, 'i').exec(head)?.[1] ??
+    new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]+(?:property|name)=["']${name}["']`, 'i').exec(head)?.[1] ??
+    '';
+  const title = meta('og:title') || /<title[^>]*>([\s\S]*?)<\/title>/i.exec(head)?.[1] || '';
+  const description = meta('og:description') || meta('description') || meta('twitter:description');
+  return { title: clean(unescape(title), 200), description: clean(unescape(description), 400) };
+}
+

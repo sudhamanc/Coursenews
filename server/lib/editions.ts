@@ -73,10 +73,18 @@ export async function readEditionOnOrBefore<T>(kind: EditionKind, date: string):
   return pick ? readEdition<T>(kind, pick) : null;
 }
 
-/** Delete snapshots older than KEEP_DAYS (today counts as day one). */
+/**
+ * Delete snapshots older than KEEP_DAYS (today counts as day one), and the
+ * research wire's audits (`audit/research-<date>.json`) on the same schedule.
+ */
 export async function pruneEditions(): Promise<number> {
   const cutoff = utcDate(Date.now() - (KEEP_DAYS - 1) * DAY_MS);
-  const stale = (await listKeys()).filter((k) => k.date < cutoff);
-  await Promise.all(stale.map((k) => store().delete(k.key)));
+  const stale = (await listKeys()).filter((k) => k.date < cutoff).map((k) => k.key);
+  const { blobs: audits } = await store().list({ prefix: 'audit/' });
+  for (const b of audits) {
+    const date = /-(\d{4}-\d{2}-\d{2})\.json$/.exec(b.key)?.[1];
+    if (date && date < cutoff) stale.push(b.key);
+  }
+  await Promise.all(stale.map((key) => store().delete(key)));
   return stale.length;
 }

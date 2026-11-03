@@ -4,15 +4,16 @@
  *
  *   refreshWires     research + ecosystem wires, daily at 13:00 UTC. Ranking
  *                    spends three Haiku calls (one for research, one per
- *                    ecosystem lane).
+ *                    ecosystem lane); the research one takes ~30s.
  *   refreshBriefing  the Agentic AI Intelligence Briefing, weekdays at 13:30
  *                    UTC. One Sonnet call. A quiet day publishes nothing and
  *                    leaves the previous briefing current.
  *
- * Each run archives what it wrote under today's date (30-day history), prunes
- * old editions, and purges the CDN's copies of the live endpoints.
+ * Each run archives what it wrote under today's date (30-day history), keeps
+ * an audit of what the research wire dropped and why, prunes old editions,
+ * and purges the CDN's copies of the live endpoints.
  */
-import { buildFeed, writeLatest } from './news';
+import { buildFeed, writeLatest, writeAudit, type AuditRow } from './news';
 import { buildEcosystemFeed, writeEcosystem } from './ecosystem';
 import { buildBriefing, writeBriefing } from './briefing';
 import { archiveEdition, pruneEditions } from './editions';
@@ -32,9 +33,12 @@ export async function refreshWires(which: WireChoice = 'both'): Promise<Record<s
     jobs.push([
       'research',
       async () => {
-        const feed = await buildFeed();
+        const audit: AuditRow[] = [];
+        const feed = await buildFeed(audit);
         await writeLatest(feed);
         await archiveEdition('research', feed);
+        // Best effort: the audit explains the feed, it is not part of it.
+        await writeAudit(feed.generatedAt, audit).catch((err) => console.error('refresh: audit write failed', err));
         return feed;
       },
     ]);

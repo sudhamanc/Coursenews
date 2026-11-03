@@ -144,6 +144,11 @@ export class SiteStack extends Stack {
       );
     }
 
+    // /api/refresh-news hands manual refreshes to the jobs function, which has
+    // the time for them (a research refresh outlasts the API's 30s).
+    api.addEnvironment('JOBS_FUNCTION_NAME', jobs.functionName);
+    jobs.grantInvoke(api);
+
     const apiUrl = api.addFunctionUrl({ authType: lambda.FunctionUrlAuthType.NONE });
 
     /* ------------------------------------------------------------- CDN */
