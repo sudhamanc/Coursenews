@@ -236,7 +236,7 @@ the inputs that most influenced an output. They are quick and visual, but they
 show *where* a model looked, not *why* it mattered, and a persuasive heatmap can
 look valid even for an unreliable model. **Example-based** methods explain by
 analogy: prototypes surface similar training cases, and counterfactuals name the
-smallest change that flips the result — *"if your income were $5,000 higher, the
+smallest change that flips the result — *"if your income were \$5,000 higher, the
 loan would be approved."* **Concept- and part-based** methods (TCAV, concept
 bottleneck models, ProtoPNet) explain in human terms — *"striped feathers," "a
 long beak"* — because that mirrors how experts actually teach. Cutting across all

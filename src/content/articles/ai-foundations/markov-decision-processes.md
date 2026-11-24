@@ -508,8 +508,8 @@ computation**. You need to know the details of the MDP — $T$ and $R$ — in ad
 **do not actually play the game**.
 
 The limits of that show up in a deliberately tiny MDP. The **double bandit** has two
-states, Win and Lose, and two actions. Blue pays $1 with certainty. Red pays $2 with
-probability 0.75 and $0 with probability 0.25. With no discount and 100 time steps, the
+states, Win and Lose, and two actions. Blue pays \$1 with certainty. Red pays \$2 with
+probability 0.75 and \$0 with probability 0.25. With no discount and 100 time steps, the
 arithmetic is immediate: Blue is worth 100, Red is worth $100 \times (0.75 \times 2) =
 150$. Play Red. No experience required; the answer is a calculation.
 

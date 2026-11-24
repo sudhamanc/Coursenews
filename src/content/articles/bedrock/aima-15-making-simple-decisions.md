@@ -93,7 +93,7 @@ Utility is not money, and the difference is where the interesting behavior lives
 
 Empirically the utility of wealth is approximately **logarithmic**: the same
 absolute gain matters less the more you already have. Curvature yields **risk
-aversion** — preferring a sure $500 to a coin flip between $0 and $1000. The
+aversion** — preferring a sure \$500 to a coin flip between \$0 and \$1000. The
 **certainty equivalent** is the guaranteed amount that would be accepted in place
 of a gamble, and the difference between a gamble's expected value and its
 certainty equivalent is the **insurance premium**, which is how insurance can be

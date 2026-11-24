@@ -156,7 +156,7 @@ Humans are frequently **confidently incorrect**, and not at random.
   longshots relative to their true chance of winning and underbet favorites, so the
   expected return per dollar falls as the odds lengthen. The error persists in markets
   where bettors have every incentive to fix it.
-- **Inconsistent risk attitudes.** Offered a 50% chance at $100 or a certain $50, a
+- **Inconsistent risk attitudes.** Offered a 50% chance at \$100 or a certain \$50, a
   subset of people prefer the gamble. At equal expected value that preference is a risk
   attitude, not an arithmetic mistake. What *is* a problem is that the attitude flips:
   people tend to be risk-averse when a choice is framed as a gain and risk-seeking when
@@ -512,10 +512,10 @@ function — supplied from outside, and ask which actions maximize its expected 
 given the percept sequence. Take the reflex vacuum agent from §7 and two candidate
 measures:
 
-- **+$1 for every square cleaned.** The reflex agent does well. It is also exposed to
+- **+\$1 for every square cleaned.** The reflex agent does well. It is also exposed to
   the gaming problem above — a measure that pays per cleaning event rewards
   re-dirtying.
-- **+$2 for every square cleaned, −$1 for every move.** Now movement has a price. Once
+- **+\$2 for every square cleaned, −\$1 for every move.** Now movement has a price. Once
   both squares are clean, the rational action is `NoOp`, but the reflex agent keeps
   shuttling between them forever, losing a dollar a step. It *cannot* do better: with
   no memory it cannot know the other square is already clean.
