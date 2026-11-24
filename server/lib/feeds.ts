@@ -49,10 +49,75 @@ export async function pool<T>(jobs: Array<() => Promise<T>>, limit = 6): Promise
 
 export const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '@_' });
 export const asArray = <T,>(v: T | T[] | undefined): T[] => (v === undefined ? [] : Array.isArray(v) ? v : [v]);
+/**
+ * The named entities worth knowing, which is the punctuation and typography a
+ * news headline actually uses. Anything outside this table is left alone.
+ */
+const NAMED: Record<string, string> = {
+  // nbsp decodes to U+00A0, the character it names; `clean` folds it into a
+  // plain space along with the rest of the whitespace.
+  amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ',
+  ndash: '–', mdash: '—', horbar: '―', hellip: '…',
+  lsquo: '‘', rsquo: '’', sbquo: '‚', ldquo: '“', rdquo: '”', bdquo: '„',
+  laquo: '«', raquo: '»', lsaquo: '‹', rsaquo: '›',
+  bull: '•', middot: '·', dagger: '†', Dagger: '‡', prime: '′', Prime: '″',
+  times: '×', divide: '÷', minus: '−', plusmn: '±', frasl: '⁄',
+  deg: '°', micro: 'µ', permil: '‰', para: '¶', sect: '§',
+  copy: '©', reg: '®', trade: '™',
+  euro: '€', pound: '£', yen: '¥', cent: '¢',
+  frac12: '½', frac14: '¼', frac34: '¾', sup2: '²', sup3: '³',
+  larr: '←', rarr: '→', harr: '↔', uarr: '↑', darr: '↓',
+  aacute: 'á', eacute: 'é', iacute: 'í', oacute: 'ó', uacute: 'ú',
+  agrave: 'à', egrave: 'è', igrave: 'ì', ograve: 'ò', ugrave: 'ù',
+  acirc: 'â', ecirc: 'ê', icirc: 'î', ocirc: 'ô', ucirc: 'û',
+  auml: 'ä', euml: 'ë', iuml: 'ï', ouml: 'ö', uuml: 'ü',
+  atilde: 'ã', ntilde: 'ñ', otilde: 'õ', ccedil: 'ç',
+  aring: 'å', oslash: 'ø', aelig: 'æ', szlig: 'ß',
+};
+
+const ENTITY = /&(#\d{1,7}|#[xX][\da-fA-F]{1,6}|[a-zA-Z][a-zA-Z\d]{1,31});/g;
+
+/** A numeric reference's character, or null when it does not name one. */
+const fromCode = (n: number): string | null => {
+  if (!Number.isInteger(n) || n <= 0 || n > 0x10ffff) return null;
+  if (n >= 0xd800 && n <= 0xdfff) return null; // lone surrogate
+  try {
+    return String.fromCodePoint(n);
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Decode HTML entity references — `&#8217;`, `&#x27;`, `&amp;` — in one pass.
+ *
+ * Feed text arrives encoded, and often double-encoded: a publisher emits
+ * `AT&amp;#038;T`, the XML parser unwraps the outer `&amp;`, and `AT&#038;T`
+ * is what reaches us. Decoding here is what turns that back into `AT&T`.
+ *
+ * One pass, deliberately. A single pass renders `&amp;lt;` as the literal text
+ * `&lt;`, which is what a publisher writing about markup meant; decoding in a
+ * loop would collapse it to `<` and rewrite their copy. Unknown entities are
+ * returned untouched rather than dropped, so a gap in the table shows up in
+ * the output instead of silently eating characters.
+ */
+export const decodeEntities = (s: string): string =>
+  s.replace(ENTITY, (whole, body: string) => {
+    if (body[0] !== '#') return NAMED[body] ?? whole;
+    const hex = body[1] === 'x' || body[1] === 'X';
+    return fromCode(Number.parseInt(body.slice(hex ? 2 : 1), hex ? 16 : 10)) ?? whole;
+  });
+
+/**
+ * Feed text to display text: drop markup, decode entities, collapse space.
+ *
+ * Every wire's titles and summaries pass through here, so this is the one
+ * place entity decoding has to be right. Decoding runs after the tags are
+ * stripped (so escaped markup stays visible as the text it was written as)
+ * and before whitespace is collapsed (so a decoded `&nbsp;` folds away).
+ */
 export const clean = (s: unknown, max = 400): string =>
-  String(s ?? '')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&[a-z]+;/gi, ' ')
+  decodeEntities(String(s ?? '').replace(/<[^>]+>/g, ' '))
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, max);
@@ -139,13 +204,6 @@ export function isBoilerplateLink(url: string, feedHost: string): boolean {
   return BOILERPLATE_PATH.test(path);
 }
 
-const decodeEntities = (s: string): string =>
-  s
-    .replace(/&amp;/g, '&')
-    .replace(/&#x2F;/gi, '/')
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
-    .replace(/&quot;/g, '"');
-
 /** Every outbound `<a href>` in an item body, normalised and de-boilerplated. */
 export function extractLinks(html: string, feedHost: string): FeedLink[] {
   const out = new Map<string, FeedLink>();
@@ -217,9 +275,6 @@ export async function readFeed(
   return out;
 }
 
-const unescape = (s: string): string =>
-  s.replace(/&amp;/g, '&').replace(/&#0?39;|&apos;|&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
-
 /**
  * A page's own title and description (Open Graph first, then the plain tags),
  * for links that arrive with only a headline. One GET, never throws.
@@ -234,6 +289,7 @@ export async function pageMeta(url: string, ms = 7000): Promise<{ title: string;
     '';
   const title = meta('og:title') || /<title[^>]*>([\s\S]*?)<\/title>/i.exec(head)?.[1] || '';
   const description = meta('og:description') || meta('description') || meta('twitter:description');
-  return { title: clean(unescape(title), 200), description: clean(unescape(description), 400) };
+  // `clean` decodes entities itself — decoding here too would double-decode.
+  return { title: clean(title, 200), description: clean(description, 400) };
 }
 
